@@ -1,78 +1,59 @@
 defmodule GsmlgAppWeb.Lookup.WhoisControllerTest do
   use GsmlgAppWeb.ConnCase
 
-  import GsmlgApp.LookupFixtures
-
-  alias GsmlgApp.Lookup.Whois
-
-  @create_attrs %{}
-  @update_attrs %{}
-  @invalid_attrs %{}
-
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  describe "index" do
-    test "lists all whois", %{conn: conn} do
-      conn = get(conn, ~p"/api/lookup/whois")
-      assert json_response(conn, 200)["data"] == []
-    end
-  end
-
-  describe "create whois" do
-    test "renders whois when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/api/lookup/whois", whois: @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
-
-      conn = get(conn, ~p"/api/lookup/whois/#{id}")
-
-      assert %{
-               "id" => ^id
-             } = json_response(conn, 200)["data"]
+  describe "query endpoints" do
+    test "query endpoint requires query parameter", %{conn: conn} do
+      conn = get(conn, "/lookup/whois")
+      assert response(conn, 422)
     end
 
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, ~p"/api/lookup/whois", whois: @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
-
-  describe "update whois" do
-    setup [:create_whois]
-
-    test "renders whois when data is valid", %{conn: conn, whois: %Whois{id: id} = whois} do
-      conn = put(conn, ~p"/api/lookup/whois/#{whois}", whois: @update_attrs)
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
-
-      conn = get(conn, ~p"/api/lookup/whois/#{id}")
-
-      assert %{
-               "id" => ^id
-             } = json_response(conn, 200)["data"]
+    test "query_domain endpoint requires query parameter", %{conn: conn} do
+      conn = get(conn, "/lookup/whois/domain")
+      assert response(conn, 422)
     end
 
-    test "renders errors when data is invalid", %{conn: conn, whois: whois} do
-      conn = put(conn, ~p"/api/lookup/whois/#{whois}", whois: @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
+    test "query_ip endpoint requires query parameter", %{conn: conn} do
+      conn = get(conn, "/lookup/whois/ip")
+      assert response(conn, 422)
     end
-  end
 
-  describe "delete whois" do
-    setup [:create_whois]
-
-    test "deletes chosen whois", %{conn: conn, whois: whois} do
-      conn = delete(conn, ~p"/api/lookup/whois/#{whois}")
-      assert response(conn, 204)
-
-      assert_error_sent 404, fn ->
-        get(conn, ~p"/api/lookup/whois/#{whois}")
-      end
+    test "query_as endpoint requires query parameter", %{conn: conn} do
+      conn = get(conn, "/lookup/whois/as")
+      assert response(conn, 422)
     end
-  end
 
-  defp create_whois(_) do
-    whois = whois_fixture()
-    %{whois: whois}
+    test "query endpoint with valid query parameter", %{conn: conn} do
+      # This test will fail if the gsmlg_whois dependency is not available
+      # but it shows the endpoint structure is correct
+      conn = get(conn, "/lookup/whois", %{"query" => "example.com"})
+
+      # The response should be 200 (success) with valid whois data
+      assert response(conn, 200)
+    end
+
+    test "query_domain endpoint with valid query parameter", %{conn: conn} do
+      conn = get(conn, "/lookup/whois/domain", %{"query" => "example.com"})
+
+      # The response should be 200 (success) with valid whois data
+      assert response(conn, 200)
+    end
+
+    test "query_ip endpoint with valid query parameter", %{conn: conn} do
+      conn = get(conn, "/lookup/whois/ip", %{"query" => "8.8.8.8"})
+
+      # The response should be 200 (success) with valid whois data
+      assert response(conn, 200)
+    end
+
+    test "query_as endpoint with valid query parameter", %{conn: conn} do
+      conn = get(conn, "/lookup/whois/as", %{"query" => "12345"})
+
+      # The response should be 200 (success) with valid whois data
+      assert response(conn, 200)
+    end
   end
 end

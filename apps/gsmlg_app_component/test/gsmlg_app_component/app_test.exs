@@ -1,8 +1,9 @@
 defmodule GsmlgAppComponent.AppTest do
-  use GsmlgAppComponentTest.ConnCase, async: true
+  use ExUnit.Case, async: true
 
   import Phoenix.Component
   import Phoenix.LiveViewTest
+  import GsmlgAppComponent.App
 
   describe "app_topbar/1" do
     test "renders app topbar with default title" do
@@ -36,7 +37,7 @@ defmodule GsmlgAppComponent.AppTest do
     test "renders app topbar with user block slot" do
       assigns = %{
         title: "Test App",
-        user_block: [%{inner_content: ["<div>User Content</div>"]}]
+        user_block: [%{inner_block: fn _, _ -> "<div>User Content</div>" end}]
       }
 
       html = render_component(&GsmlgAppComponent.App.app_topbar/1, assigns)
@@ -104,9 +105,9 @@ defmodule GsmlgAppComponent.AppTest do
       assert html =~ "Home"
       assert html =~ "About"
       assert html =~ "Profile"
-      assert html =~ ~s(navigate="/")
-      assert html =~ ~s(navigate="/about")
-      assert html =~ ~s(navigate="/profile")
+      assert html =~ ~s(href="/")
+      assert html =~ ~s(href="/about")
+      assert html =~ ~s(href="/profile")
     end
 
     test "highlights active menu item" do

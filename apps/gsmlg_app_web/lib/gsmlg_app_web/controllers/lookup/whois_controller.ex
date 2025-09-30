@@ -19,8 +19,14 @@ defmodule GsmlgAppWeb.Lookup.WhoisController do
     end
   end
 
+  def query(conn, _params) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> render(:error, error: "Query parameter is required")
+  end
+
   def query_domain(conn, %{"query" => query} = _params) do
-    case GSMLG.Whois.lookup_domain_raw(query) do
+    case GSMLG.Whois.lookup_raw(query) do
       {:error, :nxdomain} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -33,7 +39,7 @@ defmodule GsmlgAppWeb.Lookup.WhoisController do
 
       {:ok, whois} ->
         conn
-        |> render(:index, whois: whois)
+        |> render(:list, whois_list: whois)
 
       {:error, unknown} ->
         Logger.error("Unknown Error #{inspect(unknown)}")
@@ -44,8 +50,14 @@ defmodule GsmlgAppWeb.Lookup.WhoisController do
     end
   end
 
+  def query_domain(conn, _params) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> render(:error, error: "Query parameter is required")
+  end
+
   def query_ip(conn, %{"query" => query} = _params) do
-    case GSMLG.Whois.lookup_ip_raw(query) do
+    case GSMLG.Whois.lookup_raw(query) do
       {:error, :unsupported} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -53,7 +65,7 @@ defmodule GsmlgAppWeb.Lookup.WhoisController do
 
       {:ok, whois} ->
         conn
-        |> render(:index, whois: whois)
+        |> render(:list, whois_list: whois)
 
       {:error, unknown} ->
         Logger.error("Unknown Error #{inspect(unknown)}")
@@ -64,8 +76,14 @@ defmodule GsmlgAppWeb.Lookup.WhoisController do
     end
   end
 
+  def query_ip(conn, _params) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> render(:error, error: "Query parameter is required")
+  end
+
   def query_as(conn, %{"query" => query} = _params) do
-    case GSMLG.Whois.lookup_as_raw(query) do
+    case GSMLG.Whois.lookup_raw(query) do
       {:error, :unsupported} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -73,7 +91,7 @@ defmodule GsmlgAppWeb.Lookup.WhoisController do
 
       {:ok, whois} ->
         conn
-        |> render(:index, whois: whois)
+        |> render(:list, whois_list: whois)
 
       {:error, unknown} ->
         Logger.error("Unknown Error #{inspect(unknown)}")
@@ -82,5 +100,11 @@ defmodule GsmlgAppWeb.Lookup.WhoisController do
         |> put_status(:unprocessable_entity)
         |> render(:error, error: "Unknown Error")
     end
+  end
+
+  def query_as(conn, _params) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> render(:error, error: "Query parameter is required")
   end
 end
