@@ -1,0 +1,18 @@
+@source "../js/**/*.js";
+@source "../../lib/*_web.ex";
+@source "../../lib/*_web/**/*.*ex";
+@source "../../../gsmlg_app_component/assets/**/*.js";
+@source "../../../gsmlg_app_component/lib/**/*.*ex";
+@source "../../../../deps/phoenix_duskmoon/lib/phoenix_duskmoon/**/*.*ex";
+
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@plugin "daisyui";
+@import "phoenix_duskmoon/theme";
+@import "phoenix_duskmoon/components";
+
+/* This file is for your main application CSS */
+
+body {
+  min-height: 100svh;
+}

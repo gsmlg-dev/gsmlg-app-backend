@@ -1,0 +1,19 @@
+{
+  "name": "gsmlg-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GSMLG App Website",
+  "main": "priv/static/assets/app.js",
+  "scripts": {
+    "test": "echo 'no test'"
+  },
+  "author": "Jonathan Gao",
+  "license": "ISC",
+  "dependencies": {
+    "phoenix_duskmoon": "^6.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.16",
+    "daisyui": "^5.0.43"
+  }
+}
