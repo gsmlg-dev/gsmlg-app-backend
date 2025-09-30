@@ -1,4 +1,4 @@
-FROM gsmlg/alpine:latest
+FROM ghcr.io/gsmlg-dev/alpine:latest
 
 ARG RELEASE_VERSION=1.0.0
 
