@@ -5,6 +5,9 @@
   "description": "GSMLG App Website",
   "main": "priv/static/assets/app.js",
   "scripts": {
+    "build": "bun build assets/js/app.js --outdir=priv/static/assets --target=browser --format=esm",
+    "build:deploy": "bun build assets/js/app.js --outdir=priv/static/assets --target=browser --format=esm --minify",
+    "dev": "bun build assets/js/app.js --outdir=priv/static/assets --target=browser --format=esm --watch",
     "test": "echo 'no test'"
   },
   "author": "Jonathan Gao",

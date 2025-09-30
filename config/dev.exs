@@ -15,7 +15,7 @@ config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "++y7z5YOMi8AqMVyn3x941rXNBaD81/CtGtj+EY/4H37gKkVPbAJbrasc0sq94hW",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:gsmlg_app_web, ~w(--sourcemap=inline --watch)]},
+    bun: {Bun, :install_and_run, [:gsmlg_app_web, ~w(--watch)]},
     tailwind: {Tailwind, :install_and_run, [:gsmlg_app_web, ~w(--watch)]}
   ]
 
@@ -60,7 +60,7 @@ config :gsmlg_app_admin_web, GsmlgAppAdminWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "1gdA/MEjjg9APn1rwyUsdBQ5FVA6iUIeIlUclRMFBT2i1cx3ONPx3DqxWXSDqi1w",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:gsmlg_app_admin_web, ~w(--sourcemap=inline --watch)]},
+    bun: {Bun, :install_and_run, [:gsmlg_app_admin_web, ~w(--watch)]},
     tailwind: {Tailwind, :install_and_run, [:gsmlg_app_admin_web, ~w(--watch)]}
   ]
 

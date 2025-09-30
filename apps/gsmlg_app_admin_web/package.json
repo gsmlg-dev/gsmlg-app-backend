@@ -1,4 +1,17 @@
 {
+  "name": "gsmlg-admin-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GSMLG App Admin Website",
+  "main": "priv/static/assets/app.js",
+  "scripts": {
+    "build": "bun build assets/js/app.js --outdir=priv/static/assets --target=browser --format=esm",
+    "build:deploy": "bun build assets/js/app.js --outdir=priv/static/assets --target=browser --format=esm --minify",
+    "dev": "bun build assets/js/app.js --outdir=priv/static/assets --target=browser --format=esm --watch",
+    "test": "echo 'no test'"
+  },
+  "author": "Jonathan Gao",
+  "license": "ISC",
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",
     "daisyui": "^5.0.43"

@@ -44,7 +44,7 @@ defmodule GsmlgAppAdminWeb.MixProject do
       {:phoenix_duskmoon, "~> 6.0"},
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.2"},
-      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
+      {:bun, "~> 1.0", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
@@ -66,11 +66,11 @@ defmodule GsmlgAppAdminWeb.MixProject do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind gsmlg_app_admin_web", "esbuild gsmlg_app_admin_web"],
+      "assets.setup": ["tailwind.install --if-missing"],
+      "assets.build": ["tailwind gsmlg_app_admin_web", "bun run build"],
       "assets.deploy": [
         "tailwind gsmlg_app_admin_web --minify",
-        "esbuild gsmlg_app_admin_web --minify",
+        "bun run build:deploy",
         "phx.digest"
       ]
     ]
