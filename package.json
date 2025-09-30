@@ -8,15 +8,15 @@
     "apps/gsmlg_app_admin_web"
   ],
   "scripts": {
-    "setup": "npm run setup:web && npm run setup:admin",
-    "setup:web": "cd apps/gsmlg_app_web && npm install",
-    "setup:admin": "cd apps/gsmlg_app_admin_web && npm install",
-    "build": "npm run build:web && npm run build:admin",
-    "build:web": "cd apps/gsmlg_app_web && npm run build",
-    "build:admin": "cd apps/gsmlg_app_admin_web && npm run build",
-    "dev": "concurrently \"npm run dev:web\" \"npm run dev:admin\"",
-    "dev:web": "cd apps/gsmlg_app_web && npm run dev",
-    "dev:admin": "cd apps/gsmlg_app_admin_web && npm run dev",
+    "setup": "bun run setup:web && bun run setup:admin",
+    "setup:web": "cd apps/gsmlg_app_web && bun install",
+    "setup:admin": "cd apps/gsmlg_app_admin_web && bun install",
+    "build": "bun run build:web && bun run build:admin",
+    "build:web": "cd apps/gsmlg_app_web && bun run build",
+    "build:admin": "cd apps/gsmlg_app_admin_web && bun run build",
+    "dev": "concurrently \"bun run dev:web\" \"bun run dev:admin\"",
+    "dev:web": "cd apps/gsmlg_app_web && bun run dev",
+    "dev:admin": "cd apps/gsmlg_app_admin_web && bun run dev",
     "format": "mix format",
     "test": "mix cmd mix test",
     "lint": "mix format --check-formatted"
@@ -25,5 +25,6 @@
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^8.2.2"
-  }
+  },
+  "packageManager": "bun@1.1.0"
 }
