@@ -5,7 +5,7 @@ import Config
 #
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
-# with esbuild to bundle .js and .css sources.
+# with Bun to bundle .js and .css sources.
 config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
@@ -39,7 +39,7 @@ config :gsmlg_app_web, dev_routes: true
 config :gsmlg_app_admin, GsmlgAppAdmin.Repo,
   username: "gsmlg_app",
   password: "gsmlg_app",
-  hostname: "10.100.10.13",
+  hostname: "10.1.132.4",
   database: "gsmlg_app_admin_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
@@ -50,7 +50,7 @@ config :gsmlg_app_admin, GsmlgAppAdmin.Repo,
 #
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
-# with esbuild to bundle .js and .css sources.
+# with Bun to bundle .js and .css sources.
 config :gsmlg_app_admin_web, GsmlgAppAdminWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.

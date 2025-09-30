@@ -99,10 +99,10 @@ defmodule GsmlgAppWeb.AppComponents do
             </div>
             <div class="w-3/4 flex flex-col gap-4 text-neutral-400">
               <h3 class="text-4xl font-bold mb-4 text-[goldenrod]">
-                <%= @name %>
+                {@name}
               </h3>
               <p :for={d <- @description} class="text-2xl animated-text-gradient">
-                <%= render_slot(d) %>
+                {render_slot(d)}
               </p>
               <div class="flex items-center gap-8">
                 <span class="flex text-xl after:content-[':']">
@@ -115,7 +115,7 @@ defmodule GsmlgAppWeb.AppComponents do
                   href={Map.get(store, :link, "javascript:void(0)")}
                   disabled={!Map.has_key?(%{}, :link)}
                 >
-                  <%= render_slot(store) %>
+                  {render_slot(store)}
                 </.link>
               </div>
               <div class="flex items-center gap-8">

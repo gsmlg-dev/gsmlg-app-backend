@@ -26,25 +26,51 @@ defmodule GsmlgAppAdminWeb.ExampleLiveView do
           </thead>
           <tbody>
             <tr :for={post <- @posts}>
-              <td><%= post.title %></td>
-              <td><%= if Map.get(post, :content), do: post.content, else: "" %></td>
-              <td><button class="btn btn-error" phx-click="delete_post" phx-value-post-id={post.id}>delete</button></td>
+              <td>{post.title}</td>
+              <td>{if Map.get(post, :content), do: post.content, else: ""}</td>
+              <td>
+                <button class="btn btn-error" phx-click="delete_post" phx-value-post-id={post.id}>
+                  delete
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
       <div class="flex flex-col gap-4">
         <h3>Create Post</h3>
-        <.form :let={f} for={@create_form} as={:form} phx-submit="create_post" class="flex flex-col gap-4">
-          <.input class="input-primary w-full" type="text" field={f[:title]} placeholder="input title" />
+        <.form
+          :let={f}
+          for={@create_form}
+          as={:form}
+          phx-submit="create_post"
+          class="flex flex-col gap-4"
+        >
+          <.input
+            class="input-primary w-full"
+            type="text"
+            field={f[:title]}
+            placeholder="input title"
+          />
           <.button class="btn btn-primary" type="submit">create</.button>
         </.form>
       </div>
       <div class="flex flex-col gap-4">
         <h3>Update Post</h3>
-        <.form :let={f} for={@update_form} as={:form} phx-submit="update_post" class="flex flex-col gap-4">
+        <.form
+          :let={f}
+          for={@update_form}
+          as={:form}
+          phx-submit="update_post"
+          class="flex flex-col gap-4"
+        >
           <.input field={f[:post_id]} type="select" options={@post_selector} />
-          <.input class="textarea-secondary w-full" type="textarea" field={f[:content]} placeholder="input content" />
+          <.input
+            class="textarea-secondary w-full"
+            type="textarea"
+            field={f[:content]}
+            placeholder="input content"
+          />
           <.button class="btn btn-primary" type="submit">update</.button>
         </.form>
       </div>

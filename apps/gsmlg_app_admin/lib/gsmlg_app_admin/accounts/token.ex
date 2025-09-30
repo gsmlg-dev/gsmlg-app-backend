@@ -5,11 +5,11 @@ defmodule GsmlgAppAdmin.Accounts.Token do
     authorizers: [Ash.Policy.Authorizer]
 
   actions do
-    defaults [:read]
+    defaults([:read])
   end
 
   attributes do
-    uuid_primary_key :id
+    uuid_primary_key(:id)
   end
 
   relationships do
@@ -18,11 +18,11 @@ defmodule GsmlgAppAdmin.Accounts.Token do
 
   policies do
     policy always() do
-      description """
+      description("""
       There are currently no usages of user tokens resource that should be publicly accessible.
-      """
+      """)
 
-      forbid_if always()
+      forbid_if(always())
     end
   end
 
@@ -31,13 +31,13 @@ defmodule GsmlgAppAdmin.Accounts.Token do
     repo(GsmlgAppAdmin.Repo)
 
     references do
-      reference :user, on_delete: :delete, on_update: :update
+      reference(:user, on_delete: :delete, on_update: :update)
     end
   end
 
   resource do
-    description """
+    description("""
     Represents a token allowing a user to log in, reset their password, or confirm their email.
-    """
+    """)
   end
 end

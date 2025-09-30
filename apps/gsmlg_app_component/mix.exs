@@ -34,7 +34,7 @@ defmodule GsmlgAppComponent.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:finch, "~> 0.18"},
       {:gettext, "~> 0.20"},
-      {:jason, "~> 1.2"},
+      {:jason, "~> 1.2"}
     ]
   end
 end

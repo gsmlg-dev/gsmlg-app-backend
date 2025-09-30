@@ -56,23 +56,28 @@ defmodule GsmlgAppComponent.App do
   @doc """
   Generates app menus
   """
-  attr :id, :any, default: nil
-  attr :class, :any, default: nil
-  attr :active_id, :string, default: ""
-  attr :menus, :any, default: [], doc: """
-  menus = [
-    %{
-      title: "Title",
-      items: [
-        %{
-          id: "1",
-          title: "Home",
-          navigate: "/",
-        }
-      ]
-    }
-  ]
-  """
+  attr(:id, :any, default: nil)
+  attr(:class, :any, default: nil)
+  attr(:active_id, :string, default: "")
+
+  attr(:menus, :any,
+    default: [],
+    doc: """
+    menus = [
+      %{
+        title: "Title",
+        items: [
+          %{
+            id: "1",
+            title: "Home",
+            navigate: "/",
+          }
+        ]
+      }
+    ]
+    """
+  )
+
   def app_menus(assigns) do
     ~H"""
     <ul id={@id} class={["menu rounded-box mb-4", @class]}>

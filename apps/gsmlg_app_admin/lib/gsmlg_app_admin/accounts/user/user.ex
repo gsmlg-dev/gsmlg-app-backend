@@ -1,5 +1,4 @@
 defmodule GsmlgAppAdmin.Accounts.User do
-
   use Ash.Resource,
     extensions: [AshAuthentication],
     domain: GsmlgAppAdmin.Accounts,
@@ -10,10 +9,9 @@ defmodule GsmlgAppAdmin.Accounts.User do
 
   alias GsmlgAppAdmin.Calculations.Decrypt
 
-
   actions do
     # Add a set of default actions, which includes a primary read action
-    defaults [:read]
+    defaults([:read])
   end
 
   attributes do
@@ -21,31 +19,31 @@ defmodule GsmlgAppAdmin.Accounts.User do
     attribute(:email, :string, allow_nil?: false, public?: true)
     attribute(:hashed_password, :string, sensitive?: true)
 
-    create_timestamp :created_at
-    update_timestamp :updated_at
+    create_timestamp(:created_at)
+    update_timestamp(:updated_at)
   end
 
   authentication do
     strategies do
-    password :default do
-        identity_field :email
-        hashed_password_field :hashed_password
-        sign_in_tokens_enabled? true
+      password :default do
+        identity_field(:email)
+        hashed_password_field(:hashed_password)
+        sign_in_tokens_enabled?(true)
       end
     end
 
     tokens do
-      enabled? true
-      token_resource GsmlgAppAdmin.Accounts.Token
-      require_token_presence_for_authentication? true
+      enabled?(true)
+      token_resource(GsmlgAppAdmin.Accounts.Token)
+      require_token_presence_for_authentication?(true)
     end
 
-    subject_name :email
+    subject_name(:email)
   end
 
   relationships do
     has_one :token, GsmlgAppAdmin.Accounts.Token do
-      destination_attribute :user_id
+      destination_attribute(:user_id)
     end
   end
 
@@ -56,12 +54,12 @@ defmodule GsmlgAppAdmin.Accounts.User do
 
   identities do
     identity :unique_email, [:email] do
-      eager_check_with GsmlgAppAdmin.Accounts
+      eager_check_with(GsmlgAppAdmin.Accounts)
     end
   end
 
   validations do
-    validate match(:email, ~r/^[^\s]+@[^\s]+$/), message: "must have the @ sign and no spaces"
+    validate(match(:email, ~r/^[^\s]+@[^\s]+$/), message: "must have the @ sign and no spaces")
   end
 
   # If using policies, add the folowing bypass:

@@ -19,16 +19,12 @@ defmodule GsmlgAppComponentTest.ConnCase do
 
   using do
     quote do
-      # The default endpoint for testing
-      @endpoint GsmlgAppComponentWeb.Endpoint
-
-      use GsmlgAppComponentWeb, :verified_routes
-
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
       import Phoenix.Component
       import Phoenix.LiveViewTest
+      import GsmlgAppComponent.App
     end
   end
 

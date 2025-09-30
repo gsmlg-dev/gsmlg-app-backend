@@ -27,9 +27,10 @@ defmodule GsmlgAppAdminWeb.Router do
       otp_app: :gsmlg_app_admin,
       overrides: [GsmlgAppAdminWeb.AshOverrides]
     )
-    sign_out_route AuthController
+
+    sign_out_route(AuthController)
     # plug AshAuthentication.Plug, user: Accounts.User
-    auth_routes_for GsmlgAppAdmin.Accounts.User, to: AuthController
+    auth_routes_for(GsmlgAppAdmin.Accounts.User, to: AuthController)
 
     get("/", PageController, :home)
 
