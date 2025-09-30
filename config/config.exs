@@ -23,9 +23,9 @@ config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
   pubsub_server: GsmlgApp.PubSub,
   live_view: [signing_salt: "eNwXe6VH"]
 
-# Configure esbuild (the version is required)
-config :esbuild,
-  version: "0.25.5",
+# Configure bun (the version is required)
+config :bun,
+  version: "1.2.5",
   gsmlg_app_web: [
     args:
       ~w(assets/js/app.js --bundle --format=esm --target=es2022 --outdir=priv/static/assets --loader:.js=jsx --external:/fonts/* --external:/images/*),
