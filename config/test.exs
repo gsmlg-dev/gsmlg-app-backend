@@ -15,7 +15,7 @@ config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
 config :gsmlg_app_admin, GsmlgAppAdmin.Repo,
   username: "gsmlg_app",
   password: "gsmlg_app",
-  hostname: "10.1.132.4",
+  hostname: "10.100.1.10",
   database: "gsmlg_app_admin_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
