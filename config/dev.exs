@@ -82,6 +82,9 @@ config :gsmlg_app_admin_web,
 config :gsmlg_app_admin,
   token_signing_secret: "1gdA/MEjjg9APn1rwyUsdBQ5FVA6iUIeIlUclRMFBT2i1cx3ONPx3DqxWXSDqi1w"
 
+config :ash_authentication,
+  token_signing_secret: "1gdA/MEjjg9APn1rwyUsdBQ5FVA6iUIeIlUclRMFBT2i1cx3ONPx3DqxWXSDqi1w"
+
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
 

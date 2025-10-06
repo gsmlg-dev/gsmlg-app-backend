@@ -10,13 +10,13 @@ defmodule GsmlgAppAdmin.Accounts.User do
   alias GsmlgAppAdmin.Calculations.Decrypt
 
   actions do
-    # Add a set of default actions, which includes a primary read action
-    defaults([:read])
+    # Add a set of default actions for full CRUD operations
+    defaults([:read, :create, :update, :destroy])
   end
 
   attributes do
     uuid_primary_key(:id)
-    attribute(:email, :string, allow_nil?: false, public?: true)
+    attribute(:email, :ci_string, allow_nil?: false, public?: true)
     attribute(:hashed_password, :string, sensitive?: true)
 
     create_timestamp(:created_at)
@@ -33,9 +33,9 @@ defmodule GsmlgAppAdmin.Accounts.User do
     end
 
     tokens do
-      enabled?(true)
+      enabled?(false)
       token_resource(GsmlgAppAdmin.Accounts.Token)
-      require_token_presence_for_authentication?(true)
+      require_token_presence_for_authentication?(false)
     end
 
     subject_name(:email)
@@ -53,9 +53,7 @@ defmodule GsmlgAppAdmin.Accounts.User do
   end
 
   identities do
-    identity :unique_email, [:email] do
-      eager_check_with(GsmlgAppAdmin.Accounts)
-    end
+    identity(:unique_email, [:email])
   end
 
   validations do

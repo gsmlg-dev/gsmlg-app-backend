@@ -34,7 +34,6 @@ defmodule GsmlgAppAdminWeb.Router do
 
     get("/", PageController, :home)
 
-    auth_routes_for(GsmlgAppAdmin.Accounts.User, to: AuthController)
     reset_route(otp_app: :gsmlg_app_admin)
   end
 
