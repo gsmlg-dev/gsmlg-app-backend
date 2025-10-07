@@ -17,7 +17,7 @@ defmodule GsmlgAppWeb.AppsSupportController do
     render(conn, :yellowdog_dns)
   end
 
-  def support(conn, %{"app_label" => "ansible_semaphore_client"} = _params) do
-    render(conn, :ansible_semaphore_client)
+  def support(conn, %{"app_label" => "semaphore_client"} = _params) do
+    render(conn, :semaphore_client)
   end
 end
