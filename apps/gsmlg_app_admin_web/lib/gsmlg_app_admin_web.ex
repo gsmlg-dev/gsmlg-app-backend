@@ -39,8 +39,7 @@ defmodule GsmlgAppAdminWeb do
   def controller do
     quote do
       use Phoenix.Controller,
-        formats: [:html, :json],
-        layouts: [html: GsmlgAppAdminWeb.Layouts]
+        formats: [:html, :json]
 
       import Plug.Conn
       use Gettext, backend: GsmlgAppAdminWeb.Gettext
@@ -51,8 +50,7 @@ defmodule GsmlgAppAdminWeb do
 
   def live_view do
     quote do
-      use Phoenix.LiveView,
-        layout: {GsmlgAppAdminWeb.Layouts, :app}
+      use Phoenix.LiveView
 
       unquote(html_helpers())
     end
@@ -69,6 +67,7 @@ defmodule GsmlgAppAdminWeb do
   def html do
     quote do
       use Phoenix.Component
+      use PhoenixDuskmoon.Component
 
       # Import convenience functions from controllers
       import Phoenix.Controller,
@@ -84,13 +83,15 @@ defmodule GsmlgAppAdminWeb do
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components and translation
-      import GsmlgAppAdminWeb.CoreComponents
+      use PhoenixDuskmoon.Component
+      import GsmlgAppAdminWeb.AppComponents
       use Gettext, backend: GsmlgAppAdminWeb.Gettext
 
       import GsmlgAppComponent.App
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
+      alias GsmlgAppAdminWeb.Layouts
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())
