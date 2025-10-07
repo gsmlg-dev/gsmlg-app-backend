@@ -1,4 +1,39 @@
 <GsmlgAppWeb.Layouts.app flash={@flash}>
+  <:header_slot>
+    <div class={[
+      "container select-none py-32",
+      "flex flex-col justify-center items-center gap-12"
+    ]}>
+      <div
+        class={[
+          "my-4",
+          "flex flex-row items-center justify-center",
+          "text-8xl text-teal-300 drop-shadow-md font-bold text-center"
+        ]}
+        style="text-shadow: 0px 0px 8px #000"
+      >
+        Apps
+      </div>
+      <div
+        class={[
+          "my-4",
+          "flex flex-row items-center justify-center gap-12",
+          "text-4xl text-amber-500 drop-shadow-md font-bold text-center"
+        ]}
+        style="text-shadow: 0px 0px 2px #fff"
+      >
+        <div>iOS</div>
+        <div class="w-[0] h-[2rem] border border-slate-500"></div>
+        <div>Android</div>
+        <div class="w-[0] h-[2rem] border border-slate-500"></div>
+        <div>macOS</div>
+        <div class="w-[0] h-[2rem] border border-slate-500"></div>
+        <div>Windows</div>
+        <div class="w-[0] h-[2rem] border border-slate-500"></div>
+        <div>Linux</div>
+      </div>
+    </div>
+  </:header_slot>
   <.app_section
     name="GeoIP Lookup"
     app_label="geoip_lookup"
@@ -70,7 +105,7 @@
   </.app_section>
 
   <.app_section
-    name="Ansible Semaphore Client"
+    name="Semaphore Client"
     app_label="ansible_semaphore_client"
     icon_path="/images/icons/ansible_semaphore_client.png"
   >

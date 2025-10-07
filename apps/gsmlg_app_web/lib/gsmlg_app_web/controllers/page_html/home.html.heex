@@ -1,4 +1,49 @@
 <GsmlgAppWeb.Layouts.home flash={@flash}>
+  <:header_slot>
+    <div class={[
+      "container select-none",
+      "flex flex-col justify-center items-center"
+    ]}>
+      <div
+        class={[
+          "w-2/3",
+          "flex flex-row justify-center items-center my-8",
+          "text-6xl text-amber-500 drop-shadow-md",
+          "text-center"
+        ]}
+        style="text-shadow: 0px 0px 2px #fff"
+      >
+        Make everything as simple as possible, but not simpler
+      </div>
+      <div
+        class={[
+          "w-1/2",
+          "flex flex-row justify-center items-center my-8 font-bold",
+          "text-8xl text-teal-300 drop-shadow-md",
+          "text-center"
+        ]}
+        style="text-shadow: 0px 0px 8px #000"
+      >
+        GSMLG
+      </div>
+      <div class={[
+        "flex flex-row my-8",
+        "justify-center text-center"
+      ]}>
+        <.link
+          class={[
+            "hover:text-slate-50 hover:shadow-xl shadow-white",
+            "bg-teal-800 px-6 py-3 rounded-2xl",
+            "inline-flex items-center gap-2"
+          ]}
+          href="#page"
+        >
+          Learn More <.dm_mdi name="arrow-right" class="w-4 h-4" />
+        </.link>
+      </div>
+    </div>
+  </:header_slot>
+
   <div class="w-full py-36 bg-black text-neutral-400 flex justify-center">
     <div class="container">
       <div class={[

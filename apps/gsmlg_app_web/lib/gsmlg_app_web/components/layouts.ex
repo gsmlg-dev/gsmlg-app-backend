@@ -3,6 +3,7 @@ defmodule GsmlgAppWeb.Layouts do
 
   embed_templates "layouts/*"
 
+  slot :header_slot
   slot :inner_block, required: true
 
   attr :flash, :map, required: true
@@ -26,39 +27,7 @@ defmodule GsmlgAppWeb.Layouts do
         Apps
       </:menu>
       <:user_profile></:user_profile>
-      <div class={[
-        "container select-none py-32",
-        "flex flex-col justify-center items-center gap-12"
-      ]}>
-        <div
-          class={[
-            "my-4",
-            "flex flex-row items-center justify-center",
-            "text-8xl text-teal-300 drop-shadow-md font-bold text-center"
-          ]}
-          style="text-shadow: 0px 0px 8px #000"
-        >
-          Apps
-        </div>
-        <div
-          class={[
-            "my-4",
-            "flex flex-row items-center justify-center gap-12",
-            "text-4xl text-amber-500 drop-shadow-md font-bold text-center"
-          ]}
-          style="text-shadow: 0px 0px 2px #fff"
-        >
-          <div>iOS</div>
-          <div class="w-[0] h-[2rem] border border-slate-500"></div>
-          <div>Android</div>
-          <div class="w-[0] h-[2rem] border border-slate-500"></div>
-          <div>macOS</div>
-          <div class="w-[0] h-[2rem] border border-slate-500"></div>
-          <div>Windows</div>
-          <div class="w-[0] h-[2rem] border border-slate-500"></div>
-          <div>Linux</div>
-        </div>
-      </div>
+      {render_slot(@header_slot)}
     </.dm_page_header>
     <main class={[
       "flex flex-col",
@@ -75,43 +44,11 @@ defmodule GsmlgAppWeb.Layouts do
       </div>
     </main>
 
-    <.dm_page_footer class={[
-      "bg-slate-900",
-      "text-slate-500"
-    ]}>
-      <:section title="About" title_class="py-2 px-4 text-slate-600">
-        <.link
-          class={[
-            "py-2 px-4"
-          ]}
-          href="/products"
-        >
-          Products
-        </.link>
-        <.link class="py-2 px-4" href="/license">
-          License
-        </.link>
-        <.link class="py-2 px-4" href="/assistant">
-          A.I. Assistant
-        </.link>
-        <.link class="py-2 px-4" href="/about">
-          About US
-        </.link>
-      </:section>
-      <:copyright>
-        <div class="flex gap-x-4">
-          <.dm_mdi name="youtube" class="w-8 h-8 text-slate-600" />
-          <.dm_mdi name="twitter" class="w-8 h-8 text-slate-600" />
-          <.dm_mdi name="facebook" class="w-8 h-8 text-slate-600" />
-        </div>
-        <p class="my-4 text-md">
-          Copyright © 2023 G.S.M.L.G. All rights reserved.
-        </p>
-      </:copyright>
-    </.dm_page_footer>
+    <.app_footer />
     """
   end
 
+  slot :header_slot
   slot :inner_block, required: true
 
   attr :flash, :map, required: true
@@ -136,48 +73,7 @@ defmodule GsmlgAppWeb.Layouts do
         Apps
       </:menu>
       <:user_profile></:user_profile>
-      <div class={[
-        "container select-none",
-        "flex flex-col justify-center items-center"
-      ]}>
-        <div
-          class={[
-            "w-2/3",
-            "flex flex-row justify-center items-center my-8",
-            "text-6xl text-amber-500 drop-shadow-md",
-            "text-center"
-          ]}
-          style="text-shadow: 0px 0px 2px #fff"
-        >
-          Make everything as simple as possible, but not simpler
-        </div>
-        <div
-          class={[
-            "w-1/2",
-            "flex flex-row justify-center items-center my-8 font-bold",
-            "text-8xl text-teal-300 drop-shadow-md",
-            "text-center"
-          ]}
-          style="text-shadow: 0px 0px 8px #000"
-        >
-          GSMLG
-        </div>
-        <div class={[
-          "flex flex-row my-8",
-          "justify-center text-center"
-        ]}>
-          <.link
-            class={[
-              "hover:text-slate-50 hover:shadow-xl shadow-white",
-              "bg-teal-800 px-6 py-3 rounded-2xl",
-              "inline-flex items-center gap-2"
-            ]}
-            href="#page"
-          >
-            Learn More <.dm_mdi name="arrow-right" class="w-4 h-4" />
-          </.link>
-        </div>
-      </div>
+      {render_slot(@header_slot)}
     </.dm_page_header>
     <main class={[
       "flex flex-col",
@@ -194,40 +90,7 @@ defmodule GsmlgAppWeb.Layouts do
       </div>
     </main>
 
-    <.dm_page_footer class={[
-      "bg-slate-900",
-      "text-slate-500"
-    ]}>
-      <:section title="About" title_class="py-2 px-4 text-slate-600">
-        <.link
-          class={[
-            "py-2 px-4"
-          ]}
-          href="/products"
-        >
-          Products
-        </.link>
-        <.link class="py-2 px-4" href="/license">
-          License
-        </.link>
-        <.link class="py-2 px-4" href="/assistant">
-          A.I. Assistant
-        </.link>
-        <.link class="py-2 px-4" href="/about">
-          About US
-        </.link>
-      </:section>
-      <:copyright>
-        <div class="flex gap-x-4">
-          <.dm_mdi name="youtube" class="w-8 h-8 text-slate-600" />
-          <.dm_mdi name="twitter" class="w-8 h-8 text-slate-600" />
-          <.dm_mdi name="facebook" class="w-8 h-8 text-slate-600" />
-        </div>
-        <p class="my-4 text-md">
-          Copyright © 2023 G.S.M.L.G. All rights reserved.
-        </p>
-      </:copyright>
-    </.dm_page_footer>
+    <.app_footer />
     """
   end
 
@@ -288,40 +151,7 @@ defmodule GsmlgAppWeb.Layouts do
       </div>
     </main>
 
-    <.dm_page_footer class={[
-      "bg-slate-900",
-      "text-slate-500"
-    ]}>
-      <:section title="About" title_class="py-2 px-4 text-slate-600">
-        <.link
-          class={[
-            "py-2 px-4"
-          ]}
-          href="/products"
-        >
-          Products
-        </.link>
-        <.link class="py-2 px-4" href="/license">
-          License
-        </.link>
-        <.link class="py-2 px-4" href="/assistant">
-          A.I. Assistant
-        </.link>
-        <.link class="py-2 px-4" href="/about">
-          About US
-        </.link>
-      </:section>
-      <:copyright>
-        <div class="flex gap-x-4">
-          <.dm_mdi name="youtube" class="w-8 h-8 text-slate-600" />
-          <.dm_mdi name="twitter" class="w-8 h-8 text-slate-600" />
-          <.dm_mdi name="facebook" class="w-8 h-8 text-slate-600" />
-        </div>
-        <p class="my-4 text-md">
-          Copyright © 2023 G.S.M.L.G. All rights reserved.
-        </p>
-      </:copyright>
-    </.dm_page_footer>
+    <.app_footer />
     """
   end
 
@@ -382,40 +212,7 @@ defmodule GsmlgAppWeb.Layouts do
       </div>
     </main>
 
-    <.dm_page_footer class={[
-      "bg-slate-900",
-      "text-slate-500"
-    ]}>
-      <:section title="About" title_class="py-2 px-4 text-slate-600">
-        <.link
-          class={[
-            "py-2 px-4"
-          ]}
-          href="/products"
-        >
-          Products
-        </.link>
-        <.link class="py-2 px-4" href="/license">
-          License
-        </.link>
-        <.link class="py-2 px-4" href="/assistant">
-          A.I. Assistant
-        </.link>
-        <.link class="py-2 px-4" href="/about">
-          About US
-        </.link>
-      </:section>
-      <:copyright>
-        <div class="flex gap-x-4">
-          <.dm_mdi name="youtube" class="w-8 h-8 text-slate-600" />
-          <.dm_mdi name="twitter" class="w-8 h-8 text-slate-600" />
-          <.dm_mdi name="facebook" class="w-8 h-8 text-slate-600" />
-        </div>
-        <p class="my-4 text-md">
-          Copyright © 2023 G.S.M.L.G. All rights reserved.
-        </p>
-      </:copyright>
-    </.dm_page_footer>
+    <.app_footer />
     """
   end
 end

@@ -1,16 +1,14 @@
-<GsmlgAppWeb.Layouts.app flash={@flash}>
-  <script defer phx-track-static src={~p"/assets/geomap.js"} />
-  <div class="w-full h-full min-h-[300px] bg-[rgb(66,66,66)] flex justify-center items-center">
-    <d3-world-map
-      class="w-full h-[300px] max-w-[600px]"
-      points={Jason.encode!([[@longitude, @latitude]])}
-      center-longitude={@longitude}
-    >
-    </d3-world-map>
-  </div>
-  <style>
-    html,body {
-        background-color: rgb(66,66,66);
-    }
-  </style>
-</GsmlgAppWeb.Layouts.app>
+<script defer phx-track-static src={~p"/assets/geomap.js"} />
+<div class="w-full h-full min-h-[300px] bg-[rgb(66,66,66)] flex justify-center items-center">
+  <d3-world-map
+    class="w-full h-[300px] max-w-[600px]"
+    points={Jason.encode!([[@longitude, @latitude]])}
+    center-longitude={@longitude}
+  >
+  </d3-world-map>
+</div>
+<style>
+  html,body {
+      background-color: rgb(66,66,66);
+  }
+</style>
