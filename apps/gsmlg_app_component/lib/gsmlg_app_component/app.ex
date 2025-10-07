@@ -4,8 +4,6 @@ defmodule GsmlgAppComponent.App do
   """
   use Phoenix.Component
 
-  alias Phoenix.LiveView.JS
-
   @doc """
   Renders app bar.
 
