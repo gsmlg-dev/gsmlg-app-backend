@@ -38,7 +38,7 @@ defmodule GsmlgAppWeb.Layouts do
         "mx-auto max-w-2xl",
         "flex flex-col items-center"
       ]}>
-        <.flash_group flash={@flash} />
+        <.dm_flash_group flash={@flash} />
         <a name="page"></a>
         {render_slot(@inner_block)}
       </div>
@@ -84,7 +84,7 @@ defmodule GsmlgAppWeb.Layouts do
         "mx-auto max-w-2xl",
         "flex flex-col items-center"
       ]}>
-        <.flash_group flash={@flash} />
+        <.dm_flash_group flash={@flash} />
         <a name="page"></a>
         {render_slot(@inner_block)}
       </div>
@@ -145,7 +145,7 @@ defmodule GsmlgAppWeb.Layouts do
         "mx-auto max-w-2xl",
         "flex flex-col items-center"
       ]}>
-        <.flash_group flash={@flash} />
+        <.dm_flash_group flash={@flash} />
         <a name="page"></a>
         {render_slot(@inner_block)}
       </div>
@@ -206,7 +206,7 @@ defmodule GsmlgAppWeb.Layouts do
         "mx-auto max-w-2xl",
         "flex flex-col items-center"
       ]}>
-        <.flash_group flash={@flash} />
+        <.dm_flash_group flash={@flash} />
         <a name="page"></a>
         {render_slot(@inner_block)}
       </div>

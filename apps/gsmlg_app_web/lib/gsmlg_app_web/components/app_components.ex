@@ -7,7 +7,7 @@ defmodule GsmlgAppWeb.AppComponents do
   use PhoenixDuskmoon.Component
 
   alias Phoenix.LiveView.JS
-  import GsmlgAppWeb.Gettext
+  use Gettext, backend: GsmlgAppWeb.Gettext
 
   use GsmlgAppWeb, :verified_routes
 

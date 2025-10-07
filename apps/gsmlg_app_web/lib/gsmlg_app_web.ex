@@ -42,7 +42,7 @@ defmodule GsmlgAppWeb do
         formats: [:html, :json]
 
       import Plug.Conn
-      import GsmlgAppWeb.Gettext
+      use Gettext, backend: GsmlgAppWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -54,7 +54,7 @@ defmodule GsmlgAppWeb do
         formats: [:html, :json]
 
       import Plug.Conn
-      import GsmlgAppWeb.Gettext
+      use Gettext, backend: GsmlgAppWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -66,7 +66,7 @@ defmodule GsmlgAppWeb do
         formats: [:html, :json]
 
       import Plug.Conn
-      import GsmlgAppWeb.Gettext
+      use Gettext, backend: GsmlgAppWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -78,7 +78,7 @@ defmodule GsmlgAppWeb do
         formats: [:html, :json]
 
       import Plug.Conn
-      import GsmlgAppWeb.Gettext
+      use Gettext, backend: GsmlgAppWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -119,9 +119,8 @@ defmodule GsmlgAppWeb do
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components and translation
-      import GsmlgAppWeb.CoreComponents
       import GsmlgAppWeb.AppComponents
-      import GsmlgAppWeb.Gettext
+      use Gettext, backend: GsmlgAppWeb.Gettext
 
       use PhoenixDuskmoon.Component
 
