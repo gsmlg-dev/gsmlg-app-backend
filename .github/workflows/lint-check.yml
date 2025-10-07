@@ -90,6 +90,7 @@ jobs:
           bun install
 
       - name: Setup database
+        working-directory: ./apps/gsmlg_app_admin/
         run: |
           mix setup
         env:
