@@ -3,7 +3,6 @@ defmodule GsmlgAppAdminWeb.Layouts do
 
   embed_templates "layouts/*"
 
-
   slot :inner_block, required: true
 
   attr :flash, :map, required: true
@@ -12,7 +11,10 @@ defmodule GsmlgAppAdminWeb.Layouts do
     assigns = assigns |> assign_new(:current_user, fn -> nil end)
 
     ~H"""
-    <.dm_simple_appbar title="GSMLG APP Admin" class="bg-primary text-primary-content sticky top-0 z-100">
+    <.dm_simple_appbar
+      title="GSMLG APP Admin"
+      class="bg-primary text-primary-content sticky top-0 z-100"
+    >
       <:user_profile>
         <%= if @current_user do %>
           <div tabindex="0" role="button" class="btn btn-ghost">
@@ -46,5 +48,4 @@ defmodule GsmlgAppAdminWeb.Layouts do
     </main>
     """
   end
-
 end

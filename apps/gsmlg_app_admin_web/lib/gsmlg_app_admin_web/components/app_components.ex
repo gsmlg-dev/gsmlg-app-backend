@@ -49,5 +49,4 @@ defmodule GsmlgAppAdminWeb.AppComponents do
     </.dm_page_footer>
     """
   end
-
 end
