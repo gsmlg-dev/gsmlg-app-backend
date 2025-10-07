@@ -36,7 +36,7 @@ defmodule GsmlgAppAdminWeb.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.7.10"},
+      {:phoenix, "~> 1.8"},
       {:phoenix_ecto, "~> 4.4"},
       {:phoenix_html, "~> 4.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
@@ -48,7 +48,7 @@ defmodule GsmlgAppAdminWeb.MixProject do
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
-      {:gettext, "~> 0.20"},
+      {:gettext, "~>0.26 or ~> 1.0"},
       {:ash, "~> 3.0"},
       {:ash_authentication_phoenix, "~> 2.4"},
       {:ash_phoenix, "~> 2.0"},

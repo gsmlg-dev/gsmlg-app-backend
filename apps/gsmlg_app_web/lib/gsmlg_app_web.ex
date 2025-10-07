@@ -39,8 +39,7 @@ defmodule GsmlgAppWeb do
   def controller do
     quote do
       use Phoenix.Controller,
-        formats: [:html, :json],
-        layouts: [html: {GsmlgAppWeb.Layouts, :home}]
+        formats: [:html, :json]
 
       import Plug.Conn
       import GsmlgAppWeb.Gettext
@@ -52,8 +51,7 @@ defmodule GsmlgAppWeb do
   def app_controller do
     quote do
       use Phoenix.Controller,
-        formats: [:html, :json],
-        layouts: [html: {GsmlgAppWeb.Layouts, :app}]
+        formats: [:html, :json]
 
       import Plug.Conn
       import GsmlgAppWeb.Gettext
@@ -65,8 +63,7 @@ defmodule GsmlgAppWeb do
   def app_support_controller do
     quote do
       use Phoenix.Controller,
-        formats: [:html, :json],
-        layouts: [html: {GsmlgAppWeb.Layouts, :support}]
+        formats: [:html, :json]
 
       import Plug.Conn
       import GsmlgAppWeb.Gettext
@@ -78,8 +75,7 @@ defmodule GsmlgAppWeb do
   def app_privacy_controller do
     quote do
       use Phoenix.Controller,
-        formats: [:html, :json],
-        layouts: [html: {GsmlgAppWeb.Layouts, :privacy}]
+        formats: [:html, :json]
 
       import Plug.Conn
       import GsmlgAppWeb.Gettext
@@ -90,8 +86,7 @@ defmodule GsmlgAppWeb do
 
   def live_view do
     quote do
-      use Phoenix.LiveView,
-        layout: {GsmlgAppWeb.Layouts, :app}
+      use Phoenix.LiveView
 
       unquote(html_helpers())
     end
@@ -132,6 +127,8 @@ defmodule GsmlgAppWeb do
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
+
+      alias GsmlgAppWeb.Layouts
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())
