@@ -12,13 +12,13 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.14'
-          otp-version: '26'
+          elixir-version: '1.18.4'
+          otp-version: '28'
           version-type: 'strict'
 
       - name: Cache dependencies
@@ -61,13 +61,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: '1.14'
-          otp-version: '26'
+          elixir-version: '1.18.4'
+          otp-version: '28'
           version-type: 'strict'
 
       - name: Cache dependencies
