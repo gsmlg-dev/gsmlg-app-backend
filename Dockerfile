@@ -21,21 +21,15 @@ COPY . /build
 
 WORKDIR /build
 
-RUN <<EOF
-set -evx
-cd /build
+RUN mix deps.get && bun install
 
-mix deps.get
-bun install
-install -m 755 -D $MIX_TAILWIND_PATH /build/_build/tailwind-linux-x64
-install -m 755 -D $MIX_BUN_PATH /build/_build/bun
+RUN install -m 755 -D $MIX_TAILWIND_PATH /build/_build/tailwind-linux-x64 && install -m 755 -D $MIX_BUN_PATH /build/_build/bun
 
-bash update_version.sh $RELEASE_VERSION
+RUN bash update_version.sh $RELEASE_VERSION
 
-mix release "${NAME}" --version "${RELEASE_VERSION}" --overwrite
+RUN mix release "${NAME}" --version "${RELEASE_VERSION}" --overwrite
 
-cp -r "_build/prod/rel/${NAME}" /app
-EOF
+RUN cp -r "_build/prod/rel/${NAME}" /app
 
 FROM ghcr.io/gsmlg-dev/alpine:latest
 
