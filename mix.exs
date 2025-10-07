@@ -9,13 +9,24 @@ defmodule GsmlgApp.Umbrella.MixProject do
       deps: deps(),
       aliases: aliases(),
       releases: [
+        gsmlg_app_backend: [
+          include_executables_for: [:unix],
+          applications: [
+            gsmlg_app_admin: :permanent,
+            gsmlg_app_admin_web: :permanent,
+            gsmlg_app: :permanent,
+            gsmlg_app_web: :permanent
+          ]
+        ],
         gsmlg_app_admin: [
+          include_executables_for: [:unix],
           applications: [
             gsmlg_app_admin: :permanent,
             gsmlg_app_admin_web: :permanent
           ]
         ],
         gsmlg_app: [
+          include_executables_for: [:unix],
           applications: [
             gsmlg_app: :permanent,
             gsmlg_app_web: :permanent
