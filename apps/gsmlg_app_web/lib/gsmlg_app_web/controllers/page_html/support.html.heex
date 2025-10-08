@@ -1,0 +1,395 @@
+<Layouts.support flash={@flash}>
+  <:header_slot>
+    <div
+      class="hero min-h-screen relative overflow-hidden"
+      style="background-image: url(/images/explosion.png);"
+    >
+      <div class="hero-overlay bg-opacity-60 bg-gradient-to-b from-black/50 to-black/80"></div>
+      <div class="hero-content text-center text-neutral-content relative z-10">
+        <div class="max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div class="animate-fade-in-down">
+            <h1 class="mb-6 text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 bg-clip-text text-transparent leading-tight">
+              Support Center
+            </h1>
+          </div>
+          <div class="animate-fade-in-up animation-delay-200">
+            <h2 class="mb-8 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-teal-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent leading-tight">
+              We're Here to Help
+            </h2>
+          </div>
+          <div class="animate-fade-in animation-delay-400">
+            <p class="mb-8 text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto">
+              Get the support you need for GSMLG's open source software tools
+            </p>
+            <div class="flex items-center justify-center gap-2 text-gray-300">
+              <.dm_mdi name="headset" class="w-5 h-5" />
+              <span class="text-lg">24/7 Community Support</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+        <.dm_mdi name="chevron-down" class="w-8 h-8 text-white/60" />
+      </div>
+    </div>
+  </:header_slot>
+
+  <div
+    id="page"
+    class="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black py-8 sm:py-12"
+  >
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 space-y-12 sm:space-y-16">
+      
+<!-- Contact Methods Section -->
+      <div class="text-center">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+          Get in Touch
+        </h2>
+        <p class="text-lg sm:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+          Multiple ways to reach us for different types of support
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <!-- Email Support -->
+          <div class="card bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+            <div class="card-body text-center">
+              <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <.dm_mdi name="email" class="w-8 h-8 text-primary" />
+              </div>
+              <h3 class="card-title text-lg font-bold text-primary mb-3">Email Support</h3>
+              <p class="text-sm text-gray-300 mb-4">
+                Direct support for technical issues and inquiries
+              </p>
+              <div class="text-xs text-gray-400 mb-4">
+                Response time: 24-48 hours
+              </div>
+              <a href="mailto:contact@gsmlg.dev" class="btn btn-primary btn-sm">
+                <.dm_mdi name="send" class="w-4 h-4 mr-2" /> Send Email
+              </a>
+            </div>
+          </div>
+          
+<!-- GitHub Issues -->
+          <div class="card bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+            <div class="card-body text-center">
+              <div class="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <.dm_mdi name="github" class="w-8 h-8 text-secondary" />
+              </div>
+              <h3 class="card-title text-lg font-bold text-secondary mb-3">GitHub Issues</h3>
+              <p class="text-sm text-gray-300 mb-4">
+                Report bugs and request features for our projects
+              </p>
+              <div class="text-xs text-gray-400 mb-4">
+                Community-driven support
+              </div>
+              <a href="https://github.com/gsmlg" target="_blank" class="btn btn-secondary btn-sm">
+                <.dm_mdi name="bug" class="w-4 h-4 mr-2" /> Report Issue
+              </a>
+            </div>
+          </div>
+          
+<!-- Community Forum -->
+          <div class="card bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+            <div class="card-body text-center">
+              <div class="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <.dm_mdi name="forum" class="w-8 h-8 text-accent" />
+              </div>
+              <h3 class="card-title text-lg font-bold text-accent mb-3">Community Forum</h3>
+              <p class="text-sm text-gray-300 mb-4">
+                Connect with other users and share knowledge
+              </p>
+              <div class="text-xs text-gray-400 mb-4">
+                Peer-to-peer support
+              </div>
+              <a
+                href="https://github.com/gsmlg/discussions"
+                target="_blank"
+                class="btn btn-accent btn-sm"
+              >
+                <.dm_mdi name="account-group" class="w-4 h-4 mr-2" /> Join Forum
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+<!-- Support Hours Section -->
+      <div class="card lg:card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
+        <figure class="lg:w-1/2 relative overflow-hidden max-h-96 lg:max-h-none">
+          <img
+            src="/images/space-earth-light.jpg"
+            alt="Support Hours"
+            class="w-full h-full object-cover rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none transition-transform duration-500 group-hover:scale-110"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          </div>
+        </figure>
+        <div class="card-body lg:w-1/2 bg-gradient-to-br from-gray-900 to-black text-neutral-300 p-4 sm:p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-3 h-3 bg-info rounded-full animate-pulse"></div>
+            <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-info to-cyan-400 bg-clip-text text-transparent">
+              Support Hours & Response Times
+            </h2>
+          </div>
+          <div class="space-y-3 sm:space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-base sm:text-lg">Email Support</span>
+              <span class="badge badge-info">24-48 hours</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-base sm:text-lg">GitHub Issues</span>
+              <span class="badge badge-secondary">Community response</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-base sm:text-lg">Critical Issues</span>
+              <span class="badge badge-warning">Within 24 hours</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-base sm:text-lg">Business Hours</span>
+              <span class="badge badge-success">Mon-Fri, 9AM-6PM HKT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+<!-- FAQ Section -->
+      <div class="text-center">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+          Frequently Asked Questions
+        </h2>
+        <p class="text-lg sm:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+          Quick answers to common questions about our software and services
+        </p>
+
+        <div class="space-y-4 max-w-4xl mx-auto">
+          <!-- FAQ Item 1 -->
+          <div class="collapse collapse-arrow bg-base-100/95 backdrop-blur-sm">
+            <input type="radio" name="faq-1" checked="checked" />
+            <div class="collapse-title text-xl font-medium text-white">
+              What software does GSMLG develop?
+            </div>
+            <div class="collapse-content">
+              <p class="text-gray-300">
+                GSMLG develops a range of open source software tools including network utilities,
+                DevOps tools, and mobile-optimized applications. Our focus is on creating professional
+                tools for developers, system administrators, and IT professionals.
+              </p>
+            </div>
+          </div>
+          
+<!-- FAQ Item 2 -->
+          <div class="collapse collapse-arrow bg-base-100/95 backdrop-blur-sm">
+            <input type="radio" name="faq-1" />
+            <div class="collapse-title text-xl font-medium text-white">
+              Is your software really free to use?
+            </div>
+            <div class="collapse-content">
+              <p class="text-gray-300">
+                Yes! All our software is open source and free to use under permissive licenses.
+                We believe in the power of open source and community collaboration to create better tools for everyone.
+              </p>
+            </div>
+          </div>
+          
+<!-- FAQ Item 3 -->
+          <div class="collapse collapse-arrow bg-base-100/95 backdrop-blur-sm">
+            <input type="radio" name="faq-1" />
+            <div class="collapse-title text-xl font-medium text-white">
+              How can I contribute to your projects?
+            </div>
+            <div class="collapse-content">
+              <p class="text-gray-300">
+                We welcome contributions! You can contribute by reporting bugs, suggesting features,
+                submitting pull requests on GitHub, or helping other users in our community forum.
+                Every contribution helps make our software better.
+              </p>
+            </div>
+          </div>
+          
+<!-- FAQ Item 4 -->
+          <div class="collapse collapse-arrow bg-base-100/95 backdrop-blur-sm">
+            <input type="radio" name="faq-1" />
+            <div class="collapse-title text-xl font-medium text-white">
+              Do you offer commercial support?
+            </div>
+            <div class="collapse-content">
+              <p class="text-gray-300">
+                While our software is free and community-supported, we do offer priority commercial
+                support for enterprise customers. Contact us at contact@gsmlg.dev for more information
+                about commercial support packages.
+              </p>
+            </div>
+          </div>
+          
+<!-- FAQ Item 5 -->
+          <div class="collapse collapse-arrow bg-base-100/95 backdrop-blur-sm">
+            <input type="radio" name="faq-1" />
+            <div class="collapse-title text-xl font-medium text-white">
+              What platforms do you support?
+            </div>
+            <div class="collapse-content">
+              <p class="text-gray-300">
+                Our tools are designed to work across multiple platforms including iOS, Android,
+                macOS, Windows, and Linux. We believe in providing consistent professional tools
+                across all your devices.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+<!-- Bug Reporting Guidelines -->
+      <div class="text-center py-12">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+          Bug Reporting Guidelines
+        </h2>
+        <p class="text-lg sm:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+          Help us help you by providing detailed information when reporting issues
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- What to Include -->
+          <div class="text-center">
+            <div class="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <.dm_mdi name="check-circle" class="w-8 h-8 text-success" />
+            </div>
+            <h3 class="text-xl font-bold text-success mb-3">What to Include</h3>
+            <ul class="text-left text-gray-300 space-y-2">
+              <li class="flex items-start">
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2 mt-1 flex-shrink-0" />
+                <span>Software version and platform</span>
+              </li>
+              <li class="flex items-start">
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2 mt-1 flex-shrink-0" />
+                <span>Step-by-step reproduction steps</span>
+              </li>
+              <li class="flex items-start">
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2 mt-1 flex-shrink-0" />
+                <span>Expected vs actual behavior</span>
+              </li>
+              <li class="flex items-start">
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2 mt-1 flex-shrink-0" />
+                <span>Error messages or screenshots</span>
+              </li>
+              <li class="flex items-start">
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2 mt-1 flex-shrink-0" />
+                <span>System environment details</span>
+              </li>
+            </ul>
+          </div>
+          
+<!-- Best Practices -->
+          <div class="text-center">
+            <div class="w-16 h-16 bg-info/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <.dm_mdi name="lightbulb" class="w-8 h-8 text-info" />
+            </div>
+            <h3 class="text-xl font-bold text-info mb-3">Best Practices</h3>
+            <ul class="text-left text-gray-300 space-y-2">
+              <li class="flex items-start">
+                <.dm_mdi name="check" class="w-4 h-4 text-info mr-2 mt-1 flex-shrink-0" />
+                <span>Search existing issues first</span>
+              </li>
+              <li class="flex items-start">
+                <.dm_mdi name="check" class="w-4 h-4 text-info mr-2 mt-1 flex-shrink-0" />
+                <span>Use clear, descriptive titles</span>
+              </li>
+              <li class="flex items-start">
+                <.dm_mdi name="check" class="w-4 h-4 text-info mr-2 mt-1 flex-shrink-0" />
+                <span>One issue per report</span>
+              </li>
+              <li class="flex items-start">
+                <.dm_mdi name="check" class="w-4 h-4 text-info mr-2 mt-1 flex-shrink-0" />
+                <span>Provide minimal reproduction case</span>
+              </li>
+              <li class="flex items-start">
+                <.dm_mdi name="check" class="w-4 h-4 text-info mr-2 mt-1 flex-shrink-0" />
+                <span>Follow up on questions</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+<!-- Community Support Section -->
+      <div class="card lg:card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
+        <figure class="lg:w-1/2 lg:order-last relative overflow-hidden max-h-96 lg:max-h-none">
+          <img
+            src="/images/people-in-skyscraper.jpg"
+            alt="Community Support"
+            class="w-full h-full object-cover rounded-t-lg lg:rounded-r-lg lg:rounded-tl-none transition-transform duration-500 group-hover:scale-110"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          </div>
+        </figure>
+        <div class="card-body lg:w-1/2 bg-gradient-to-br from-gray-900 to-black text-neutral-300 p-4 sm:p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-3 h-3 bg-warning rounded-full animate-pulse"></div>
+            <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-warning to-orange-400 bg-clip-text text-transparent">
+              Community Support
+            </h2>
+          </div>
+          <div class="space-y-3 sm:space-y-4">
+            <p class="text-base sm:text-lg leading-relaxed">
+              Join our vibrant community of developers and users who help each other succeed
+            </p>
+            <p class="text-base sm:text-lg leading-relaxed">
+              Share your experiences, learn from others, and contribute to the growth of our open source ecosystem
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <span class="badge badge-primary">GitHub Discussions</span>
+              <span class="badge badge-secondary">Stack Overflow</span>
+              <span class="badge badge-accent">Discord Community</span>
+              <span class="badge badge-info">Reddit</span>
+            </div>
+          </div>
+          <div class="card-actions justify-start mt-4 sm:mt-6">
+            <a
+              href="https://github.com/gsmlg"
+              target="_blank"
+              class="btn btn-warning btn-sm sm:btn-md lg:btn-wide hover:btn-warning transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              <.dm_mdi name="account-group" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+              <span class="text-xs sm:text-sm">Join Community</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+<!-- Contact CTA Section -->
+      <div class="text-center py-16 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+          Still Need Help?
+        </h2>
+        <p class="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+          Our team is here to support you. Don't hesitate to reach out with any questions or concerns.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="mailto:contact@gsmlg.dev" class="btn btn-primary btn-lg">
+            <.dm_mdi name="email" class="w-5 h-5 mr-2" /> Email Support
+          </a>
+          <a
+            href="https://github.com/gsmlg"
+            target="_blank"
+            class="btn btn-outline btn-lg border-white text-white hover:bg-white hover:text-black"
+          >
+            <.dm_mdi name="github" class="w-5 h-5 mr-2" /> Visit GitHub
+          </a>
+        </div>
+        <div class="mt-8 flex items-center justify-center gap-6 text-gray-400">
+          <div class="flex items-center gap-2">
+            <.dm_mdi name="map-marker" class="w-4 h-4" />
+            <span>Hong Kong</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <.dm_mdi name="clock" class="w-4 h-4" />
+            <span>Mon-Fri 9AM-6PM HKT</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <.dm_mdi name="email" class="w-4 h-4" />
+            <span>contact@gsmlg.dev</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layouts.support>

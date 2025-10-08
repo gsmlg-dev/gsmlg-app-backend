@@ -10,4 +10,8 @@ defmodule GsmlgAppWeb.PageController do
   def about_us(conn, _params) do
     render(conn, :about_us)
   end
+
+  def support(conn, _params) do
+    render(conn, :support)
+  end
 end

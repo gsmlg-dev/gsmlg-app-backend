@@ -19,6 +19,7 @@ defmodule GsmlgAppWeb.Router do
 
     get("/", PageController, :home)
     get("/about-us", PageController, :about_us)
+    get("/support", PageController, :support)
 
     get("/apps", AppsController, :list)
 

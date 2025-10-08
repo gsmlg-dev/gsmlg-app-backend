@@ -20,14 +20,17 @@ defmodule GsmlgAppWeb.Layouts do
         "bg-black text-slate-400"
       ]}
     >
-      <:menu to="/">
+      <:menu class="uppercase" to="/">
         Home
       </:menu>
-      <:menu to="/about-us">
-        About Us
-      </:menu>
-      <:menu class="border-b-2 text-slate-200 border-slate-200" to="/apps">
+      <:menu class="uppercase" to="/apps">
         Apps
+      </:menu>
+      <:menu class="uppercase" to="/support">
+        Support
+      </:menu>
+      <:menu class="uppercase" to="/about-us">
+        About Us
       </:menu>
       <:user_profile></:user_profile>
       {render_slot(@header_slot)}
@@ -69,14 +72,17 @@ defmodule GsmlgAppWeb.Layouts do
         "bg-black text-slate-400"
       ]}
     >
-      <:menu class="border-b-2 text-slate-200 border-slate-200" to="/">
+      <:menu class="border-b-2 text-slate-200 border-slate-200 uppercase" to="/">
         Home
       </:menu>
-      <:menu to="/about-us">
-        About Us
-      </:menu>
-      <:menu to="/apps">
+      <:menu class="uppercase" to="/apps">
         Apps
+      </:menu>
+      <:menu class="uppercase" to="/support">
+        Support
+      </:menu>
+      <:menu class="uppercase" to="/about-us">
+        About Us
       </:menu>
       <:user_profile></:user_profile>
       {render_slot(@header_slot)}
@@ -116,14 +122,17 @@ defmodule GsmlgAppWeb.Layouts do
         "bg-black text-slate-400"
       ]}
     >
-      <:menu to="/">
+      <:menu class="uppercase" to="/">
         Home
       </:menu>
-      <:menu to="/about-us">
-        About Us
-      </:menu>
-      <:menu class="border-b-2 text-slate-200 border-slate-200" to="/apps">
+      <:menu class="uppercase" to="/apps">
         Apps
+      </:menu>
+      <:menu class="border-b-2 text-slate-200 border-slate-200 uppercase" to="/support">
+        Support
+      </:menu>
+      <:menu class="uppercase" to="/about-us">
+        About Us
       </:menu>
       <:user_profile></:user_profile>
       <div class={[
@@ -180,14 +189,17 @@ defmodule GsmlgAppWeb.Layouts do
         "bg-black text-slate-400"
       ]}
     >
-      <:menu to="/">
+      <:menu class="uppercase" to="/">
         Home
       </:menu>
-      <:menu to="/about-us">
-        About Us
-      </:menu>
-      <:menu class="border-b-2 text-slate-200 border-slate-200" to="/apps">
+      <:menu class="uppercase" to="/apps">
         Apps
+      </:menu>
+      <:menu class="uppercase" to="/support">
+        Support
+      </:menu>
+      <:menu class="uppercase" to="/about-us">
+        About Us
       </:menu>
       <:user_profile></:user_profile>
       <div class={[
@@ -245,14 +257,17 @@ defmodule GsmlgAppWeb.Layouts do
         "bg-black text-slate-400"
       ]}
     >
-      <:menu to="/">
+      <:menu class="uppercase" to="/">
         Home
       </:menu>
-      <:menu class="border-b-2 text-slate-200 border-slate-200" to="/about-us">
-        About Us
-      </:menu>
-      <:menu to="/apps">
+      <:menu class="uppercase" to="/apps">
         Apps
+      </:menu>
+      <:menu class="uppercase" to="/support">
+        Support
+      </:menu>
+      <:menu class="border-b-2 text-slate-200 border-slate-200 uppercase" to="/about-us">
+        About Us
       </:menu>
       <:user_profile></:user_profile>
       {render_slot(@header_slot)}
