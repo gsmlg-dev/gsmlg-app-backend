@@ -23,6 +23,9 @@ defmodule GsmlgAppWeb.Layouts do
       <:menu to="/">
         Home
       </:menu>
+      <:menu to="/about-us">
+        About Us
+      </:menu>
       <:menu class="border-b-2 text-slate-200 border-slate-200" to="/apps">
         Apps
       </:menu>
@@ -69,6 +72,9 @@ defmodule GsmlgAppWeb.Layouts do
       <:menu class="border-b-2 text-slate-200 border-slate-200" to="/">
         Home
       </:menu>
+      <:menu to="/about-us">
+        About Us
+      </:menu>
       <:menu to="/apps">
         Apps
       </:menu>
@@ -112,6 +118,9 @@ defmodule GsmlgAppWeb.Layouts do
     >
       <:menu to="/">
         Home
+      </:menu>
+      <:menu to="/about-us">
+        About Us
       </:menu>
       <:menu class="border-b-2 text-slate-200 border-slate-200" to="/apps">
         Apps
@@ -174,6 +183,9 @@ defmodule GsmlgAppWeb.Layouts do
       <:menu to="/">
         Home
       </:menu>
+      <:menu to="/about-us">
+        About Us
+      </:menu>
       <:menu class="border-b-2 text-slate-200 border-slate-200" to="/apps">
         Apps
       </:menu>
@@ -200,6 +212,54 @@ defmodule GsmlgAppWeb.Layouts do
     <main class={[
       "flex flex-col",
       "min-h-[20vh] w-full"
+    ]}>
+      <div class={[
+        "w-full min-w-full min-h-full",
+        "mx-auto max-w-2xl",
+        "flex flex-col items-center"
+      ]}>
+        <.dm_flash_group flash={@flash} />
+        <a name="page"></a>
+        {render_slot(@inner_block)}
+      </div>
+    </main>
+
+    <.app_footer />
+    """
+  end
+
+  slot :header_slot
+  slot :inner_block, required: true
+
+  attr :flash, :map, required: true
+
+  def about(assigns) do
+    ~H"""
+    <.dm_page_header
+      class={[
+        "bg-gradient-to-br from-slate-700 to-neutral-700",
+        "text-slate-400",
+        "h-fit"
+      ]}
+      nav_class={[
+        "bg-black text-slate-400"
+      ]}
+    >
+      <:menu to="/">
+        Home
+      </:menu>
+      <:menu class="border-b-2 text-slate-200 border-slate-200" to="/about-us">
+        About Us
+      </:menu>
+      <:menu to="/apps">
+        Apps
+      </:menu>
+      <:user_profile></:user_profile>
+      {render_slot(@header_slot)}
+    </.dm_page_header>
+    <main class={[
+      "flex flex-col",
+      "min-h-[calc(100vh-50%)] w-full"
     ]}>
       <div class={[
         "w-full min-w-full min-h-full",

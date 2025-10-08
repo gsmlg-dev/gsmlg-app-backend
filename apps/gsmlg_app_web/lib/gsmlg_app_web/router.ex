@@ -18,6 +18,7 @@ defmodule GsmlgAppWeb.Router do
     pipe_through(:browser)
 
     get("/", PageController, :home)
+    get("/about-us", PageController, :about_us)
 
     get("/apps", AppsController, :list)
 

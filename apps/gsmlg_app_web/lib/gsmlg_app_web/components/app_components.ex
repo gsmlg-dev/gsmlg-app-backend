@@ -21,17 +21,14 @@ defmodule GsmlgAppWeb.AppComponents do
           class={[
             "py-2 px-4"
           ]}
-          href="/products"
+          href="/apps"
         >
           Products
-        </.link>
-        <.link class="py-2 px-4" href="/license">
-          License
         </.link>
         <.link class="py-2 px-4" href="/assistant">
           A.I. Assistant
         </.link>
-        <.link class="py-2 px-4" href="/about">
+        <.link class="py-2 px-4" href="/about-us">
           About US
         </.link>
       </:section>

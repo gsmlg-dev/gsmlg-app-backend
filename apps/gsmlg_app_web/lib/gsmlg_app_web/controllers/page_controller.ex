@@ -6,4 +6,8 @@ defmodule GsmlgAppWeb.PageController do
     # so skip the default app layout.
     render(conn, :home)
   end
+
+  def about_us(conn, _params) do
+    render(conn, :about_us)
+  end
 end
