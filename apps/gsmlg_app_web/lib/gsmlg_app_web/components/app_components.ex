@@ -16,20 +16,23 @@ defmodule GsmlgAppWeb.AppComponents do
       "bg-slate-900",
       "text-slate-500"
     ]}>
-      <:section title="About" title_class="py-2 px-4 text-slate-600">
+      <:section title="Site Map" title_class="py-2 px-4 text-slate-600">
         <.link
           class={[
             "py-2 px-4"
           ]}
-          href="/apps"
+          href="/"
         >
-          Products
+          Home
         </.link>
-        <.link class="py-2 px-4" href="/assistant">
-          A.I. Assistant
+        <.link class="py-2 px-4" href="/apps">
+          Apps
+        </.link>
+        <.link class="py-2 px-4" href="/support">
+          Support
         </.link>
         <.link class="py-2 px-4" href="/about-us">
-          About US
+          About Us
         </.link>
       </:section>
       <:copyright>
