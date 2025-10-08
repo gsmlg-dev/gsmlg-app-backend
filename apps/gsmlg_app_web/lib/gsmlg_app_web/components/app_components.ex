@@ -174,6 +174,170 @@ defmodule GsmlgAppWeb.AppComponents do
   end
 
   @doc """
+  Enhanced app section using phoenix_duskmoon_ui components
+  """
+  attr(:id, :any, default: false)
+  attr(:class, :string, default: "")
+  attr(:icon_path, :string, required: true)
+  attr(:name, :string, required: true)
+  attr(:app_label, :string, default: "")
+  attr(:platforms, :list, default: [])
+  attr(:category, :string, default: "utility")
+
+  slot(:description, required: true)
+
+  slot(:store_link, required: false) do
+    attr(:link, :string)
+  end
+
+  def enhanced_app_section(assigns) do
+    ~H"""
+    <.dm_card
+      id={@id}
+      class={[
+        "bg-base-100 shadow-2xl hover:shadow-3xl transition-all duration-300",
+        "border border-base-300 hover:border-primary",
+        "group cursor-pointer card-hover-lift",
+        @class
+      ]}
+    >
+      <:title class="flex items-center gap-4">
+        <div class="avatar">
+          <div class="w-16 h-16 rounded-2xl ring-4 ring-primary ring-offset-2 group-hover:scale-110 transition-transform duration-300">
+            <img src={@icon_path} alt={@name} />
+          </div>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-primary">{@name}</h2>
+          <div class="flex gap-2 mt-1">
+            <div class="badge badge-xs bg-accent text-accent-content capitalize">
+              {@category}
+            </div>
+            <.platform_chips platforms={@platforms} />
+          </div>
+        </div>
+      </:title>
+
+      <:action>
+        <div class="dropdown dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-circle btn-ghost btn-sm">
+            <.dm_mdi name="dots-vertical" class="w-4 h-4" />
+          </div>
+          <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+            <li>
+              <.link navigate={~p"/apps-support/app/#{@app_label}"}>
+                <.dm_mdi name="headset" class="w-4 h-4" /> Support
+              </.link>
+            </li>
+            <li>
+              <.link navigate={~p"/apps-privacy/app/#{@app_label}"}>
+                <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> Privacy
+              </.link>
+            </li>
+          </ul>
+        </div>
+      </:action>
+
+      <div class="card-body">
+        <div class="space-y-3">
+          <p :for={d <- @description} class="text-base-content/80 leading-relaxed">
+            {render_slot(d)}
+          </p>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="card-actions justify-between items-center">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-semibold text-base-content/60">Available on:</span>
+            <div class="flex gap-2">
+              <.link
+                :for={store <- @store_link}
+                class="btn btn-circle btn-ghost btn-sm hover:scale-110 transition-transform duration-200"
+                target="_blank"
+                href={Map.get(store, :link, "javascript:void(0)")}
+              >
+                {render_slot(store)}
+              </.link>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <.link
+              class="btn btn-outline btn-sm hover:bg-primary hover:text-primary-content"
+              navigate={~p"/apps-support/app/#{@app_label}"}
+            >
+              <.dm_mdi name="headset" class="w-4 h-4" /> Support
+            </.link>
+            <.link
+              class="btn btn-outline btn-sm hover:bg-secondary hover:text-secondary-content"
+              navigate={~p"/apps-privacy/app/#{@app_label}"}
+            >
+              <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> Privacy
+            </.link>
+          </div>
+        </div>
+      </div>
+    </.dm_card>
+    """
+  end
+
+  @doc """
+  Platform badge component for header
+  """
+  attr(:name, :string, required: true)
+  attr(:icon, :string, required: true)
+  attr(:color, :string, default: "primary")
+
+  def platform_badge(assigns) do
+    ~H"""
+    <div class={[
+      "badge badge-lg gap-2 platform-badge",
+      "bg-white/90 text-gray-800 border-2 border-white/50 shadow-xl",
+      "hover:scale-105 transition-transform duration-200 font-semibold"
+    ]}>
+      <.dm_mdi name={@icon} class="w-4 h-4" />
+      {@name}
+    </div>
+    """
+  end
+
+  @doc """
+  Platform chips for app cards
+  """
+  attr(:platforms, :list, default: [])
+
+  def platform_chips(assigns) do
+    ~H"""
+    <div class="flex gap-1">
+      <div
+        :for={platform <- @platforms}
+        class={[
+          "badge badge-xs",
+          platform_chip_color(platform)
+        ]}
+      >
+        {platform_icon(platform)} {String.upcase(platform)}
+      </div>
+    </div>
+    """
+  end
+
+  defp platform_chip_color("ios"), do: "bg-info text-info-content"
+  defp platform_chip_color("android"), do: "bg-success text-success-content"
+  defp platform_chip_color("macos"), do: "bg-warning text-warning-content"
+  defp platform_chip_color("windows"), do: "bg-error text-error-content"
+  defp platform_chip_color("linux"), do: "bg-neutral text-neutral-content"
+  defp platform_chip_color(_), do: "bg-base-200 text-base-content"
+
+  defp platform_icon("ios"), do: "🍎"
+  defp platform_icon("android"), do: "🤖"
+  defp platform_icon("macos"), do: "🍎"
+  defp platform_icon("windows"), do: "🪟"
+  defp platform_icon("linux"), do: "🐧"
+  defp platform_icon(_), do: "📱"
+
+  @doc """
   Generates playstore_icon
   ## Example
       <.playstore_icon class="w-6 h-6" />
