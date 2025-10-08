@@ -89,10 +89,18 @@ jobs:
           mix deps.get
           bun install
 
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+
       - name: Setup database
         working-directory: ./apps/gsmlg_app_admin/
         run: |
-          mix setup
+          mix ecto.create
+          mix ecto.migrate
         env:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432

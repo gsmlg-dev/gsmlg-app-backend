@@ -33,7 +33,7 @@ defmodule GsmlgAppAdmin.Accounts.User do
     end
 
     tokens do
-      enabled?(false)
+      enabled?(true)
       token_resource(GsmlgAppAdmin.Accounts.Token)
       require_token_presence_for_authentication?(false)
     end
