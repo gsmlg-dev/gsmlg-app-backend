@@ -99,8 +99,8 @@ jobs:
       - name: Setup database
         working-directory: ./apps/gsmlg_app_admin/
         run: |
-          MIX_ENV=test mix ecto.create
-          MIX_ENV=test mix ecto.migrate
+          MIX_ENV=test mix ecto.create --quiet
+          MIX_ENV=test mix ecto.migrate --quiet
         env:
           MIX_ENV: test
           POSTGRES_HOST: localhost

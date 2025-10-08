@@ -13,12 +13,15 @@ config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :gsmlg_app_admin, GsmlgAppAdmin.Repo,
-  username: "gsmlg_app",
-  password: "gsmlg_app",
-  hostname: "10.100.1.10",
-  database: "gsmlg_app_admin_test#{System.get_env("MIX_TEST_PARTITION")}",
+  username: System.get_env("POSTGRES_USER", "gsmlg_app"),
+  password: System.get_env("POSTGRES_PASSWORD", "gsmlg_app"),
+  hostname: System.get_env("POSTGRES_HOST", "localhost"),
+  database:
+    "#{System.get_env("POSTGRES_DATABASE", "gsmlg_app_admin_test")}#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
-  pool_size: 10
+  pool_size: 10,
+  queue_target: 5000,
+  queue_interval: 1000
 
 # In test we don't send emails.
 config :gsmlg_app, GsmlgApp.Mailer, adapter: Swoosh.Adapters.Test
