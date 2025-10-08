@@ -7,8 +7,6 @@ defmodule GsmlgAppAdmin.Accounts.User do
 
   require Ash.Query
 
-  alias GsmlgAppAdmin.Calculations.Decrypt
-
   actions do
     # Add a set of default actions for full CRUD operations
     defaults([:read, :create, :update, :destroy])
@@ -35,9 +33,10 @@ defmodule GsmlgAppAdmin.Accounts.User do
     tokens do
       enabled?(true)
       token_resource(GsmlgAppAdmin.Accounts.Token)
-      require_token_presence_for_authentication?(false)
+      require_token_presence_for_authentication?(true)
     end
 
+    session_identifier(:jti)
     subject_name(:email)
   end
 
