@@ -1,112 +1,367 @@
 <Layouts.home flash={@flash}>
   <:header_slot>
-    <div class={[
-      "container select-none",
-      "flex flex-col justify-center items-center"
-    ]}>
-      <div
-        class={[
-          "w-2/3",
-          "flex flex-row justify-center items-center my-8",
-          "text-6xl text-amber-500 drop-shadow-md",
-          "text-center"
-        ]}
-        style="text-shadow: 0px 0px 2px #fff"
-      >
-        Make everything as simple as possible, but not simpler
+    <div
+      class="hero min-h-screen relative overflow-hidden"
+      style="background-image: url(/images/sky-commet.jpg);"
+    >
+      <div class="hero-overlay bg-opacity-60 bg-gradient-to-b from-black/50 to-black/80"></div>
+      <div class="hero-content text-center text-neutral-content relative z-10">
+        <div class="max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div class="animate-fade-in-down">
+            <h1 class="mb-6 text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 bg-clip-text text-transparent leading-tight">
+              Professional Tools, Mobile Optimized
+            </h1>
+          </div>
+          <div class="animate-fade-in-up animation-delay-200">
+            <h2 class="mb-8 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-teal-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent leading-tight">
+              Network utilities and DevOps tools for developers on the go
+            </h2>
+          </div>
+          <div class="animate-fade-in animation-delay-400">
+            <.link
+              href="/apps"
+              class="btn btn-primary btn-lg btn-wide shadow-2xl hover:scale-105 transition-transform duration-300 text-sm sm:text-base"
+            >
+              Explore All Apps <.dm_mdi name="arrow-right" class="w-4 h-4 ml-2" />
+            </.link>
+          </div>
+        </div>
       </div>
-      <div
-        class={[
-          "w-1/2",
-          "flex flex-row justify-center items-center my-8 font-bold",
-          "text-8xl text-teal-300 drop-shadow-md",
-          "text-center"
-        ]}
-        style="text-shadow: 0px 0px 8px #000"
-      >
-        GSMLG
-      </div>
-      <div class={[
-        "flex flex-row my-8",
-        "justify-center text-center"
-      ]}>
-        <.link
-          class={[
-            "hover:text-slate-50 hover:shadow-xl shadow-white",
-            "bg-teal-800 px-6 py-3 rounded-2xl",
-            "inline-flex items-center gap-2"
-          ]}
-          href="#page"
-        >
-          Learn More <.dm_mdi name="arrow-right" class="w-4 h-4" />
-        </.link>
+      <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+        <.dm_mdi name="chevron-down" class="w-8 h-8 text-white/60" />
       </div>
     </div>
   </:header_slot>
 
-  <div class="w-full py-36 bg-black text-neutral-400 flex justify-center">
-    <div class="container">
-      <div class={[
-        "w-full p-8",
-        "flex flex-col justify-start items-center gap-4"
-      ]}>
-        <div class="flex flex-col lg:flex-row items-center justify-start gap-24">
-          <div class="w-10/12 lg:w-7/12 flex flex-col">
-            <img class="rounded-lg" src="/images/space-earth-light.jpg" />
+  <div
+    id="page"
+    class="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black py-8 sm:py-12"
+  >
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 space-y-12 sm:space-y-16">
+      
+<!-- App Preview Section -->
+      <div class="text-center">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+          Our Professional Toolkit Includes:
+        </h2>
+        <p class="text-lg sm:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+          Essential utilities for developers, system administrators, and IT professionals
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <!-- GeoIP Lookup -->
+          <div class="card bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+            <figure class="px-4 pt-4">
+              <div class="avatar">
+                <div class="w-16 h-16 rounded-xl mx-auto">
+                  <img src="/images/icons/geoip_lookup.png" alt="GeoIP Lookup" class="rounded-xl" />
+                </div>
+              </div>
+            </figure>
+            <div class="card-body text-center">
+              <h3 class="card-title text-lg font-bold text-warning">GeoIP Lookup</h3>
+              <p class="text-sm text-gray-300">
+                Find geographic locations of IP addresses for network analysis
+              </p>
+            </div>
           </div>
-          <div class="flex flex-col gap-4 text-neutral-400">
-            <h3 class="text-4xl">Global Server</h3>
-            <p class="text-2xl">
-              Manage all application data through global data centers.
+          
+<!-- Whois Lookup -->
+          <div class="card bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+            <figure class="px-4 pt-4">
+              <div class="avatar">
+                <div class="w-16 h-16 rounded-xl mx-auto">
+                  <img src="/images/icons/whois_lookup.png" alt="Whois Lookup" class="rounded-xl" />
+                </div>
+              </div>
+            </figure>
+            <div class="card-body text-center">
+              <h3 class="card-title text-lg font-bold text-info">Whois Lookup</h3>
+              <p class="text-sm text-gray-300">
+                Research domain registration and IP allocation information
+              </p>
+            </div>
+          </div>
+          
+<!-- YellowDog DNS -->
+          <div class="card bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+            <figure class="px-4 pt-4">
+              <div class="avatar">
+                <div class="w-16 h-16 rounded-xl mx-auto">
+                  <img
+                    src="/images/icons/yellowdog_dns.png"
+                    alt="YellowDog DNS"
+                    class="rounded-xl"
+                  />
+                </div>
+              </div>
+            </figure>
+            <div class="card-body text-center">
+              <h3 class="card-title text-lg font-bold text-success">YellowDog DNS</h3>
+              <p class="text-sm text-gray-300">Advanced DNS querying and benchmarking tools</p>
+            </div>
+          </div>
+          
+<!-- Semaphore Client -->
+          <div class="card bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+            <figure class="px-4 pt-4">
+              <div class="avatar">
+                <div class="w-16 h-16 rounded-xl mx-auto">
+                  <img
+                    src="/images/icons/semaphore_client.png"
+                    alt="Semaphore Client"
+                    class="rounded-xl"
+                  />
+                </div>
+              </div>
+            </figure>
+            <div class="card-body text-center">
+              <h3 class="card-title text-lg font-bold text-error">Semaphore Client</h3>
+              <p class="text-sm text-gray-300">
+                Manage Ansible tasks and DevOps workflows remotely
+              </p>
+            </div>
+          </div>
+          
+<!-- Simple Mirror -->
+          <div class="card bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+            <figure class="px-4 pt-4">
+              <div class="avatar">
+                <div class="w-16 h-16 rounded-xl mx-auto">
+                  <img
+                    src="/images/icons/simple_mirror.png"
+                    alt="Simple Mirror"
+                    class="rounded-xl"
+                  />
+                </div>
+              </div>
+            </figure>
+            <div class="card-body text-center">
+              <h3 class="card-title text-lg font-bold text-secondary">Simple Mirror</h3>
+              <p class="text-sm text-gray-300">
+                Everyday utilities optimized for professional use
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <.link href="/apps" class="btn btn-primary btn-lg">
+          View All Apps & Features <.dm_mdi name="arrow-right" class="w-4 h-4 ml-2" />
+        </.link>
+      </div>
+      
+<!-- Network Tools Section -->
+      <div class="card lg:card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
+        <figure class="lg:w-1/2 relative overflow-hidden max-h-96 lg:max-h-none">
+          <img
+            src="/images/space-earth-light.jpg"
+            alt="Network Tools"
+            class="w-full h-full object-cover rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none transition-transform duration-500 group-hover:scale-110"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          </div>
+        </figure>
+        <div class="card-body lg:w-1/2 bg-gradient-to-br from-gray-900 to-black text-neutral-300 p-4 sm:p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-3 h-3 bg-success rounded-full animate-pulse"></div>
+            <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-success to-emerald-400 bg-clip-text text-transparent">
+              Network Diagnostics in Your Pocket
+            </h2>
+          </div>
+          <div class="space-y-3 sm:space-y-4">
+            <p class="text-base sm:text-lg leading-relaxed">
+              Geolocate IPs, query DNS records, and research domains from anywhere
             </p>
-            <p class="text-2xl">All data is encrypted with security keys.</p>
+            <p class="text-base sm:text-lg leading-relaxed">
+              Professional network tools optimized for mobile workflows
+            </p>
+          </div>
+          <div class="card-actions justify-end mt-4 sm:mt-6">
+            <.link
+              href="/apps"
+              class="btn btn-success btn-sm sm:btn-md lg:btn-wide hover:btn-success transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              <.dm_mdi name="lan" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+              <span class="text-xs sm:text-sm">View Network Tools</span>
+            </.link>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="w-full py-36 bg-black text-neutral-400 flex justify-center">
-    <div class="container">
-      <div class={[
-        "w-full p-8",
-        "flex flex-col justify-start items-center gap-4"
-      ]}>
-        <div class="flex flex-col lg:flex-row items-center justify-start gap-24">
-          <div class="flex flex-col gap-4 text-neutral-400">
-            <h3 class="text-4xl">Management</h3>
-            <p class="text-2xl">
-              Manage your work as simple as possible.
-            </p>
-            <p class="text-2xl">Simple logic, complex work.</p>
+      
+<!-- DevOps Section -->
+      <div class="card lg:card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
+        <figure class="lg:w-1/2 lg:order-last relative overflow-hidden max-h-96 lg:max-h-none">
+          <img
+            src="/images/teal-pannel.jpg"
+            alt="DevOps Tools"
+            class="w-full h-full object-cover rounded-t-lg lg:rounded-r-lg lg:rounded-tl-none transition-transform duration-500 group-hover:scale-110"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           </div>
-          <div class="w-10/12 lg:w-7/12 flex flex-col order-first lg:order-last">
-            <img class="rounded-lg" src="/images/teal-pannel.jpg" />
+        </figure>
+        <div class="card-body lg:w-1/2 bg-gradient-to-br from-gray-900 to-black text-neutral-300 p-4 sm:p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-3 h-3 bg-info rounded-full animate-pulse"></div>
+            <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-info to-cyan-400 bg-clip-text text-transparent">
+              Infrastructure Management On the Go
+            </h2>
+          </div>
+          <div class="space-y-3 sm:space-y-4">
+            <p class="text-base sm:text-lg leading-relaxed">
+              Run Ansible tasks and manage DevOps workflows from your mobile device
+            </p>
+            <p class="text-base sm:text-lg leading-relaxed">
+              Stay connected to your infrastructure wherever you are
+            </p>
+          </div>
+          <div class="card-actions justify-start mt-4 sm:mt-6">
+            <.link
+              href="/apps"
+              class="btn btn-info btn-sm sm:btn-md lg:btn-wide hover:btn-info transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              <.dm_mdi name="server" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+              <span class="text-xs sm:text-sm">Explore DevOps Tools</span>
+            </.link>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+      
+<!-- Cross-Platform Section -->
+      <div class="card lg:card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
+        <figure class="lg:w-1/2 relative overflow-hidden max-h-96 lg:max-h-none">
+          <img
+            src="/images/people-in-skyscraper.jpg"
+            alt="Cross-Platform"
+            class="w-full h-full object-cover rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none transition-transform duration-500 group-hover:scale-110"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          </div>
+        </figure>
+        <div class="card-body lg:w-1/2 bg-gradient-to-br from-gray-900 to-black text-neutral-300 p-4 sm:p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-3 h-3 bg-warning rounded-full animate-pulse"></div>
+            <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-warning to-orange-400 bg-clip-text text-transparent">
+              Available Everywhere You Work
+            </h2>
+          </div>
+          <div class="space-y-3 sm:space-y-4">
+            <p class="text-base sm:text-lg leading-relaxed">
+              iOS, Android, macOS, Windows, and Linux support
+            </p>
+            <p class="text-base sm:text-lg leading-relaxed">
+              Consistent professional tools across all your devices
+            </p>
+          </div>
+          <div class="card-actions justify-end mt-4 sm:mt-6">
+            <.link
+              href="/apps"
+              class="btn btn-warning btn-sm sm:btn-md lg:btn-wide hover:btn-warning transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              <.dm_mdi name="devices" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+              <span class="text-xs sm:text-sm">Download for Your Platform</span>
+            </.link>
+          </div>
+        </div>
+      </div>
+      
+<!-- Target Audience Section -->
+      <div class="text-center py-12">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-12">
+          Built for Technical Professionals
+        </h2>
 
-  <div class="w-full py-36 bg-black text-neutral-400 flex justify-center">
-    <div class="container">
-      <div class={[
-        "w-full p-8",
-        "flex flex-col justify-start items-center gap-4"
-      ]}>
-        <div class="flex flex-col lg:flex-row items-center justify-start gap-24">
-          <div class="w-10/12 lg:w-7/12 flex flex-col">
-            <img class="rounded-lg" src="/images/people-in-skyscraper.jpg" />
-          </div>
-          <div class="flex flex-col gap-4 text-neutral-400">
-            <h3 class="text-4xl">Governance</h3>
-            <p class="text-2xl">
-              Control your business.
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- For Developers -->
+          <div class="text-center">
+            <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <.dm_mdi name="application" class="w-8 h-8 text-primary" />
+            </div>
+            <h3 class="text-xl font-bold text-primary mb-3">For Developers</h3>
+            <p class="text-gray-300 mb-4">
+              Tools designed specifically for mobile development workflows
             </p>
-            <p class="text-2xl">
-              Control like your own arm.
-            </p>
+            <ul class="text-left text-gray-400 space-y-2">
+              <li class="flex items-center">
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
+                Network diagnostics during field work
+              </li>
+              <li class="flex items-center">
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
+                Domain research for development projects
+              </li>
+              <li class="flex items-center">
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
+                DNS troubleshooting on the go
+              </li>
+            </ul>
           </div>
+          
+<!-- For System Administrators -->
+          <div class="text-center">
+            <div class="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <.dm_mdi name="server" class="w-8 h-8 text-secondary" />
+            </div>
+            <h3 class="text-xl font-bold text-secondary mb-3">For System Administrators</h3>
+            <p class="text-gray-300 mb-4">Stay connected to your systems outside the office</p>
+            <ul class="text-left text-gray-400 space-y-2">
+              <li class="flex items-center">
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
+                Remote server management
+              </li>
+              <li class="flex items-center">
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
+                Network monitoring from mobile
+              </li>
+              <li class="flex items-center">
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
+                Emergency troubleshooting capabilities
+              </li>
+            </ul>
+          </div>
+          
+<!-- For IT Professionals -->
+          <div class="text-center">
+            <div class="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <.dm_mdi name="shield" class="w-8 h-8 text-accent" />
+            </div>
+            <h3 class="text-xl font-bold text-accent mb-3">For IT Professionals</h3>
+            <p class="text-gray-300 mb-4">
+              Enterprise-grade utilities optimized for mobile workflows
+            </p>
+            <ul class="text-left text-gray-400 space-y-2">
+              <li class="flex items-center">
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
+                Cross-platform compatibility
+              </li>
+              <li class="flex items-center">
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> Secure data handling
+              </li>
+              <li class="flex items-center">
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> Offline capabilities
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+<!-- Final CTA Section -->
+      <div class="text-center py-16 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+          Ready to Boost Your Mobile Productivity?
+        </h2>
+        <p class="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+          Join thousands of professionals using GSMLG tools daily for network diagnostics, infrastructure management, and technical utilities
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <.link href="/apps" class="btn btn-primary btn-lg">
+            <.dm_mdi name="application" class="w-5 h-5 mr-2" /> Browse All Apps
+          </.link>
+          <.link
+            href="/apps"
+            class="btn btn-outline btn-lg border-white text-white hover:bg-white hover:text-black"
+          >
+            <.dm_mdi name="download" class="w-5 h-5 mr-2" /> Download for iOS/Android
+          </.link>
         </div>
       </div>
     </div>

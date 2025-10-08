@@ -6,7 +6,6 @@ defmodule GsmlgAppWeb.AppComponents do
   use Phoenix.Component
   use PhoenixDuskmoon.Component
 
-  alias Phoenix.LiveView.JS
   use Gettext, backend: GsmlgAppWeb.Gettext
 
   use GsmlgAppWeb, :verified_routes
@@ -118,57 +117,52 @@ defmodule GsmlgAppWeb.AppComponents do
 
   def app_section(assigns) do
     ~H"""
-    <div
-      id={@id}
-      class={[
-        "w-full py-12",
-        "bg-black text-neutral-400",
-        "flex justify-center",
-        @class
-      ]}
-    >
-      <div class="container">
-        <div class={[
-          "w-full p-8",
-          "flex flex-col justify-center items-center gap-4"
-        ]}>
-          <div class="w-full flex flex-col md:flex-row items-center justify-center gap-4 md:gap-24">
-            <div class="w-1/4 flex flex-col grow-0 shrink-0">
-              <img class="aspect-square rounded-[25%] w-[clamp(5rem,25vw,20rem)]" src={@icon_path} />
-            </div>
-            <div class="w-3/4 flex flex-col gap-4 text-neutral-400">
-              <h3 class="text-4xl font-bold mb-4 text-[goldenrod]">
-                {@name}
-              </h3>
-              <p :for={d <- @description} class="text-2xl animated-text-gradient">
-                {render_slot(d)}
-              </p>
-              <div class="flex items-center gap-8">
-                <span class="flex text-xl after:content-[':']">
-                  App Store Link
-                </span>
-                <.link
-                  :for={store <- @store_link}
-                  class="inline-flex color-carousel hover:animate-bounce"
-                  target="_blank"
-                  href={Map.get(store, :link, "javascript:void(0)")}
-                  disabled={!Map.has_key?(%{}, :link)}
-                >
-                  {render_slot(store)}
-                </.link>
+    <div id={@id} class={["w-full py-12 bg-black flex justify-center", @class]}>
+      <div class="container px-4">
+        <div class="card lg:card-side bg-base-100 shadow-xl">
+          <figure class="lg:w-1/3 flex justify-center items-center p-8">
+            <div class="avatar">
+              <div class="w-24 md:w-32 lg:w-48 rounded-[25%]">
+                <img src={@icon_path} alt={@name} />
               </div>
-              <div class="flex items-center gap-8">
+            </div>
+          </figure>
+          <div class="card-body lg:w-2/3 bg-black text-neutral-400">
+            <h2 class="card-title text-4xl text-warning mb-4">
+              {@name}
+            </h2>
+            <p
+              :for={d <- @description}
+              class="text-lg lg:text-xl mb-2 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent"
+            >
+              {render_slot(d)}
+            </p>
+            <div class="card-actions justify-between items-center">
+              <div class="flex items-center gap-4">
+                <span class="text-sm lg:text-base font-semibold">App Store:</span>
+                <div class="flex gap-2">
+                  <.link
+                    :for={store <- @store_link}
+                    class="btn btn-circle btn-ghost hover:btn-primary animate-pulse hover:animate-bounce"
+                    target="_blank"
+                    href={Map.get(store, :link, "javascript:void(0)")}
+                  >
+                    {render_slot(store)}
+                  </.link>
+                </div>
+              </div>
+              <div class="flex gap-2">
                 <.link
-                  class="inline-flex items-center gap-2 hover:scale-125 transition-transform text-blue-400"
+                  class="btn btn-outline btn-sm lg:btn-md"
                   navigate={~p"/apps-support/app/#{@app_label}"}
                 >
                   <.dm_mdi name="headset" class="w-4 h-4" /> Support
                 </.link>
                 <.link
-                  class="inline-flex items-center gap-2 hover:scale-125 transition-transform text-blue-400"
+                  class="btn btn-outline btn-sm lg:btn-md"
                   navigate={~p"/apps-privacy/app/#{@app_label}"}
                 >
-                  <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> Privacy Policy
+                  <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> Privacy
                 </.link>
               </div>
             </div>
