@@ -20,6 +20,20 @@ defmodule GsmlgAppAdmin.Accounts.User.Policies do
 
     policy action(:read) do
       authorize_if(expr(id == ^actor(:id)))
+      authorize_if(expr(^actor(:is_admin) == true))
+    end
+
+    policy action(:update) do
+      authorize_if(expr(id == ^actor(:id)))
+      authorize_if(expr(^actor(:is_admin) == true))
+    end
+
+    policy action(:destroy) do
+      authorize_if(expr(^actor(:is_admin) == true))
+    end
+
+    policy action(:create) do
+      authorize_if(expr(^actor(:is_admin) == true))
     end
   end
 end
