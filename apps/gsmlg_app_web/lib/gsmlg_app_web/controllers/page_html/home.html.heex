@@ -1,36 +1,12 @@
 <Layouts.home flash={@flash}>
   <:header_slot>
-    <div
-      class="hero min-h-screen relative overflow-hidden"
-      style="background-image: url(/images/sky-commet.jpg);"
-    >
-      <div class="hero-overlay bg-opacity-60 bg-gradient-to-b from-black/50 to-black/80"></div>
-      <div class="hero-content text-center text-neutral-content relative z-10">
-        <div class="max-w-4xl px-4 sm:px-6 lg:px-8">
-          <div class="animate-fade-in-down">
-            <h1 class="mb-6 text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 bg-clip-text text-transparent leading-tight">
-              Professional Tools, Mobile Optimized
-            </h1>
-          </div>
-          <div class="animate-fade-in-up animation-delay-200">
-            <h2 class="mb-8 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-teal-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent leading-tight">
-              Network utilities and DevOps tools for developers on the go
-            </h2>
-          </div>
-          <div class="animate-fade-in animation-delay-400">
-            <.link
-              href="/apps"
-              class="btn btn-primary btn-lg btn-wide shadow-2xl hover:scale-105 transition-transform duration-300 text-sm sm:text-base"
-            >
-              Explore All Apps <.dm_mdi name="arrow-right" class="w-4 h-4 ml-2" />
-            </.link>
-          </div>
-        </div>
-      </div>
-      <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-        <.dm_mdi name="chevron-down" class="w-8 h-8 text-white/60" />
-      </div>
-    </div>
+    <.hero_section
+      title="Professional Tools, Mobile Optimized"
+      subtitle="Network utilities and DevOps tools for developers on the go"
+      background="/images/sky-commet.jpg"
+      cta="Explore All Apps"
+      cta_link="/apps"
+    />
   </:header_slot>
 
   <div

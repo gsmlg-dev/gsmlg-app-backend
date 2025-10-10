@@ -1,27 +1,24 @@
 <Layouts.app flash={@flash}>
   <:header_slot>
-    <div class="hero bg-gradient-to-br from-primary/95 via-primary/95 to-secondary/95 min-h-[40vh] rounded-b-3xl shadow-2xl">
-      <div class="hero-content text-center text-white">
-        <div class="max-w-md bg-black/10 backdrop-blur-sm rounded-2xl p-8">
-          <div class="flex items-center justify-center gap-4 mb-6">
-            <.dm_mdi name="apps" class="w-12 h-12 text-white drop-shadow-lg" />
-            <h1 class="text-6xl font-bold text-white drop-shadow-lg">
-              Apps
-            </h1>
-          </div>
-          <p class="text-lg mb-8 text-white/90 drop-shadow-md">
-            Discover our collection of powerful tools across all platforms
-          </p>
-          <div class="flex flex-wrap justify-center gap-3">
-            <.platform_badge name="iOS" icon="apple" color="info" />
-            <.platform_badge name="Android" icon="android" color="success" />
-            <.platform_badge name="macOS" icon="apple" color="warning" />
-            <.platform_badge name="Windows" icon="microsoft-windows" color="error" />
-            <.platform_badge name="Linux" icon="linux" color="neutral" />
-          </div>
+    <.hero_section
+      title="Apps"
+      subtitle="Discover our collection of powerful tools across all platforms"
+      type="gradient"
+      gradient_colors="from-primary/95 via-primary/95 to-secondary/95"
+      min_height="min-h-[40vh]"
+      icon="apps"
+      class="rounded-b-3xl shadow-2xl"
+    >
+      <div class="w-full max-w-2xl bg-black/10 backdrop-blur-sm rounded-2xl p-8 animate-fade-in animation-delay-400 mx-auto">
+        <div class="flex flex-wrap justify-center gap-3">
+          <.platform_badge name="iOS" icon="apple" color="info" />
+          <.platform_badge name="Android" icon="android" color="success" />
+          <.platform_badge name="macOS" icon="apple" color="warning" />
+          <.platform_badge name="Windows" icon="microsoft-windows" color="error" />
+          <.platform_badge name="Linux" icon="linux" color="neutral" />
         </div>
       </div>
-    </div>
+    </.hero_section>
   </:header_slot>
 
   <div class="container mx-auto px-4 py-8">

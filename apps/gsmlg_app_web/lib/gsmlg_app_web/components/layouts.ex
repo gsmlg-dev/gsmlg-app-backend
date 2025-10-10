@@ -3,33 +3,41 @@ defmodule GsmlgAppWeb.Layouts do
 
   embed_templates "layouts/*"
 
+  @doc """
+  Base layout component that provides common structure for all layouts
+  """
   slot :header_slot
   slot :inner_block, required: true
-
   attr :flash, :map, required: true
+  attr :current_page, :string, required: true
+  attr :header_class, :string, default: nil
+  attr :main_class, :string, default: nil
+  attr :extra_header_class, :string, default: nil
 
-  def app(assigns) do
+  def base_layout(assigns) do
     ~H"""
     <.dm_page_header
       class={[
         "bg-gradient-to-br from-slate-700 to-neutral-700",
         "text-slate-400",
-        "h-fit"
+        "h-fit",
+        @header_class,
+        @extra_header_class
       ]}
       nav_class={[
         "bg-black text-slate-400"
       ]}
     >
-      <:menu class="uppercase" to="/">
+      <:menu class={GsmlgAppWeb.AppComponents.menu_class("home", @current_page)} to="/">
         Home
       </:menu>
-      <:menu class="uppercase" to="/apps">
+      <:menu class={GsmlgAppWeb.AppComponents.menu_class("apps", @current_page)} to="/apps">
         Apps
       </:menu>
-      <:menu class="uppercase" to="/support">
+      <:menu class={GsmlgAppWeb.AppComponents.menu_class("support", @current_page)} to="/support">
         Support
       </:menu>
-      <:menu class="uppercase" to="/about-us">
+      <:menu class={GsmlgAppWeb.AppComponents.menu_class("about-us", @current_page)} to="/about-us">
         About Us
       </:menu>
       <:user_profile></:user_profile>
@@ -37,7 +45,8 @@ defmodule GsmlgAppWeb.Layouts do
     </.dm_page_header>
     <main class={[
       "flex flex-col",
-      "min-h-[calc(100vh-50%)] w-full"
+      "min-h-[calc(100vh-50%)] w-full",
+      @main_class
     ]}>
       <div class={[
         "w-full min-w-full min-h-full",
@@ -51,6 +60,22 @@ defmodule GsmlgAppWeb.Layouts do
     </main>
 
     <.app_footer />
+    """
+  end
+
+  slot :header_slot
+  slot :inner_block, required: true
+
+  attr :flash, :map, required: true
+
+  def app(assigns) do
+    ~H"""
+    <.base_layout flash={@flash} current_page="apps">
+      <:header_slot>
+        {render_slot(@header_slot)}
+      </:header_slot>
+      {render_slot(@inner_block)}
+    </.base_layout>
     """
   end
 
@@ -61,182 +86,56 @@ defmodule GsmlgAppWeb.Layouts do
 
   def home(assigns) do
     ~H"""
-    <.dm_page_header
-      class={[
-        "bg-gradient-to-br from-slate-700 to-neutral-700",
-        "text-slate-400",
-        "bg-[url(/images/sky-commet.jpg)] bg-no-repeat bg-cover",
-        "h-screen"
-      ]}
-      nav_class={[
-        "bg-black text-slate-400"
-      ]}
+    <.base_layout
+      flash={@flash}
+      current_page="home"
+      extra_header_class="bg-[url(/images/sky-commet.jpg)] bg-no-repeat bg-cover h-screen"
     >
-      <:menu class="border-b-2 text-slate-200 border-slate-200 uppercase" to="/">
-        Home
-      </:menu>
-      <:menu class="uppercase" to="/apps">
-        Apps
-      </:menu>
-      <:menu class="uppercase" to="/support">
-        Support
-      </:menu>
-      <:menu class="uppercase" to="/about-us">
-        About Us
-      </:menu>
-      <:user_profile></:user_profile>
-      {render_slot(@header_slot)}
-    </.dm_page_header>
-    <main class={[
-      "flex flex-col",
-      "min-h-[calc(100vh-50%)] w-full"
-    ]}>
-      <div class={[
-        "w-full min-w-full min-h-full",
-        "mx-auto max-w-2xl",
-        "flex flex-col items-center"
-      ]}>
-        <.dm_flash_group flash={@flash} />
-        <a name="page"></a>
-        {render_slot(@inner_block)}
-      </div>
-    </main>
-
-    <.app_footer />
+      <:header_slot>
+        {render_slot(@header_slot)}
+      </:header_slot>
+      {render_slot(@inner_block)}
+    </.base_layout>
     """
   end
 
+  slot :header_slot
   slot :inner_block, required: true
 
   attr :flash, :map, required: true
 
   def support(assigns) do
     ~H"""
-    <.dm_page_header
-      class={[
-        "bg-gradient-to-br from-slate-700 to-neutral-700",
-        "text-slate-400",
-        "h-fit"
-      ]}
-      nav_class={[
-        "bg-black text-slate-400"
-      ]}
+    <.base_layout
+      flash={@flash}
+      current_page="support"
+      main_class="min-h-[20vh] w-full"
     >
-      <:menu class="uppercase" to="/">
-        Home
-      </:menu>
-      <:menu class="uppercase" to="/apps">
-        Apps
-      </:menu>
-      <:menu class="border-b-2 text-slate-200 border-slate-200 uppercase" to="/support">
-        Support
-      </:menu>
-      <:menu class="uppercase" to="/about-us">
-        About Us
-      </:menu>
-      <:user_profile></:user_profile>
-      <div class={[
-        "container select-none py-32",
-        "flex flex-col justify-center items-center gap-12"
-      ]}>
-        <div
-          class={[
-            "my-4",
-            "flex flex-row items-center justify-center",
-            "text-4xl lg:text-6xl xl:text-8xl text-teal-300 drop-shadow-md font-bold text-center"
-          ]}
-          style="text-shadow: 0px 0px 8px #000"
-        >
-          <.dm_mdi
-            name="headset"
-            class="w-12 h-12 lg:w-16 lg:h-16 xl:w-24 xl:h-24 mr-2 lg:mr-4 xl:mr-6"
-          /> Support
-        </div>
-      </div>
-    </.dm_page_header>
-    <main class={[
-      "flex flex-col",
-      "min-h-[20vh] w-full"
-    ]}>
-      <div class={[
-        "w-full min-w-full min-h-full",
-        "mx-auto max-w-2xl",
-        "flex flex-col items-center"
-      ]}>
-        <.dm_flash_group flash={@flash} />
-        <a name="page"></a>
-        {render_slot(@inner_block)}
-      </div>
-    </main>
-
-    <.app_footer />
+      <:header_slot>
+        {render_slot(@header_slot)}
+      </:header_slot>
+      {render_slot(@inner_block)}
+    </.base_layout>
     """
   end
 
+  slot :header_slot
   slot :inner_block, required: true
 
   attr :flash, :map, required: true
 
   def privacy(assigns) do
     ~H"""
-    <.dm_page_header
-      class={[
-        "bg-gradient-to-br from-slate-700 to-neutral-700",
-        "text-slate-400",
-        "h-fit"
-      ]}
-      nav_class={[
-        "bg-black text-slate-400"
-      ]}
+    <.base_layout
+      flash={@flash}
+      current_page="privacy"
+      main_class="min-h-[20vh] w-full"
     >
-      <:menu class="uppercase" to="/">
-        Home
-      </:menu>
-      <:menu class="uppercase" to="/apps">
-        Apps
-      </:menu>
-      <:menu class="uppercase" to="/support">
-        Support
-      </:menu>
-      <:menu class="uppercase" to="/about-us">
-        About Us
-      </:menu>
-      <:user_profile></:user_profile>
-      <div class={[
-        "container select-none py-32",
-        "flex flex-col justify-center items-center gap-12"
-      ]}>
-        <div
-          class={[
-            "my-4",
-            "flex flex-row items-center justify-center",
-            "text-4xl lg:text-6xl xl:text-8xl text-teal-300 drop-shadow-md font-bold text-center"
-          ]}
-          style="text-shadow: 0px 0px 8px #000"
-        >
-          <.dm_mdi
-            name="shield-lock-outline"
-            class="w-12 h-12 lg:w-16 lg:h-16 xl:w-24 xl:h-24 mr-2 lg:mr-4 xl:mr-6"
-          /> Privacy Policy
-        </div>
-      </div>
-    </.dm_page_header>
-    <main class={[
-      "flex flex-col",
-      "min-h-[20vh] w-full"
-    ]}>
-      <div class={[
-        "w-full min-w-full min-h-full",
-        "mx-auto max-w-2xl",
-        "flex flex-col items-center"
-      ]}>
-        <.dm_flash_group flash={@flash} />
-        <a name="page"></a>
-        {render_slot(@inner_block)}
-      </div>
-    </main>
-
-    <.app_footer />
+      <:header_slot>
+        {render_slot(@header_slot)}
+      </:header_slot>
+      {render_slot(@inner_block)}
+    </.base_layout>
     """
   end
 
@@ -247,47 +146,12 @@ defmodule GsmlgAppWeb.Layouts do
 
   def about(assigns) do
     ~H"""
-    <.dm_page_header
-      class={[
-        "bg-gradient-to-br from-slate-700 to-neutral-700",
-        "text-slate-400",
-        "h-fit"
-      ]}
-      nav_class={[
-        "bg-black text-slate-400"
-      ]}
-    >
-      <:menu class="uppercase" to="/">
-        Home
-      </:menu>
-      <:menu class="uppercase" to="/apps">
-        Apps
-      </:menu>
-      <:menu class="uppercase" to="/support">
-        Support
-      </:menu>
-      <:menu class="border-b-2 text-slate-200 border-slate-200 uppercase" to="/about-us">
-        About Us
-      </:menu>
-      <:user_profile></:user_profile>
-      {render_slot(@header_slot)}
-    </.dm_page_header>
-    <main class={[
-      "flex flex-col",
-      "min-h-[calc(100vh-50%)] w-full"
-    ]}>
-      <div class={[
-        "w-full min-w-full min-h-full",
-        "mx-auto max-w-2xl",
-        "flex flex-col items-center"
-      ]}>
-        <.dm_flash_group flash={@flash} />
-        <a name="page"></a>
-        {render_slot(@inner_block)}
-      </div>
-    </main>
-
-    <.app_footer />
+    <.base_layout flash={@flash} current_page="about-us">
+      <:header_slot>
+        {render_slot(@header_slot)}
+      </:header_slot>
+      {render_slot(@inner_block)}
+    </.base_layout>
     """
   end
 end

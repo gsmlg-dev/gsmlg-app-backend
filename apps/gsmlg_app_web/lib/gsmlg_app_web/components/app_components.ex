@@ -407,6 +407,123 @@ defmodule GsmlgAppWeb.AppComponents do
   end
 
   @doc """
+  Hero section component for page headers
+  ## Examples
+      <.hero_section 
+        title="Support Center" 
+        subtitle="We're Here to Help"
+        background="explosion.png"
+        gradient="from-black/50 to-black/80"
+      />
+      
+      <.hero_section 
+        title="Apps"
+        subtitle="Discover our collection"
+        type="gradient"
+        gradient_colors="from-primary/95 via-primary/95 to-secondary/95"
+      />
+  """
+  @doc type: :component
+  attr(:id, :any, default: false)
+  attr(:class, :string, default: "")
+  attr(:title, :string, required: true)
+  attr(:subtitle, :string, default: nil)
+  attr(:description, :string, default: nil)
+  attr(:type, :string, default: "image", values: ["image", "gradient"])
+  attr(:background, :string, default: nil)
+  attr(:gradient_colors, :string, default: "from-black/50 to-black/80")
+  attr(:min_height, :string, default: "min-h-screen")
+  attr(:icon, :string, default: nil)
+  attr(:cta, :string, default: nil)
+  attr(:cta_link, :string, default: nil)
+
+  slot(:inner_block, doc: "Custom content for the hero section")
+
+  def hero_section(assigns) do
+    ~H"""
+    <div class={[
+      "hero relative overflow-hidden",
+      @min_height,
+      hero_background_style(@type, @background, @gradient_colors),
+      @class
+    ]}>
+      <div class={["hero-overlay bg-opacity-60 bg-gradient-to-b", @gradient_colors]}></div>
+      <div class="hero-content text-center text-neutral-content relative z-10">
+        <div class="max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div class="animate-fade-in-down">
+            <div class="flex items-center justify-center gap-4 mb-6">
+              <.dm_mdi
+                :if={@icon}
+                name={@icon}
+                class="w-12 h-12 lg:w-16 lg:h-16 text-white drop-shadow-lg"
+              />
+              <h1 class={[
+                "text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold",
+                "bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500 bg-clip-text text-transparent",
+                "leading-tight"
+              ]}>
+                {@title}
+              </h1>
+            </div>
+          </div>
+
+          <div :if={@subtitle} class="animate-fade-in-up animation-delay-200">
+            <h2 class={[
+              "mb-8 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold",
+              "bg-gradient-to-r from-teal-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent",
+              "leading-tight"
+            ]}>
+              {@subtitle}
+            </h2>
+          </div>
+
+          <div :if={@description} class="animate-fade-in animation-delay-400">
+            <p class="mb-8 text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto">
+              {@description}
+            </p>
+          </div>
+
+          <div :if={@cta && @cta_link} class="animate-fade-in animation-delay-400">
+            <.link
+              href={@cta_link}
+              class="btn btn-primary btn-lg btn-wide shadow-2xl hover:scale-105 transition-transform duration-300"
+            >
+              {@cta} <.dm_mdi name="arrow-right" class="w-4 h-4 ml-2" />
+            </.link>
+          </div>
+
+          {render_slot(@inner_block)}
+        </div>
+      </div>
+
+      <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+        <.dm_mdi name="chevron-down" class="w-8 h-8 text-white/60" />
+      </div>
+    </div>
+    """
+  end
+
+  defp hero_background_style("image", background, _gradient),
+    do: "style=\"background-image: url(#{background});\""
+
+  defp hero_background_style("gradient", _background, gradient_colors),
+    do: "bg-gradient-to-br #{gradient_colors}"
+
+  @doc """
+  Returns menu class for highlighting active menu item
+  ## Examples
+      menu_class("home", "home") # returns "border-b-2 text-slate-200 border-slate-200 uppercase"
+      menu_class("apps", "home") # returns "uppercase"
+  """
+  def menu_class(page, current_page) when page == current_page do
+    "border-b-2 text-slate-200 border-slate-200 uppercase"
+  end
+
+  def menu_class(_page, _current_page) do
+    "uppercase"
+  end
+
+  @doc """
   Generates fdroid_icon
   ## Example
       <.fdroid_icon class="w-6 h-6" />
