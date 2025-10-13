@@ -7,13 +7,14 @@ in
 {
   env.GREET = "GSMLG APP Backend";
 
-  packages = [
-    pkgs-stable.git
-    pkgs-stable.figlet
-    pkgs-stable.lolcat
-    pkgs-stable.watchman
-    pkgs-stable.inotify-tools
-    pkgs-stable.tailwindcss_4
+  packages = with pkgs-stable; [
+    git
+    figlet
+    lolcat
+    watchman
+    tailwindcss_4
+  ] ++ lib.optionals stdenv.isLinux [
+    inotify-tools
   ];
 
   languages.elixir.enable = true;
@@ -31,6 +32,26 @@ in
   enterShell = ''
     hello
   '';
+
+  # services
+  services.postgres = {
+    enable = true;
+    package = pkgs-stable.postgresql_14;
+    initialDatabases = [{ name = "gsmlg_app_admin_dev"; }];
+    listen_addresses = "localhost";
+    port = 5432;
+    settings = {
+      max_connections = 200;
+      shared_buffers = "512MB";
+      log_min_duration_statement = 500;
+    };
+    initialScript = ''
+      CREATE USER gsmlg_app WITH PASSWORD 'gsmlg_app';
+      CREATE DATABASE gsmlg_app OWNER gsmlg_app;
+      ALTER USER gsmlg_app WITH CREATEDB PASSWORD 'gsmlg_app';
+      ALTER DATABASE gsmlg_app_admin_dev OWNER TO gsmlg_app;
+    '';
+  };
 
 }
 

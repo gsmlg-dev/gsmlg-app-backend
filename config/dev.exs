@@ -39,7 +39,7 @@ config :gsmlg_app_web, dev_routes: true
 config :gsmlg_app_admin, GsmlgAppAdmin.Repo,
   username: "gsmlg_app",
   password: "gsmlg_app",
-  hostname: "10.100.1.10",
+  hostname: "localhost",
   database: "gsmlg_app_admin_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
