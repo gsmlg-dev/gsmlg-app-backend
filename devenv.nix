@@ -37,7 +37,10 @@ in
   services.postgres = {
     enable = true;
     package = pkgs-stable.postgresql_14;
-    initialDatabases = [{ name = "gsmlg_app_admin_dev"; }];
+    initialDatabases = [
+      { name = "gsmlg_app_admin_dev"; }
+      { name = "gsmlg_app_admin_test"; }
+    ];
     listen_addresses = "localhost";
     port = 5432;
     settings = {

@@ -17,7 +17,7 @@ config :gsmlg_app_admin, GsmlgAppAdmin.Repo,
   password: System.get_env("POSTGRES_PASSWORD", "gsmlg_app"),
   hostname: System.get_env("POSTGRES_HOST", "localhost"),
   database:
-    "#{System.get_env("POSTGRES_DATABASE", "gsmlg_app_admin_test")}#{System.get_env("MIX_TEST_PARTITION")}",
+    "gsmlg_app_admin_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10,
   queue_target: 5000,
