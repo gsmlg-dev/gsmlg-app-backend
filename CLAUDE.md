@@ -137,3 +137,5 @@ docker build -t gsmlg-app-backend .
 - `devenv.nix` - Nix development environment with PostgreSQL
 - `AGENTS.md` - Additional build/lint/test commands and code style guidelines
 - `.formatter.exs` - Code formatting rules including HEEx files
+- This app use phoenix_duskmoon for ui instead of CoreComponent. The phoenix_dusmoon is a phoenix UI lib.
+- This app use duskmoonui instead of daisyui, duskmoonui is a fork of daisyui, add a tertiary color in the theme.

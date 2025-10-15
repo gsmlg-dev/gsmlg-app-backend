@@ -34,6 +34,11 @@ defmodule GsmlgAppAdminWeb.Router do
 
     get("/", PageController, :home)
 
+    # User management routes
+    live "/users", UserManagementLive.Index, :index
+    live "/users/new", UserManagementLive.Index, :new
+    live "/users/:id/edit", UserManagementLive.Index, :edit
+
     reset_route(otp_app: :gsmlg_app_admin)
   end
 

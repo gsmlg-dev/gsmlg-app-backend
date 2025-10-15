@@ -84,7 +84,6 @@ defmodule GsmlgAppAdminWeb do
       import Phoenix.HTML
       # Core UI components and translation
       use PhoenixDuskmoon.Component
-      import GsmlgAppAdminWeb.AppComponents
       use Gettext, backend: GsmlgAppAdminWeb.Gettext
 
       import GsmlgAppComponent.App

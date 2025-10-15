@@ -1,0 +1,21 @@
+Verify Your Email Address
+
+Hi <%= @user.first_name || "there" %>!
+
+Thank you for signing up for GSMLG Platform! To complete your registration and access all features, please verify your email address.
+
+Click the link below to verify your email:
+<%= @verification_url %>
+
+IMPORTANT: This verification link will expire in 24 hours for security reasons.
+
+If you can't click the link, please copy and paste it into your browser's address bar.
+
+If you didn't create an account with GSMLG Platform, please ignore this email or contact our support team.
+
+Best regards,
+The GSMLG Platform Team
+
+---
+This email was sent to <%= @user.email %>. You received this email because a GSMLG Platform account was created with this email address.
+If you didn't request this verification, please contact our support team immediately.

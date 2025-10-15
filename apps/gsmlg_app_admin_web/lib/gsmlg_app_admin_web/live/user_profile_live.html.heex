@@ -1,0 +1,192 @@
+<div class="space-y-6">
+  <div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+      <div class="sm:flex-auto">
+        <h1 class="text-2xl font-semibold leading-6 text-gray-900">My Profile</h1>
+        <p class="mt-2 text-sm text-gray-700">
+          Manage your personal information and account settings.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-4 sm:px-6 lg:px-8">
+    <div class="lg:grid lg:grid-cols-12 lg:gap-x-16">
+      <!-- Profile Information Card -->
+      <div class="lg:col-span-4">
+        <div class="overflow-hidden rounded-lg bg-white shadow">
+          <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center">
+              <div class="h-16 w-16 flex-shrink-0">
+                <div class="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center">
+                  <span class="text-xl font-medium text-gray-700">
+                    {String.first(@current_user.first_name || "")}{String.first(
+                      @current_user.last_name || ""
+                    )}
+                  </span>
+                </div>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">
+                  {@current_user.display_name || @current_user.username || "User"}
+                </h3>
+                <p class="text-sm text-gray-500">@{@current_user.username || "no-username"}</p>
+                <div class="mt-1">
+                  <span class={"inline-flex rounded-full px-2 text-xs font-semibold leading-5 #{role_badge_class(@current_user.role)}"}>
+                    {String.capitalize(Atom.to_string(@current_user.role))}
+                  </span>
+                  <span class={"inline-flex rounded-full px-2 text-xs font-semibold leading-5 #{status_badge_class(@current_user.status)}"}>
+                    {String.capitalize(Atom.to_string(@current_user.status))}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <dl class="mt-6 space-y-3">
+              <div class="text-sm">
+                <dt class="font-medium text-gray-500">Email</dt>
+                <dd class="text-gray-900">{@current_user.email}</dd>
+                <%= if @current_user.email_verified do %>
+                  <dd class="text-green-600">✓ Verified</dd>
+                <% else %>
+                  <dd class="text-yellow-600">✗ Not verified</dd>
+                <% end %>
+              </div>
+
+              <div class="text-sm">
+                <dt class="font-medium text-gray-500">Member Since</dt>
+                <dd class="text-gray-900">{format_datetime(@current_user.created_at)}</dd>
+              </div>
+
+              <div class="text-sm">
+                <dt class="font-medium text-gray-500">Last Login</dt>
+                <dd class="text-gray-900">{format_datetime(@current_user.last_login_at)}</dd>
+              </div>
+
+              <div class="text-sm">
+                <dt class="font-medium text-gray-500">Timezone</dt>
+                <dd class="text-gray-900">{@current_user.timezone}</dd>
+              </div>
+
+              <div class="text-sm">
+                <dt class="font-medium text-gray-500">Language</dt>
+                <dd class="text-gray-900">{@current_user.language}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+      
+<!-- Edit Profile Form -->
+      <div class="mt-6 lg:col-span-8 lg:mt-0">
+        <div class="overflow-hidden rounded-lg bg-white shadow">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg font-medium leading-6 text-gray-900">Edit Profile</h3>
+            <div class="mt-5">
+              <.dm_form
+                :let={f}
+                for={@form}
+                id="profile-form"
+                phx-submit="update_profile"
+              >
+                <div class="grid grid-cols-6 gap-6">
+                  <div class="col-span-6 sm:col-span-3">
+                    <.dm_input field={f[:first_name]} type="text" label="First name" />
+                  </div>
+
+                  <div class="col-span-6 sm:col-span-3">
+                    <.dm_input field={f[:last_name]} type="text" label="Last name" />
+                  </div>
+
+                  <div class="col-span-6">
+                    <.dm_input field={f[:display_name]} type="text" label="Display name" />
+                  </div>
+
+                  <div class="col-span-6">
+                    <.dm_input field={f[:username]} type="text" label="Username" />
+                  </div>
+
+                  <div class="col-span-6 sm:col-span-3">
+                    <.dm_input
+                      field={f[:timezone]}
+                      type="text"
+                      label="Timezone"
+                    />
+                  </div>
+
+                  <div class="col-span-6 sm:col-span-3">
+                    <.dm_input
+                      field={f[:language]}
+                      type="text"
+                      label="Language"
+                    />
+                  </div>
+                </div>
+
+                <:actions>
+                  <.dm_btn phx-disable-with="Saving...">Save Changes</.dm_btn>
+                </:actions>
+              </.dm_form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+<!-- Change Password Section -->
+    <div class="mt-6">
+      <div class="overflow-hidden rounded-lg bg-white shadow">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg font-medium leading-6 text-gray-900">Change Password</h3>
+          <div class="mt-5">
+            <.dm_form
+              :let={f}
+              for={@password_form}
+              id="password-form"
+              phx-submit="change_password"
+            >
+              <div class="grid grid-cols-6 gap-6">
+                <div class="col-span-6">
+                  <.dm_input
+                    name="password[current_password]"
+                    type="password"
+                    label="Current Password"
+                    required
+                  />
+                </div>
+
+                <div class="col-span-6 sm:col-span-3">
+                  <.dm_input
+                    name="password[new_password]"
+                    type="password"
+                    label="New Password"
+                    required
+                  />
+                </div>
+
+                <div class="col-span-6 sm:col-span-3">
+                  <.dm_input
+                    name="password[new_password_confirmation]"
+                    type="password"
+                    label="Confirm New Password"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <p class="text-sm text-gray-500">
+                  Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character.
+                </p>
+              </div>
+
+              <:actions>
+                <.dm_btn phx-disable-with="Changing password...">Change Password</.dm_btn>
+              </:actions>
+            </.dm_form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

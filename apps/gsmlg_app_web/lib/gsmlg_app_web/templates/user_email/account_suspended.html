@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Your account has been suspended</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background-color: #dc2626;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-radius: 8px 8px 0 0;
+    }
+    .content {
+      background-color: #f9fafb;
+      padding: 30px;
+      border: 1px solid #e5e7eb;
+      border-radius: 0 0 8px 8px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #6b7280;
+      font-size: 12px;
+    }
+    .notice {
+      background-color: #fee2e2;
+      border-left: 4px solid #dc2626;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .info {
+      background-color: #dbeafe;
+      border-left: 4px solid #2563eb;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Account Suspension Notice</h1>
+  </div>
+
+  <div class="content">
+    <p>Hi <%= @user.first_name || "there" %>!</p>
+
+    <div class="notice">
+      <p><strong>Your GSMLG Platform account has been suspended.</strong></p>
+    </div>
+
+    <p>This action was taken by our administrative team due to a violation of our terms of service or community guidelines.</p>
+
+    <p>As a result of this suspension:</p>
+    <ul>
+      <li>You cannot log into your account</li>
+      <li>Your access to platform features has been restricted</li>
+      <li>Your profile may not be visible to other users</li>
+    </ul>
+
+    <div class="info">
+      <p><strong>What happens next?</strong></p>
+      <p>You will receive a separate communication with details about:</p>
+      <ul>
+        <li>The reason for suspension</li>
+        <li>Duration of the suspension</li>
+        <li>Any required actions to regain access</li>
+      </ul>
+    </div>
+
+    <p>If you believe this suspension was made in error, or if you have questions about this action, please contact our support team.</p>
+
+    <p>When contacting us, please include:</p>
+    <ul>
+      <li>Your username: <%= @user.username || "Not set" %></li>
+      <li>Your registered email: <%= @user.email %></li>
+      <li>Any relevant information about your case</li>
+    </ul>
+
+    <p>We appreciate your understanding and cooperation.</p>
+
+    <p>Best regards,<br>The GSMLG Platform Team</p>
+  </div>
+
+  <div class="footer">
+    <p>This email was sent to <%= @user.email %>. You received this email because administrative action was taken on your GSMLG Platform account.</p>
+    <p>If you believe this is an error, please contact our support team immediately.</p>
+  </div>
+</body>
+</html>

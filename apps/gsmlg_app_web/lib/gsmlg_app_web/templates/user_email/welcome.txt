@@ -1,0 +1,28 @@
+Welcome to GSMLG Platform!
+
+Hi <%= @user.first_name || "there" %>!
+
+Thank you for joining GSMLG Platform! We're excited to have you on board.
+
+Your account has been successfully created with the email: <%= @user.email %>
+
+<%= if !@user.email_verified do %>
+Next Step: Please verify your email address to unlock all features of the platform.
+
+Please check your inbox for a verification email or visit our website to complete the verification process.
+<% end %>
+
+Here's what you can do with your new account:
+- Access all platform features
+- Connect with other users
+- Manage your profile and preferences
+- And much more!
+
+If you have any questions, feel free to reach out to our support team.
+
+Best regards,
+The GSMLG Platform Team
+
+---
+This email was sent to <%= @user.email %>. You received this email because you created an account on GSMLG Platform.
+If you didn't create this account, please contact our support team immediately.

@@ -32,6 +32,75 @@ defmodule GsmlgAppAdmin.Accounts.User do
         :language
       ])
     end
+
+    # Custom create action for admin interface
+    create :admin_create do
+      accept([
+        :email,
+        :first_name,
+        :last_name,
+        :username,
+        :display_name,
+        :status,
+        :email_verified,
+        :role,
+        :is_admin,
+        :timezone,
+        :language
+      ])
+
+      argument(:password, :string, sensitive?: true)
+
+      # Hash password before storing
+      change(fn changeset, _context ->
+        password = Ash.Changeset.get_argument(changeset, :password)
+
+        if password do
+          hashed_password = Bcrypt.hash_pwd_salt(password)
+          Ash.Changeset.change_attribute(changeset, :hashed_password, hashed_password)
+        else
+          changeset
+        end
+      end)
+    end
+
+    # Custom update action for admin interface that handles password changes
+    update :admin_update do
+      accept([
+        :email,
+        :first_name,
+        :last_name,
+        :username,
+        :display_name,
+        :status,
+        :email_verified,
+        :role,
+        :timezone,
+        :language
+      ])
+
+      argument(:password, :string, sensitive?: true)
+      argument(:password_confirmation, :string, sensitive?: true)
+
+      # Only update password if provided
+      change(fn changeset, _context ->
+        password = Ash.Changeset.get_argument(changeset, :password)
+        password_confirmation = Ash.Changeset.get_argument(changeset, :password_confirmation)
+
+        if password && password != "" do
+          if password == password_confirmation do
+            changeset
+            |> Ash.Changeset.change_attribute(:hashed_password, password)
+          else
+            Ash.Changeset.add_error(changeset, :password, "does not match confirmation")
+          end
+        else
+          changeset
+        end
+      end)
+
+      require_atomic?(false)
+    end
   end
 
   attributes do
@@ -128,6 +197,17 @@ defmodule GsmlgAppAdmin.Accounts.User do
     validate(one_of(:role, [:admin, :user, :moderator]),
       message: "must be one of: admin, user, moderator"
     )
+
+    # Password strength validation
+    validate(fn changeset, _context ->
+      password = Ash.Changeset.get_argument(changeset, :password)
+
+      if password && password != "" && String.length(password) < 8 do
+        {:error, "Password must be at least 8 characters long"}
+      else
+        :ok
+      end
+    end)
   end
 
   # If using policies, add the folowing bypass:
