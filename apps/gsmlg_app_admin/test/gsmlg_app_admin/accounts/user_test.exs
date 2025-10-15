@@ -25,7 +25,12 @@ defmodule GsmlgAppAdmin.Accounts.UserTest do
     }
 
     admin_actor = %{is_admin: true}
-    assert {:ok, %User{} = user} = User |> Ash.Changeset.for_create(:admin_create, valid_attrs) |> Ash.create(actor: admin_actor)
+
+    assert {:ok, %User{} = user} =
+             User
+             |> Ash.Changeset.for_create(:admin_create, valid_attrs)
+             |> Ash.create(actor: admin_actor)
+
     assert to_string(user.email) == "test@example.com"
     assert user.first_name == "John"
     assert user.last_name == "Doe"
@@ -36,7 +41,11 @@ defmodule GsmlgAppAdmin.Accounts.UserTest do
 
   test "admin_create/2 with invalid data returns error" do
     admin_actor = %{is_admin: true}
-    assert {:error, %Ash.Error.Invalid{}} = User |> Ash.Changeset.for_create(:admin_create, @invalid_attrs) |> Ash.create(actor: admin_actor)
+
+    assert {:error, %Ash.Error.Invalid{}} =
+             User
+             |> Ash.Changeset.for_create(:admin_create, @invalid_attrs)
+             |> Ash.create(actor: admin_actor)
   end
 
   test "admin_create/2 requires email to be valid format" do
@@ -48,7 +57,11 @@ defmodule GsmlgAppAdmin.Accounts.UserTest do
     }
 
     admin_actor = %{is_admin: true}
-    assert {:error, %Ash.Error.Invalid{}} = User |> Ash.Changeset.for_create(:admin_create, invalid_attrs) |> Ash.create(actor: admin_actor)
+
+    assert {:error, %Ash.Error.Invalid{}} =
+             User
+             |> Ash.Changeset.for_create(:admin_create, invalid_attrs)
+             |> Ash.create(actor: admin_actor)
   end
 
   test "admin_create/2 requires password to be at least 8 characters" do
@@ -60,7 +73,11 @@ defmodule GsmlgAppAdmin.Accounts.UserTest do
     }
 
     admin_actor = %{is_admin: true}
-    assert {:error, %Ash.Error.Invalid{}} = User |> Ash.Changeset.for_create(:admin_create, invalid_attrs) |> Ash.create(actor: admin_actor)
+
+    assert {:error, %Ash.Error.Invalid{}} =
+             User
+             |> Ash.Changeset.for_create(:admin_create, invalid_attrs)
+             |> Ash.create(actor: admin_actor)
   end
 
   test "admin_create/2 requires unique email" do
@@ -74,7 +91,11 @@ defmodule GsmlgAppAdmin.Accounts.UserTest do
     }
 
     admin_actor = %{is_admin: true}
-    assert {:error, %Ash.Error.Invalid{}} = User |> Ash.Changeset.for_create(:admin_create, duplicate_attrs) |> Ash.create(actor: admin_actor)
+
+    assert {:error, %Ash.Error.Invalid{}} =
+             User
+             |> Ash.Changeset.for_create(:admin_create, duplicate_attrs)
+             |> Ash.create(actor: admin_actor)
   end
 
   test "admin_create/2 requires unique username" do
@@ -89,6 +110,10 @@ defmodule GsmlgAppAdmin.Accounts.UserTest do
     }
 
     admin_actor = %{is_admin: true}
-    assert {:error, %Ash.Error.Invalid{}} = User |> Ash.Changeset.for_create(:admin_create, duplicate_attrs) |> Ash.create(actor: admin_actor)
+
+    assert {:error, %Ash.Error.Invalid{}} =
+             User
+             |> Ash.Changeset.for_create(:admin_create, duplicate_attrs)
+             |> Ash.create(actor: admin_actor)
   end
 end

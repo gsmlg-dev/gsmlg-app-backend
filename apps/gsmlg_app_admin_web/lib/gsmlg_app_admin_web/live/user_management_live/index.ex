@@ -53,6 +53,7 @@ defmodule GsmlgAppAdminWeb.UserManagementLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     try do
       user = Accounts.get_user!(id)
+
       socket
       |> assign(:page_title, "Edit User")
       |> assign(:user, user)
@@ -170,6 +171,7 @@ defmodule GsmlgAppAdminWeb.UserManagementLive.Index do
       :exit, reason ->
         Logger.error("Process exited while fetching users: #{inspect(reason)}")
         {:error, reason}
+
       :throw, value ->
         Logger.error("Thrown value while fetching users: #{inspect(value)}")
         {:error, value}

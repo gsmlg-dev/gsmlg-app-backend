@@ -28,7 +28,11 @@ defmodule GsmlgAppAdmin.AccountsFixtures do
         role: :user,
         email_verified: true
       })
-      |> then(&User |> Ash.Changeset.for_create(:admin_create, &1) |> Ash.create!(actor: admin_actor))
+      |> then(
+        &(User
+          |> Ash.Changeset.for_create(:admin_create, &1)
+          |> Ash.create!(actor: admin_actor))
+      )
 
     user
   end

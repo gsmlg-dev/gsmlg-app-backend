@@ -90,6 +90,7 @@ defmodule GsmlgAppAdmin.Accounts.User do
         if password && password != "" do
           if password == password_confirmation do
             hashed_password = Bcrypt.hash_pwd_salt(password)
+
             changeset
             |> Ash.Changeset.change_attribute(:hashed_password, hashed_password)
           else
