@@ -45,8 +45,8 @@ This is an Elixir umbrella project consisting of multiple applications:
 - Elixir 1.14+
 - Erlang/OTP 25+
 - PostgreSQL 13+
-- Node.js (for assets)
-- Bun 1.0+
+- Node.js 18+ (for assets)
+- Bun 1.2.5+
 
 ## Installation
 
@@ -82,10 +82,10 @@ mix phx.server
 
 Or start specific releases:
 ```bash
-# Admin interface (default port 4000)
+# Admin interface (port 4153)
 mix phx.server -s gsmlg_app_admin
 
-# Public interface (default port 4001)  
+# Public interface (port 4152)
 mix phx.server -s gsmlg_app
 ```
 
@@ -125,8 +125,16 @@ Configuration files are located in the `config/` directory:
 
 Key environment variables for production:
 - `DATABASE_URL` - PostgreSQL connection string
-- `SECRET_KEY_BASE` - Secret key for Phoenix
+- `SECRET_KEY_BASE_WEB` - Secret key for public web interface
+- `SECRET_KEY_BASE_ADMIN` - Secret key for admin interface
+- `TOKEN_SIGNING_SECRET` - Token signing secret for authentication
+- `DB_USERNAME` - Database username
+- `DB_PASSWORD` - Database password
+- `DB_HOST` - Database host
+- `DB_NAME` - Database name
 - `PORT` - Server port (default: 4152)
+
+For detailed setup instructions, see [DEVELOPMENT.md](./DEVELOPMENT.md).
 
 ## Deployment
 

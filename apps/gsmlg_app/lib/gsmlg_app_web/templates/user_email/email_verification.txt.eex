@@ -1,0 +1,17 @@
+Verify Your Email Address
+
+Hello <%= @user.display_name || @user.first_name || @user.email %>,
+
+Please verify your email address by clicking the link below:
+
+<%= @verification_url %>
+
+This link will expire in 24 hours for security reasons.
+
+If you didn't create an account with GSMLG Platform, you can safely ignore this email.
+
+Best regards,
+The GSMLG Platform Team
+
+© <%= DateTime.utc_now().year %> GSMLG Platform. All rights reserved.
+This is an automated message, please do not reply to this email.

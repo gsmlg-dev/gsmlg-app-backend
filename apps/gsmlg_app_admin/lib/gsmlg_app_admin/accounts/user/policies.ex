@@ -35,5 +35,9 @@ defmodule GsmlgAppAdmin.Accounts.User.Policies do
     policy action(:create) do
       authorize_if(expr(^actor(:is_admin) == true))
     end
+
+    policy action(:admin_create) do
+      authorize_if(expr(^actor(:is_admin) == true))
+    end
   end
 end

@@ -13,7 +13,7 @@ config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "++y7z5YOMi8AqMVyn3x941rXNBaD81/CtGtj+EY/4H37gKkVPbAJbrasc0sq94hW",
+  secret_key_base: System.get_env("SECRET_KEY_BASE_WEB") || "++y7z5YOMi8AqMVyn3x941rXNBaD81/CtGtj+EY/4H37gKkVPbAJbrasc0sq94hW",
   watchers: [
     bun: {Bun, :install_and_run, [:gsmlg_app_web, ~w(--watch)]},
     tailwind: {Tailwind, :install_and_run, [:gsmlg_app_web, ~w(--watch)]}
@@ -37,10 +37,10 @@ config :gsmlg_app_web, dev_routes: true
 
 # Configure your database
 config :gsmlg_app_admin, GsmlgAppAdmin.Repo,
-  username: "gsmlg_app",
-  password: "gsmlg_app",
-  hostname: "localhost",
-  database: "gsmlg_app_admin_dev",
+  username: System.get_env("DB_USERNAME") || "gsmlg_app",
+  password: System.get_env("DB_PASSWORD") || "gsmlg_app",
+  hostname: System.get_env("DB_HOST") || "localhost",
+  database: System.get_env("DB_NAME") || "gsmlg_app_admin_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -58,7 +58,7 @@ config :gsmlg_app_admin_web, GsmlgAppAdminWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "1gdA/MEjjg9APn1rwyUsdBQ5FVA6iUIeIlUclRMFBT2i1cx3ONPx3DqxWXSDqi1w",
+  secret_key_base: System.get_env("SECRET_KEY_BASE_ADMIN") || "1gdA/MEjjg9APn1rwyUsdBQ5FVA6iUIeIlUclRMFBT2i1cx3ONPx3DqxWXSDqi1w",
   watchers: [
     bun: {Bun, :install_and_run, [:gsmlg_app_admin_web, ~w(--watch)]},
     tailwind: {Tailwind, :install_and_run, [:gsmlg_app_admin_web, ~w(--watch)]}
@@ -80,10 +80,10 @@ config :gsmlg_app_admin_web,
   dev_routes: true
 
 config :gsmlg_app_admin,
-  token_signing_secret: "1gdA/MEjjg9APn1rwyUsdBQ5FVA6iUIeIlUclRMFBT2i1cx3ONPx3DqxWXSDqi1w"
+  token_signing_secret: System.get_env("TOKEN_SIGNING_SECRET") || "1gdA/MEjjg9APn1rwyUsdBQ5FVA6iUIeIlUclRMFBT2i1cx3ONPx3DqxWXSDqi1w"
 
 config :ash_authentication,
-  token_signing_secret: "1gdA/MEjjg9APn1rwyUsdBQ5FVA6iUIeIlUclRMFBT2i1cx3ONPx3DqxWXSDqi1w"
+  token_signing_secret: System.get_env("TOKEN_SIGNING_SECRET") || "1gdA/MEjjg9APn1rwyUsdBQ5FVA6iUIeIlUclRMFBT2i1cx3ONPx3DqxWXSDqi1w"
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
