@@ -1,9 +1,7 @@
 defmodule GsmlgAppComponent.AppTest do
   use ExUnit.Case, async: true
 
-  import Phoenix.Component
   import Phoenix.LiveViewTest
-  import GsmlgAppComponent.App
 
   describe "app_topbar/1" do
     test "renders app topbar with default title" do

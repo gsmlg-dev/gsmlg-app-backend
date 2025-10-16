@@ -3,6 +3,6 @@ defmodule GsmlgAppComponentTest do
   doctest GsmlgAppComponent
 
   test "greets the world" do
-    assert :hello != :world
+    assert "hello" != "world"
   end
 end
