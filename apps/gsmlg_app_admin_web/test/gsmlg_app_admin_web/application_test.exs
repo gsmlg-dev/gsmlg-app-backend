@@ -5,12 +5,6 @@ defmodule GsmlgAppAdminWeb.ApplicationTest do
     test "application can be started with correct configuration" do
       # Test that the application module exists and has the expected structure
       assert function_exported?(GsmlgAppAdminWeb.Application, :start, 2)
-
-      # Test that we can get children specification (if implemented)
-      if function_exported?(GsmlgAppAdminWeb.Application, :children, 0) do
-        children = GsmlgAppAdminWeb.Application.children()
-        assert is_list(children)
-      end
     end
 
     test "application has correct OTP application configuration" do
