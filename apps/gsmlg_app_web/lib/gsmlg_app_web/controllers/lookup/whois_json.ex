@@ -1,5 +1,4 @@
 defmodule GsmlgAppWeb.Lookup.WhoisJSON do
-  alias GsmlgApp.Lookup.Whois
 
   @doc """
   Renders whois info.

@@ -2,7 +2,6 @@ defmodule GsmlgAppAdminWeb.UserManagementLive.FormComponent do
   use GsmlgAppAdminWeb, :live_component
 
   alias GsmlgAppAdmin.Accounts
-  alias GsmlgAppAdmin.Accounts.User
 
   @impl true
   def render(assigns) do
@@ -10,8 +9,6 @@ defmodule GsmlgAppAdminWeb.UserManagementLive.FormComponent do
     <div>
       <.dm_card>
         <:title>{@title}</:title>
-        <:subtitle>Use this form to manage user records in your database.</:subtitle>
-        <:body>
           <.dm_form
             :let={f}
             for={@form}
@@ -131,7 +128,6 @@ defmodule GsmlgAppAdminWeb.UserManagementLive.FormComponent do
               <.dm_btn phx-disable-with="Saving...">Save User</.dm_btn>
             </:actions>
           </.dm_form>
-        </:body>
       </.dm_card>
     </div>
     """
