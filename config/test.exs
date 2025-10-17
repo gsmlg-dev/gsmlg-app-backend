@@ -43,3 +43,10 @@ config :swoosh, :api_client, false
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+# Configure Ash Authentication for tests
+config :ash_authentication,
+  token_signing_secret: "test_jwt_signing_secret_for_testing_only"
+
+config :ash_authentication, :jwt,
+  signing_secret: "test_jwt_signing_secret_for_testing_only"

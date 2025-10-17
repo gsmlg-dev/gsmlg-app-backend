@@ -53,4 +53,18 @@ if config_env() == :prod do
       port: String.to_integer(System.get_env("ADMIN_PORT") || "4153")
     ],
     secret_key_base: secret_key_base
+
+  # Configure Ash Authentication JWT signing secret for production
+  jwt_signing_secret =
+    System.get_env("TOKEN_SIGNING_SECRET") ||
+      raise """
+      environment variable TOKEN_SIGNING_SECRET is missing.
+      Generate one with: openssl rand -base64 64
+      """
+
+  config :ash_authentication,
+    token_signing_secret: jwt_signing_secret
+
+  config :ash_authentication, :jwt,
+    signing_secret: jwt_signing_secret
 end

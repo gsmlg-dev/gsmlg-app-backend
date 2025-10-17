@@ -93,6 +93,11 @@ config :ash_authentication,
     System.get_env("TOKEN_SIGNING_SECRET") ||
       "1gdA/MEjjg9APn1rwyUsdBQ5FVA6iUIeIlUclRMFBT2i1cx3ONPx3DqxWXSDqi1w"
 
+config :ash_authentication, :jwt,
+  signing_secret:
+    System.get_env("TOKEN_SIGNING_SECRET") ||
+      "1gdA/MEjjg9APn1rwyUsdBQ5FVA6iUIeIlUclRMFBT2i1cx3ONPx3DqxWXSDqi1w"
+
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
 
