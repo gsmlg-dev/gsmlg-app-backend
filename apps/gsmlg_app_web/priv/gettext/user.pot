@@ -1,0 +1,675 @@
+## This file is a PO Template file.
+##
+## "msgid"s here are often extracted from source code.
+## Add new messages manually only if they're dynamic
+## messages that can't be statically extracted.
+##
+## Run "mix gettext.extract" to bring this file up to
+## date. Leave "msgstr"s empty as changing them here has no
+## effect: edit them in PO (.po) files instead.
+#
+msgid ""
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:117
+#, elixir-autogen, elixir-format
+msgid "24-48 hours"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/geoip_lookup.html.heex:28
+#, elixir-autogen, elixir-format
+msgid "About Offline Database"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/geoip_lookup.html.heex:10
+#, elixir-autogen, elixir-format
+msgid "At GeoIP Lookup App, we take your privacy seriously. This Privacy Policy outlines the types of information we collect when you use our app, and how we use and protect that information."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/semaphore_client.html.heex:10
+#, elixir-autogen, elixir-format
+msgid "At Semaphore Client App, we take your privacy seriously."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/yellowdog_dns.html.heex:10
+#, elixir-autogen, elixir-format
+msgid "At YellowDog DNS, we are committed to protecting the privacy of our users."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:42
+#, elixir-autogen, elixir-format
+msgid "Available on App Store"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:51
+#, elixir-autogen, elixir-format
+msgid "Available on Play Store"
+msgstr ""
+
+#: lib/gsmlg_app_web/components/app_components.ex:252
+#, elixir-autogen, elixir-format
+msgid "Available on:"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:128
+#, elixir-autogen, elixir-format
+msgid "Business Hours"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:115
+#, elixir-autogen, elixir-format
+msgid "Check your reflection anytime, anywhere with our premium mirror app!"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:121
+#, elixir-autogen, elixir-format
+msgid "Community response"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:63
+#, elixir-autogen, elixir-format
+msgid "Community-driven support"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:154
+#, elixir-autogen, elixir-format
+msgid "Configure and monitor ansible tasks with real-time updates and notifications."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:79
+#, elixir-autogen, elixir-format
+msgid "Connect with other users and share knowledge"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:124
+#, elixir-autogen, elixir-format
+msgid "Critical Issues"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:312
+#, elixir-autogen, elixir-format
+msgid "Cross-platform compatibility"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:272
+#, elixir-autogen, elixir-format
+msgid "DNS troubleshooting on the go"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:41
+#, elixir-autogen, elixir-format
+msgid "Direct support for technical issues and inquiries"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:188
+#, elixir-autogen, elixir-format
+msgid "Do you offer commercial support?"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:268
+#, elixir-autogen, elixir-format
+msgid "Domain research for development projects"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:118
+#, elixir-autogen, elixir-format
+msgid "Easy to use, completely private, and absolutely free with no ads."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:295
+#, elixir-autogen, elixir-format
+msgid "Emergency troubleshooting capabilities"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:70
+#, elixir-autogen, elixir-format
+msgid "Empowering developers worldwide through accessible, high-quality open source solutions"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:307
+#, elixir-autogen, elixir-format
+msgid "Enterprise-grade utilities optimized for mobile workflows"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:243
+#, elixir-autogen, elixir-format
+msgid "Error messages or screenshots"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:95
+#, elixir-autogen, elixir-format
+msgid "Every line of code is crafted with attention to detail, performance, and user experience"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:239
+#, elixir-autogen, elixir-format
+msgid "Expected vs actual behavior"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:73
+#, elixir-autogen, elixir-format
+msgid "Find geography location of IP Address with precision and accuracy."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:94
+#, elixir-autogen, elixir-format
+msgid "Find registrant information of domain, IP or AS numbers instantly."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:277
+#, elixir-autogen, elixir-format
+msgid "Follow up on questions"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:29
+#, elixir-autogen, elixir-format
+msgid "Founded in the vibrant tech hub of Hong Kong, GSMLG emerged from a shared passion for open source software development"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:51
+#, elixir-autogen, elixir-format
+msgid "From the heart of Asia's financial center, we build software that serves a global community"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:153
+#, elixir-autogen, elixir-format
+msgid "GSMLG develops a range of open source software tools including network utilities, DevOps tools, and mobile-optimized applications. Our focus is on creating professional tools for developers, system administrators, and IT professionals."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:97
+#, elixir-autogen, elixir-format
+msgid "Get comprehensive information about your domain, IP or AS with detailed reports."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:6
+#, elixir-autogen, elixir-format
+msgid "Get the support you need for GSMLG's open source software tools"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:218
+#, elixir-autogen, elixir-format
+msgid "Help us help you by providing detailed information when reporting issues"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:175
+#, elixir-autogen, elixir-format
+msgid "How can I contribute to your projects?"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/geoip_lookup.html.heex:26
+#, elixir-autogen, elixir-format
+msgid "How is GeoIP work?"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/geoip_lookup.html.heex:27
+#, elixir-autogen, elixir-format
+msgid "How often GeoIP Database update frequency"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/semaphore_client.html.heex:26
+#, elixir-autogen, elixir-format
+msgid "How to install Ansible Semaphore Server?"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/yellowdog_dns.html.heex:29
+#, elixir-autogen, elixir-format
+msgid "How to run"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/whois_lookup.html.heex:40
+#, elixir-autogen, elixir-format
+msgid "If you have any questions about this Privacy Policy, please contact us at"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/simple_mirror.html.heex:30
+#, elixir-autogen, elixir-format
+msgid "If you have any questions about this privacy policy or our app, please contact us at"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/geoip_lookup.html.heex:36
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/semaphore_client.html.heex:32
+#, elixir-autogen, elixir-format
+msgid "If you have any questions or concerns about this Privacy Policy, please contact us at"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/yellowdog_dns.html.heex:56
+#, elixir-autogen, elixir-format
+msgid "If you have any questions or concerns about this privacy policy, please contact us at support@yellowdogdns.com."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:162
+#, elixir-autogen, elixir-format
+msgid "Is your software really free to use?"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:304
+#, elixir-autogen, elixir-format
+msgid "Join our vibrant community of developers and users who help each other succeed"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:331
+#, elixir-autogen, elixir-format
+msgid "Join thousands of professionals using GSMLG tools daily for network diagnostics, infrastructure management, and technical utilities"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:356
+#, elixir-autogen, elixir-format
+msgid "Mon-Fri 9AM-6PM HKT"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:129
+#, elixir-autogen, elixir-format
+msgid "Mon-Fri, 9AM-6PM HKT"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:29
+#, elixir-autogen, elixir-format
+msgid "Multiple ways to reach us for different types of support"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:264
+#, elixir-autogen, elixir-format
+msgid "Network diagnostics during field work"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:291
+#, elixir-autogen, elixir-format
+msgid "Network monitoring from mobile"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:318
+#, elixir-autogen, elixir-format
+msgid "Offline capabilities"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:269
+#, elixir-autogen, elixir-format
+msgid "One issue per report"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:54
+#, elixir-autogen, elixir-format
+msgid "Our Hong Kong roots give us a unique perspective on bridging Eastern and Western technology markets"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/yellowdog_dns.html.heex:44
+#, elixir-autogen, elixir-format
+msgid "Our app is not intended for children under the age of 13. We do not knowingly collect personal information from children under the age of 13."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:222
+#, elixir-autogen, elixir-format
+msgid "Our expertise in functional programming and concurrent systems helps us build scalable, maintainable software"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/simple_mirror.html.heex:14
+#, elixir-autogen, elixir-format
+msgid "Our mirror app does not collect any personal information from you. We do not collect, store or share any images or videos of you. We do not use cookies, and we do not track your location or any other information."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/simple_mirror.html.heex:18
+#, elixir-autogen, elixir-format
+msgid "Our mirror app does not use your personal information in any way. We do not share your information with third parties."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:335
+#, elixir-autogen, elixir-format
+msgid "Our team is here to support you. Don't hesitate to reach out with any questions or concerns."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:205
+#, elixir-autogen, elixir-format
+msgid "Our tools are designed to work across multiple platforms including iOS, Android, macOS, Windows, and Linux. We believe in providing consistent professional tools across all your devices."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:82
+#, elixir-autogen, elixir-format
+msgid "Peer-to-peer support"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:273
+#, elixir-autogen, elixir-format
+msgid "Provide minimal reproduction case"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/yellowdog_dns.html.heex:32
+#, elixir-autogen, elixir-format
+msgid "Provide you with our services and improve our app Respond to your inquiries and support requests Communicate with you about special offers, promotions, and updates Analyze trends and usage patterns to improve our app We will not share your personal information with third parties without your consent, unless required by law."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:133
+#, elixir-autogen, elixir-format
+msgid "Query custom DNS queries and all types of resource records!"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:141
+#, elixir-autogen, elixir-format
+msgid "Quick answers to common questions about our software and services"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:287
+#, elixir-autogen, elixir-format
+msgid "Remote server management"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:60
+#, elixir-autogen, elixir-format
+msgid "Report bugs and request features for our projects"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:44
+#, elixir-autogen, elixir-format
+msgid "Response time: 24-48 hours"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:151
+#, elixir-autogen, elixir-format
+msgid "Run Ansible tasks directly from your phone with full control."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:136
+#, elixir-autogen, elixir-format
+msgid "Run comprehensive DNS benchmarks to determine the performance of DNS servers."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:261
+#, elixir-autogen, elixir-format
+msgid "Search existing issues first"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:315
+#, elixir-autogen, elixir-format
+msgid "Secure data handling"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:76
+#, elixir-autogen, elixir-format
+msgid "See data source location of web requests and analyze network traffic patterns."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/simple_mirror.html.heex:26
+#, elixir-autogen, elixir-format
+msgid "Select camera"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:307
+#, elixir-autogen, elixir-format
+msgid "Share your experiences, learn from others, and contribute to the growth of our open source ecosystem"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:231
+#, elixir-autogen, elixir-format
+msgid "Software version and platform"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:283
+#, elixir-autogen, elixir-format
+msgid "Stay connected to your systems outside the office"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:235
+#, elixir-autogen, elixir-format
+msgid "Step-by-step reproduction steps"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:247
+#, elixir-autogen, elixir-format
+msgid "System environment details"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/yellowdog_dns.html.heex:11
+#, elixir-autogen, elixir-format
+msgid "This privacy policy outlines how we collect, use, and protect your personal information when you use our app."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:259
+#, elixir-autogen, elixir-format
+msgid "Tools designed specifically for mobile development workflows"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:265
+#, elixir-autogen, elixir-format
+msgid "Use clear, descriptive titles"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:151
+#, elixir-autogen, elixir-format
+msgid "We approach every challenge with positivity and believe in the power of technology to improve lives"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:6
+#, elixir-autogen, elixir-format
+msgid "We are an active, optimistic, and passionate team dedicated to developing quality open source software"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:82
+#, elixir-autogen, elixir-format
+msgid "We believe in the power of collaborative development and transparent code that benefits everyone"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:212
+#, elixir-autogen, elixir-format
+msgid "We build our tools using modern, robust technologies that ensure performance and reliability"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:108
+#, elixir-autogen, elixir-format
+msgid "We build tools that solve real problems and foster a supportive developer community"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/whois_lookup.html.heex:16
+#, elixir-autogen, elixir-format
+msgid "We collect your IP address, domain name, or AS number when you use our Whois Lookup app. We also collect your email address when you contact us for support."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/geoip_lookup.html.heex:24
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/semaphore_client.html.heex:20
+#, elixir-autogen, elixir-format
+msgid "We do not sell, trade, or otherwise transfer your personal information to third parties. However, we may share your information with trusted third-party service providers who help us operate our app, conduct our business, or service you. We may also disclose your information when required by law, or when we believe in good faith that disclosure is necessary to protect our rights, protect your safety or the safety of others, or investigate fraud."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:57
+#, elixir-autogen, elixir-format
+msgid "We leverage the city's dynamic energy and international outlook to drive innovation in open source"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:174
+#, elixir-autogen, elixir-format
+msgid "We love what we do and pour our hearts into creating exceptional software experiences"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/yellowdog_dns.html.heex:17
+#, elixir-autogen, elixir-format
+msgid "We may collect information about you when you use our app, such as:"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/whois_lookup.html.heex:36
+#, elixir-autogen, elixir-format
+msgid "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/yellowdog_dns.html.heex:29
+#, elixir-autogen, elixir-format
+msgid "We may use your information to:"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/geoip_lookup.html.heex:32
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/semaphore_client.html.heex:28
+#, elixir-autogen, elixir-format
+msgid "We reserve the right to modify this Privacy Policy at any time, so please review it frequently. If we make material changes to this policy, we will notify you here, by email, or by means of a notice on our app's homepage."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/simple_mirror.html.heex:26
+#, elixir-autogen, elixir-format
+msgid "We reserve the right to update this privacy policy at any time. Any changes we make to the policy will be posted on this page."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/yellowdog_dns.html.heex:50
+#, elixir-autogen, elixir-format
+msgid "We reserve the right to update this privacy policy at any time. We will notify you of any changes by posting the updated policy on our website or within the app itself."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/whois_lookup.html.heex:28
+#, elixir-autogen, elixir-format
+msgid "We take reasonable and appropriate measures to protect your personal information from loss, misuse, and unauthorized access, disclosure, alteration, and destruction."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/simple_mirror.html.heex:22
+#, elixir-autogen, elixir-format
+msgid "We take reasonable measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction. However, we cannot guarantee the security of your information as no method of transmission over the internet or electronic storage is 100% secure."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/yellowdog_dns.html.heex:38
+#, elixir-autogen, elixir-format
+msgid "We take reasonable measures to protect your personal information from unauthorized access, disclosure, and deletion. However, we cannot guarantee that your data will be completely secure."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/geoip_lookup.html.heex:28
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/semaphore_client.html.heex:24
+#, elixir-autogen, elixir-format
+msgid "We take reasonable precautions to protect the information we collect from unauthorized access, use, and disclosure. However, no method of transmission over the internet or electronic storage is 100% secure, so we cannot guarantee its absolute security."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/whois_lookup.html.heex:10
+#, elixir-autogen, elixir-format
+msgid "We take your privacy seriously and are committed to protecting it. This Privacy Policy explains what personal information we collect, how we use and protect it, and the choices you have about how that information is used."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/simple_mirror.html.heex:10
+#, elixir-autogen, elixir-format
+msgid "We take your privacy seriously and are committed to protecting your personal information. This privacy policy explains how we collect, use, and share information when you use our mirror app."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/geoip_lookup.html.heex:18
+#, elixir-autogen, elixir-format
+msgid "We use the information we collect to provide you with our app's services and features, and to improve our app's functionality and user experience. We may also use your information to personalize your experience and to provide you with targeted marketing and advertising."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/whois_lookup.html.heex:22
+#, elixir-autogen, elixir-format
+msgid "We use your personal information to provide you with the services offered by our app, to improve those services, and to respond to your support requests. We do not share your personal information with any third parties."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:179
+#, elixir-autogen, elixir-format
+msgid "We welcome contributions! You can contribute by reporting bugs, suggesting features, submitting pull requests on GitHub, or helping other users in our community forum. Every contribution helps make our software better."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:234
+#, elixir-autogen, elixir-format
+msgid "We're always excited to connect with fellow developers, contributors, and users who share our passion for open source"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:129
+#, elixir-autogen, elixir-format
+msgid "We're constantly moving, learning, and adapting to new technologies and challenges"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/yellowdog_dns.html.heex:27
+#: lib/gsmlg_app_web/controllers/apps_support_html/yellowdog_dns.html.heex:28
+#, elixir-autogen, elixir-format
+msgid "What are"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/whois_lookup.html.heex:25
+#: lib/gsmlg_app_web/controllers/apps_support_html/whois_lookup.html.heex:26
+#: lib/gsmlg_app_web/controllers/apps_support_html/whois_lookup.html.heex:27
+#: lib/gsmlg_app_web/controllers/apps_support_html/whois_lookup.html.heex:28
+#: lib/gsmlg_app_web/controllers/apps_support_html/yellowdog_dns.html.heex:25
+#: lib/gsmlg_app_web/controllers/apps_support_html/yellowdog_dns.html.heex:26
+#, elixir-autogen, elixir-format
+msgid "What is"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/semaphore_client.html.heex:25
+#, elixir-autogen, elixir-format
+msgid "What is Ansible?"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/geoip_lookup.html.heex:25
+#, elixir-autogen, elixir-format
+msgid "What is GeoIP?"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:201
+#, elixir-autogen, elixir-format
+msgid "What platforms do you support?"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:149
+#, elixir-autogen, elixir-format
+msgid "What software does GSMLG develop?"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/geoip_lookup.html.heex:14
+#, elixir-autogen, elixir-format
+msgid "When you use our app, we may collect information about your device, including your IP address, browser type, and operating system. We also collect information about your location based on your IP address."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/semaphore_client.html.heex:14
+#, elixir-autogen, elixir-format
+msgid "When you use our app, you connect to your own server, the app does not collect anything."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:192
+#, elixir-autogen, elixir-format
+msgid "While our software is free and community-supported, we do offer priority commercial support for enterprise customers. Contact us at contact@gsmlg.dev for more information about commercial support packages."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/simple_mirror.html.heex:25
+#, elixir-autogen, elixir-format
+msgid "Why can not take photo or video"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:125
+#, elixir-autogen, elixir-format
+msgid "Within 24 hours"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/geoip_lookup.html.heex:33
+#: lib/gsmlg_app_web/controllers/apps_support_html/semaphore_client.html.heex:31
+#: lib/gsmlg_app_web/controllers/apps_support_html/simple_mirror.html.heex:31
+#: lib/gsmlg_app_web/controllers/apps_support_html/whois_lookup.html.heex:33
+#: lib/gsmlg_app_web/controllers/apps_support_html/yellowdog_dns.html.heex:34
+#, elixir-autogen, elixir-format
+msgid "Write message to our support team."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:166
+#, elixir-autogen, elixir-format
+msgid "Yes! All our software is open source and free to use under permissive licenses. We believe in the power of open source and community collaboration to create better tools for everyone."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/whois_lookup.html.heex:32
+#, elixir-autogen, elixir-format
+msgid "You have the right to access and update your personal information at any time. You can also request that we delete your personal information. To do so, please contact us using the email address provided below."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/yellowdog_dns.html.heex:23
+#, elixir-autogen, elixir-format
+msgid "Your DNS queries and traffic data"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/yellowdog_dns.html.heex:21
+#, elixir-autogen, elixir-format
+msgid "Your IP address and location"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/yellowdog_dns.html.heex:22
+#, elixir-autogen, elixir-format
+msgid "Your device type and operating system"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_privacy_html/yellowdog_dns.html.heex:20
+#, elixir-autogen, elixir-format
+msgid "Your name and email address"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/geoip_lookup.html.heex:6
+#: lib/gsmlg_app_web/controllers/apps_support_html/semaphore_client.html.heex:6
+#: lib/gsmlg_app_web/controllers/apps_support_html/simple_mirror.html.heex:6
+#: lib/gsmlg_app_web/controllers/apps_support_html/whois_lookup.html.heex:6
+#: lib/gsmlg_app_web/controllers/apps_support_html/yellowdog_dns.html.heex:6
+#, elixir-autogen, elixir-format
+msgid "under construction, not working yet"
+msgstr ""

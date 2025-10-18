@@ -154,7 +154,7 @@ defmodule GsmlgAppAdmin.Accounts.User do
       enabled?(true)
       token_resource(GsmlgAppAdmin.Accounts.Token)
       require_token_presence_for_authentication?(true)
-      signing_secret(Application.get_env(:ash_authentication, :jwt)[:signing_secret])
+      signing_secret(Application.compile_env(:ash_authentication, :jwt, [])[:signing_secret])
     end
 
     session_identifier(:jti)

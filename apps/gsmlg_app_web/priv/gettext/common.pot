@@ -1,0 +1,296 @@
+## This file is a PO Template file.
+##
+## "msgid"s here are often extracted from source code.
+## Add new messages manually only if they're dynamic
+## messages that can't be statically extracted.
+##
+## Run "mix gettext.extract" to bring this file up to
+## date. Leave "msgstr"s empty as changing them here has no
+## effect: edit them in PO (.po) files instead.
+#
+msgid ""
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/whois_lookup.html.heex:28
+#, elixir-autogen, elixir-format
+msgid "AS (Autonomous System)"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:33
+#, elixir-autogen, elixir-format
+msgid "Across all platforms"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:127
+#, elixir-autogen, elixir-format
+msgid "Active"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:136
+#, elixir-autogen, elixir-format
+msgid "Agile development"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:15
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:59
+#, elixir-autogen, elixir-format
+msgid "Android"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:49
+#, elixir-autogen, elixir-format
+msgid "Android Apps"
+msgstr ""
+
+#: lib/gsmlg_app_web/components/app_components.ex:142
+#, elixir-autogen, elixir-format
+msgid "App Store"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:106
+#, elixir-autogen, elixir-format
+msgid "Community Focused"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:133
+#, elixir-autogen, elixir-format
+msgid "Continuous learning"
+msgstr ""
+
+#: lib/gsmlg_app_web/components/app_components.ex:45
+#, elixir-autogen, elixir-format
+msgid "Copyright © 2025 GSMLG All rights reserved."
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/yellowdog_dns.html.heex:25
+#, elixir-autogen, elixir-format
+msgid "DNS"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:179
+#, elixir-autogen, elixir-format
+msgid "Deep technical expertise"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:60
+#, elixir-autogen, elixir-format
+msgid "Desktop"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:312
+#, elixir-autogen, elixir-format
+msgid "Discord Community"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:219
+#, elixir-autogen, elixir-format
+msgid "Docker"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/whois_lookup.html.heex:26
+#, elixir-autogen, elixir-format
+msgid "Domain Name"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:215
+#, elixir-autogen, elixir-format
+msgid "Elixir"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:7
+#, elixir-autogen, elixir-format
+msgid "Explore All Apps"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:159
+#, elixir-autogen, elixir-format
+msgid "Future-focused thinking"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:66
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:38
+#, elixir-autogen, elixir-format
+msgid "GeoIP Lookup"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:310
+#, elixir-autogen, elixir-format
+msgid "GitHub Discussions"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:58
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:120
+#, elixir-autogen, elixir-format
+msgid "GitHub Issues"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:12
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:352
+#, elixir-autogen, elixir-format
+msgid "Hong Kong"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/whois_lookup.html.heex:27
+#, elixir-autogen, elixir-format
+msgid "IP Address"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:185
+#, elixir-autogen, elixir-format
+msgid "Innovation-driven"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:18
+#, elixir-autogen, elixir-format
+msgid "Linux"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:217
+#, elixir-autogen, elixir-format
+msgid "LiveView"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:80
+#, elixir-autogen, elixir-format
+msgid "Open Source First"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:5
+#, elixir-autogen, elixir-format
+msgid "Open Source Software from Hong Kong"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:149
+#, elixir-autogen, elixir-format
+msgid "Optimistic"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:172
+#, elixir-autogen, elixir-format
+msgid "Passionate"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:216
+#, elixir-autogen, elixir-format
+msgid "Phoenix"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:162
+#, elixir-autogen, elixir-format
+msgid "Positive collaboration"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:218
+#, elixir-autogen, elixir-format
+msgid "PostgreSQL"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:93
+#, elixir-autogen, elixir-format
+msgid "Quality Driven"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/yellowdog_dns.html.heex:27
+#, elixir-autogen, elixir-format
+msgid "RR type"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:139
+#, elixir-autogen, elixir-format
+msgid "Rapid iteration"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:313
+#, elixir-autogen, elixir-format
+msgid "Reddit"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/yellowdog_dns.html.heex:26
+#, elixir-autogen, elixir-format
+msgid "Resource Record"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:144
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:97
+#, elixir-autogen, elixir-format
+msgid "Semaphore Client"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:108
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:118
+#, elixir-autogen, elixir-format
+msgid "Simple Mirror"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:156
+#, elixir-autogen, elixir-format
+msgid "Solution-oriented mindset"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/support.html.heex:311
+#, elixir-autogen, elixir-format
+msgid "Stack Overflow"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:31
+#, elixir-autogen, elixir-format
+msgid "Total Apps"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:182
+#, elixir-autogen, elixir-format
+msgid "User-centric approach"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:87
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:55
+#, elixir-autogen, elixir-format
+msgid "Whois Lookup"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:17
+#, elixir-autogen, elixir-format
+msgid "Windows"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:126
+#: lib/gsmlg_app_web/controllers/page_html/home.html.heex:76
+#, elixir-autogen, elixir-format
+msgid "YellowDog DNS"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/yellowdog_dns.html.heex:29
+#, elixir-autogen, elixir-format
+msgid "benchmark"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/page_html/about_us.html.heex:250
+#, elixir-autogen, elixir-format
+msgid "contact@gsmlg.dev"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:14
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:58
+#, elixir-autogen, elixir-format
+msgid "iOS"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:40
+#, elixir-autogen, elixir-format
+msgid "iOS Apps"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_html/list.html.heex:16
+#, elixir-autogen, elixir-format
+msgid "macOS"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/yellowdog_dns.html.heex:28
+#, elixir-autogen, elixir-format
+msgid "query flags"
+msgstr ""
+
+#: lib/gsmlg_app_web/controllers/apps_support_html/whois_lookup.html.heex:25
+#, elixir-autogen, elixir-format
+msgid "whois service"
+msgstr ""

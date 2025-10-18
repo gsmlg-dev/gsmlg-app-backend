@@ -1,8 +1,8 @@
 <Layouts.app flash={@flash}>
   <:header_slot>
     <.hero_section
-      title="Apps"
-      subtitle="Discover our collection of powerful tools across all platforms"
+      title={dgettext("navigation", "Apps")}
+      subtitle={dgettext("navigation", "Discover our collection of powerful tools across all platforms")}
       type="gradient"
       gradient_colors="from-primary/95 via-primary/95 to-secondary/95"
       min_height="min-h-[40vh]"
@@ -11,11 +11,11 @@
     >
       <div class="w-full max-w-2xl bg-black/10 backdrop-blur-sm rounded-2xl p-8 animate-fade-in animation-delay-400 mx-auto">
         <div class="flex flex-wrap justify-center gap-3">
-          <.platform_badge name="iOS" icon="apple" color="info" />
-          <.platform_badge name="Android" icon="android" color="success" />
-          <.platform_badge name="macOS" icon="apple" color="warning" />
-          <.platform_badge name="Windows" icon="microsoft-windows" color="error" />
-          <.platform_badge name="Linux" icon="linux" color="neutral" />
+          <.platform_badge name={dgettext("common", "iOS")} icon="apple" color="info" />
+          <.platform_badge name={dgettext("common", "Android")} icon="android" color="success" />
+          <.platform_badge name={dgettext("common", "macOS")} icon="apple" color="warning" />
+          <.platform_badge name={dgettext("common", "Windows")} icon="microsoft-windows" color="error" />
+          <.platform_badge name={dgettext("common", "Linux")} icon="linux" color="neutral" />
         </div>
       </div>
     </.hero_section>
@@ -28,52 +28,52 @@
         <div class="stat-figure text-primary">
           <.dm_mdi name="apps" class="w-8 h-8" />
         </div>
-        <div class="stat-title">Total Apps</div>
+        <div class="stat-title">{dgettext("common", "Total Apps")}</div>
         <div class="stat-value text-primary">5</div>
-        <div class="stat-desc text-base-content/60">Across all platforms</div>
+        <div class="stat-desc text-base-content/60">{dgettext("common", "Across all platforms")}</div>
       </div>
 
       <div class="stat place-items-center">
         <div class="stat-figure text-secondary">
           <.dm_mdi name="apple" class="w-8 h-8" />
         </div>
-        <div class="stat-title">iOS Apps</div>
+        <div class="stat-title">{dgettext("common", "iOS Apps")}</div>
         <div class="stat-value text-secondary">3</div>
-        <div class="stat-desc text-base-content/60">Available on App Store</div>
+        <div class="stat-desc text-base-content/60">{dgettext("user", "Available on App Store")}</div>
       </div>
 
       <div class="stat place-items-center">
         <div class="stat-figure text-accent">
           <.dm_mdi name="android" class="w-8 h-8" />
         </div>
-        <div class="stat-title">Android Apps</div>
+        <div class="stat-title">{dgettext("common", "Android Apps")}</div>
         <div class="stat-value text-accent">5</div>
-        <div class="stat-desc text-base-content/60">Available on Play Store</div>
+        <div class="stat-desc text-base-content/60">{dgettext("user", "Available on Play Store")}</div>
       </div>
     </div>
     
 <!-- Filter Tabs -->
     <div class="tabs tabs-boxed mb-8 bg-base-100 p-1">
-      <a class="tab tab-active" phx-click="filter" phx-value-filter="all">All Apps</a>
-      <a class="tab" phx-click="filter" phx-value-filter="ios">iOS</a>
-      <a class="tab" phx-click="filter" phx-value-filter="android">Android</a>
-      <a class="tab" phx-click="filter" phx-value-filter="desktop">Desktop</a>
+      <a class="tab tab-active" phx-click="filter" phx-value-filter="all">{dgettext("navigation", "All Apps")}</a>
+      <a class="tab" phx-click="filter" phx-value-filter="ios">{dgettext("common", "iOS")}</a>
+      <a class="tab" phx-click="filter" phx-value-filter="android">{dgettext("common", "Android")}</a>
+      <a class="tab" phx-click="filter" phx-value-filter="desktop">{dgettext("common", "Desktop")}</a>
     </div>
     
 <!-- Apps Grid -->
     <div class="space-y-6">
       <.enhanced_app_section
-        name="GeoIP Lookup"
+        name={dgettext("common", "GeoIP Lookup")}
         app_label="geoip_lookup"
         icon_path="/images/icons/geoip_lookup.png"
         platforms={["ios", "android"]}
         category="network"
       >
         <:description>
-          Find geography location of IP Address with precision and accuracy.
+          {dgettext("user", "Find geography location of IP Address with precision and accuracy.")}
         </:description>
         <:description>
-          See data source location of web requests and analyze network traffic patterns.
+          {dgettext("user", "See data source location of web requests and analyze network traffic patterns.")}
         </:description>
         <:store_link link="https://apps.apple.com/cn/app/geoip-lookup/id1672850313">
           <.appstore_icon class="w-6 h-6" />
@@ -84,17 +84,17 @@
       </.enhanced_app_section>
 
       <.enhanced_app_section
-        name="Whois Lookup"
+        name={dgettext("common", "Whois Lookup")}
         app_label="whois_lookup"
         icon_path="/images/icons/whois_lookup.png"
         platforms={["ios", "android"]}
         category="network"
       >
         <:description>
-          Find registrant information of domain, IP or AS numbers instantly.
+          {dgettext("user", "Find registrant information of domain, IP or AS numbers instantly.")}
         </:description>
         <:description>
-          Get comprehensive information about your domain, IP or AS with detailed reports.
+          {dgettext("user", "Get comprehensive information about your domain, IP or AS with detailed reports.")}
         </:description>
         <:store_link link="https://apps.apple.com/cn/app/lookup-whois-info/id6446807576">
           <.appstore_icon class="w-6 h-6" />
@@ -105,17 +105,17 @@
       </.enhanced_app_section>
 
       <.enhanced_app_section
-        name="Simple Mirror"
+        name={dgettext("common", "Simple Mirror")}
         app_label="simple_mirror"
         icon_path="/images/icons/simple_mirror.png"
         platforms={["android"]}
         category="utility"
       >
         <:description>
-          Check your reflection anytime, anywhere with our premium mirror app!
+          {dgettext("user", "Check your reflection anytime, anywhere with our premium mirror app!")}
         </:description>
         <:description>
-          Easy to use, completely private, and absolutely free with no ads.
+          {dgettext("user", "Easy to use, completely private, and absolutely free with no ads.")}
         </:description>
         <:store_link link="https://play.google.com/store/apps/details?id=com.gsmlg.mirror">
           <.playstore_icon class="w-6 h-6" />
@@ -123,17 +123,17 @@
       </.enhanced_app_section>
 
       <.enhanced_app_section
-        name="YellowDog DNS"
+        name={dgettext("common", "YellowDog DNS")}
         app_label="yellowdog_dns"
         icon_path="/images/icons/yellowdog_dns.png"
         platforms={["android"]}
         category="network"
       >
         <:description>
-          Query custom DNS queries and all types of resource records!
+          {dgettext("user", "Query custom DNS queries and all types of resource records!")}
         </:description>
         <:description>
-          Run comprehensive DNS benchmarks to determine the performance of DNS servers.
+          {dgettext("user", "Run comprehensive DNS benchmarks to determine the performance of DNS servers.")}
         </:description>
         <:store_link link="https://play.google.com/store/apps/details?id=com.gsmlg.yellowdog">
           <.playstore_icon class="w-6 h-6" />
@@ -141,17 +141,17 @@
       </.enhanced_app_section>
 
       <.enhanced_app_section
-        name="Semaphore Client"
+        name={dgettext("common", "Semaphore Client")}
         app_label="semaphore_client"
         icon_path="/images/icons/semaphore_client.png"
         platforms={["android", "ios"]}
         category="development"
       >
         <:description>
-          Run Ansible tasks directly from your phone with full control.
+          {dgettext("user", "Run Ansible tasks directly from your phone with full control.")}
         </:description>
         <:description>
-          Configure and monitor ansible tasks with real-time updates and notifications.
+          {dgettext("user", "Configure and monitor ansible tasks with real-time updates and notifications.")}
         </:description>
         <:store_link link="https://play.google.com/store/apps/details?id=org.gsmlg.semaphore">
           <.playstore_icon class="w-6 h-6" />

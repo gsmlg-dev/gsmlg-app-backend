@@ -1,15 +1,15 @@
 <Layouts.about flash={@flash}>
   <:header_slot>
     <.hero_section
-      title="About GSMLG"
-      subtitle="Open Source Software from Hong Kong"
-      description="We are an active, optimistic, and passionate team dedicated to developing quality open source software"
+      title={dgettext("navigation", "About GSMLG")}
+      subtitle={dgettext("common", "Open Source Software from Hong Kong")}
+      description={dgettext("user", "We are an active, optimistic, and passionate team dedicated to developing quality open source software")}
       background="/images/montian-lake.jpg"
       icon="map-marker"
     >
       <div class="flex items-center justify-center gap-2 text-gray-300 animate-fade-in animation-delay-400">
         <.dm_mdi name="map-marker" class="w-5 h-5" />
-        <span class="text-lg">Hong Kong</span>
+        <span class="text-lg">{dgettext("common", "Hong Kong")}</span>
       </div>
     </.hero_section>
   </:header_slot>
@@ -23,10 +23,10 @@
 <!-- Our Story Section -->
       <div class="text-center">
         <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-          Our Story
+          {dgettext("navigation", "Our Story")}
         </h2>
         <p class="text-lg sm:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
-          Founded in the vibrant tech hub of Hong Kong, GSMLG emerged from a shared passion for open source software development
+          {dgettext("user", "Founded in the vibrant tech hub of Hong Kong, GSMLG emerged from a shared passion for open source software development")}
         </p>
 
         <div class="card lg:card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
@@ -43,18 +43,18 @@
             <div class="flex items-center gap-3 mb-4">
               <div class="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
               <h3 class="card-title text-2xl sm:text-3xl bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
-                Born in Hong Kong
+                {dgettext("navigation", "Born in Hong Kong")}
               </h3>
             </div>
             <div class="space-y-3 sm:space-y-4">
               <p class="text-base sm:text-lg leading-relaxed">
-                From the heart of Asia's financial center, we build software that serves a global community
+                {dgettext("user", "From the heart of Asia's financial center, we build software that serves a global community")}
               </p>
               <p class="text-base sm:text-lg leading-relaxed">
-                Our Hong Kong roots give us a unique perspective on bridging Eastern and Western technology markets
+                {dgettext("user", "Our Hong Kong roots give us a unique perspective on bridging Eastern and Western technology markets")}
               </p>
               <p class="text-base sm:text-lg leading-relaxed">
-                We leverage the city's dynamic energy and international outlook to drive innovation in open source
+                {dgettext("user", "We leverage the city's dynamic energy and international outlook to drive innovation in open source")}
               </p>
             </div>
           </div>
@@ -64,10 +64,10 @@
 <!-- Our Mission Section -->
       <div class="text-center">
         <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-          Our Mission
+          {dgettext("navigation", "Our Mission")}
         </h2>
         <p class="text-lg sm:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
-          Empowering developers worldwide through accessible, high-quality open source solutions
+          {dgettext("user", "Empowering developers worldwide through accessible, high-quality open source solutions")}
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -77,9 +77,9 @@
               <div class="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <.dm_mdi name="source-merge" class="w-8 h-8 text-success" />
               </div>
-              <h3 class="card-title text-lg font-bold text-success mb-3">Open Source First</h3>
+              <h3 class="card-title text-lg font-bold text-success mb-3">{dgettext("common", "Open Source First")}</h3>
               <p class="text-sm text-gray-300">
-                We believe in the power of collaborative development and transparent code that benefits everyone
+                {dgettext("user", "We believe in the power of collaborative development and transparent code that benefits everyone")}
               </p>
             </div>
           </div>
@@ -90,9 +90,9 @@
               <div class="w-16 h-16 bg-warning/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <.dm_mdi name="star" class="w-8 h-8 text-warning" />
               </div>
-              <h3 class="card-title text-lg font-bold text-warning mb-3">Quality Driven</h3>
+              <h3 class="card-title text-lg font-bold text-warning mb-3">{dgettext("common", "Quality Driven")}</h3>
               <p class="text-sm text-gray-300">
-                Every line of code is crafted with attention to detail, performance, and user experience
+                {dgettext("user", "Every line of code is crafted with attention to detail, performance, and user experience")}
               </p>
             </div>
           </div>
@@ -103,9 +103,9 @@
               <div class="w-16 h-16 bg-info/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <.dm_mdi name="account-group" class="w-8 h-8 text-info" />
               </div>
-              <h3 class="card-title text-lg font-bold text-info mb-3">Community Focused</h3>
+              <h3 class="card-title text-lg font-bold text-info mb-3">{dgettext("common", "Community Focused")}</h3>
               <p class="text-sm text-gray-300">
-                We build tools that solve real problems and foster a supportive developer community
+                {dgettext("user", "We build tools that solve real problems and foster a supportive developer community")}
               </p>
             </div>
           </div>
@@ -115,7 +115,7 @@
 <!-- Our Team Culture Section -->
       <div class="text-center py-12">
         <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-12">
-          Our Team Culture
+          {dgettext("navigation", "Our Team Culture")}
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -124,19 +124,19 @@
             <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <.dm_mdi name="run" class="w-8 h-8 text-primary" />
             </div>
-            <h3 class="text-xl font-bold text-primary mb-3">Active</h3>
+            <h3 class="text-xl font-bold text-primary mb-3">{dgettext("common", "Active")}</h3>
             <p class="text-gray-300 mb-4">
-              We're constantly moving, learning, and adapting to new technologies and challenges
+              {dgettext("user", "We're constantly moving, learning, and adapting to new technologies and challenges")}
             </p>
             <ul class="text-left text-gray-400 space-y-2">
               <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> Continuous learning
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext("common", "Continuous learning")}
               </li>
               <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> Agile development
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext("common", "Agile development")}
               </li>
               <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> Rapid iteration
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext("common", "Rapid iteration")}
               </li>
             </ul>
           </div>
@@ -146,20 +146,20 @@
             <div class="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <.dm_mdi name="lightbulb" class="w-8 h-8 text-secondary" />
             </div>
-            <h3 class="text-xl font-bold text-secondary mb-3">Optimistic</h3>
+            <h3 class="text-xl font-bold text-secondary mb-3">{dgettext("common", "Optimistic")}</h3>
             <p class="text-gray-300 mb-4">
-              We approach every challenge with positivity and believe in the power of technology to improve lives
+              {dgettext("user", "We approach every challenge with positivity and believe in the power of technology to improve lives")}
             </p>
             <ul class="text-left text-gray-400 space-y-2">
               <li class="flex items-center">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
-                Solution-oriented mindset
+                {dgettext("common", "Solution-oriented mindset")}
               </li>
               <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> Future-focused thinking
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext("common", "Future-focused thinking")}
               </li>
               <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> Positive collaboration
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext("common", "Positive collaboration")}
               </li>
             </ul>
           </div>
@@ -169,20 +169,20 @@
             <div class="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <.dm_mdi name="heart" class="w-8 h-8 text-accent" />
             </div>
-            <h3 class="text-xl font-bold text-accent mb-3">Passionate</h3>
+            <h3 class="text-xl font-bold text-accent mb-3">{dgettext("common", "Passionate")}</h3>
             <p class="text-gray-300 mb-4">
-              We love what we do and pour our hearts into creating exceptional software experiences
+              {dgettext("user", "We love what we do and pour our hearts into creating exceptional software experiences")}
             </p>
             <ul class="text-left text-gray-400 space-y-2">
               <li class="flex items-center">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
-                Deep technical expertise
+                {dgettext("common", "Deep technical expertise")}
               </li>
               <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> User-centric approach
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext("common", "User-centric approach")}
               </li>
               <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> Innovation-driven
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext("common", "Innovation-driven")}
               </li>
             </ul>
           </div>
@@ -204,22 +204,22 @@
           <div class="flex items-center gap-3 mb-4">
             <div class="w-3 h-3 bg-info rounded-full animate-pulse"></div>
             <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-info to-cyan-400 bg-clip-text text-transparent">
-              Our Technology Stack
+              {dgettext("navigation", "Our Technology Stack")}
             </h2>
           </div>
           <div class="space-y-3 sm:space-y-4">
             <p class="text-base sm:text-lg leading-relaxed">
-              We build our tools using modern, robust technologies that ensure performance and reliability
+              {dgettext("user", "We build our tools using modern, robust technologies that ensure performance and reliability")}
             </p>
             <div class="flex flex-wrap gap-2">
-              <span class="badge badge-primary">Elixir</span>
-              <span class="badge badge-secondary">Phoenix</span>
-              <span class="badge badge-accent">LiveView</span>
-              <span class="badge badge-info">PostgreSQL</span>
-              <span class="badge badge-success">Docker</span>
+              <span class="badge badge-primary">{dgettext("common", "Elixir")}</span>
+              <span class="badge badge-secondary">{dgettext("common", "Phoenix")}</span>
+              <span class="badge badge-accent">{dgettext("common", "LiveView")}</span>
+              <span class="badge badge-info">{dgettext("common", "PostgreSQL")}</span>
+              <span class="badge badge-success">{dgettext("common", "Docker")}</span>
             </div>
             <p class="text-base sm:text-lg leading-relaxed">
-              Our expertise in functional programming and concurrent systems helps us build scalable, maintainable software
+              {dgettext("user", "Our expertise in functional programming and concurrent systems helps us build scalable, maintainable software")}
             </p>
           </div>
         </div>
@@ -228,26 +228,26 @@
 <!-- Contact & Community Section -->
       <div class="text-center py-16 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl">
         <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-          Join Our Community
+          {dgettext("navigation", "Join Our Community")}
         </h2>
         <p class="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-          We're always excited to connect with fellow developers, contributors, and users who share our passion for open source
+          {dgettext("user", "We're always excited to connect with fellow developers, contributors, and users who share our passion for open source")}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <.link href="/apps" class="btn btn-primary btn-lg">
-            <.dm_mdi name="application" class="w-5 h-5 mr-2" /> Explore Our Projects
+            <.dm_mdi name="application" class="w-5 h-5 mr-2" /> {dgettext("navigation", "Explore Our Projects")}
           </.link>
           <.link
             href="https://github.com/gsmlg"
             target="_blank"
             class="btn btn-outline btn-lg border-white text-white hover:bg-white hover:text-black"
           >
-            <.dm_mdi name="github" class="w-5 h-5 mr-2" /> Follow on GitHub
+            <.dm_mdi name="github" class="w-5 h-5 mr-2" /> {dgettext("navigation", "Follow on GitHub")}
           </.link>
         </div>
         <div class="mt-8 flex items-center justify-center gap-2 text-gray-400">
           <.dm_mdi name="email" class="w-4 h-4" />
-          <span>contact@gsmlg.dev</span>
+          <span>{dgettext("common", "contact@gsmlg.dev")}</span>
         </div>
       </div>
     </div>

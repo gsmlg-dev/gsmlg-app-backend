@@ -16,23 +16,23 @@ defmodule GsmlgAppWeb.AppComponents do
       "bg-slate-900",
       "text-slate-500"
     ]}>
-      <:section title="Site Map" title_class="py-2 px-4 text-slate-600">
+      <:section title={dgettext("navigation", "Site Map")} title_class="py-2 px-4 text-slate-600">
         <.link
           class={[
             "py-2 px-4"
           ]}
           href="/"
         >
-          Home
+          {dgettext("navigation", "Home")}
         </.link>
         <.link class="py-2 px-4" href="/apps">
-          Apps
+          {dgettext("navigation", "Apps")}
         </.link>
         <.link class="py-2 px-4" href="/support">
-          Support
+          {dgettext("navigation", "Support")}
         </.link>
         <.link class="py-2 px-4" href="/about-us">
-          About Us
+          {dgettext("navigation", "About Us")}
         </.link>
       </:section>
       <:copyright>
@@ -42,7 +42,7 @@ defmodule GsmlgAppWeb.AppComponents do
           <.dm_mdi name="facebook" class="w-8 h-8 text-slate-600" />
         </div>
         <p class="my-4 text-md">
-          Copyright © 2025 GSMLG All rights reserved.
+          {dgettext("common", "Copyright © 2025 GSMLG All rights reserved.")}
         </p>
       </:copyright>
     </.dm_page_footer>
@@ -139,7 +139,7 @@ defmodule GsmlgAppWeb.AppComponents do
             </p>
             <div class="card-actions justify-between items-center">
               <div class="flex items-center gap-4">
-                <span class="text-sm lg:text-base font-semibold">App Store:</span>
+                <span class="text-sm lg:text-base font-semibold">{dgettext("common", "App Store")}:</span>
                 <div class="flex gap-2">
                   <.link
                     :for={store <- @store_link}
@@ -156,13 +156,13 @@ defmodule GsmlgAppWeb.AppComponents do
                   class="btn btn-outline btn-sm lg:btn-md"
                   navigate={~p"/apps-support/app/#{@app_label}"}
                 >
-                  <.dm_mdi name="headset" class="w-4 h-4" /> Support
+                  <.dm_mdi name="headset" class="w-4 h-4" /> {dgettext("navigation", "Support")}
                 </.link>
                 <.link
                   class="btn btn-outline btn-sm lg:btn-md"
                   navigate={~p"/apps-privacy/app/#{@app_label}"}
                 >
-                  <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> Privacy
+                  <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> {dgettext("navigation", "Privacy")}
                 </.link>
               </div>
             </div>
@@ -226,12 +226,12 @@ defmodule GsmlgAppWeb.AppComponents do
           <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
             <li>
               <.link navigate={~p"/apps-support/app/#{@app_label}"}>
-                <.dm_mdi name="headset" class="w-4 h-4" /> Support
+                <.dm_mdi name="headset" class="w-4 h-4" /> {dgettext("navigation", "Support")}
               </.link>
             </li>
             <li>
               <.link navigate={~p"/apps-privacy/app/#{@app_label}"}>
-                <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> Privacy
+                <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> {dgettext("navigation", "Privacy")}
               </.link>
             </li>
           </ul>
@@ -249,7 +249,7 @@ defmodule GsmlgAppWeb.AppComponents do
 
         <div class="card-actions justify-between items-center">
           <div class="flex items-center gap-2">
-            <span class="text-sm font-semibold text-base-content/60">Available on:</span>
+            <span class="text-sm font-semibold text-base-content/60">{dgettext("user", "Available on:")}:</span>
             <div class="flex gap-2">
               <.link
                 :for={store <- @store_link}
@@ -267,13 +267,13 @@ defmodule GsmlgAppWeb.AppComponents do
               class="btn btn-outline btn-sm hover:bg-primary hover:text-primary-content"
               navigate={~p"/apps-support/app/#{@app_label}"}
             >
-              <.dm_mdi name="headset" class="w-4 h-4" /> Support
+              <.dm_mdi name="headset" class="w-4 h-4" /> {dgettext("navigation", "Support")}
             </.link>
             <.link
               class="btn btn-outline btn-sm hover:bg-secondary hover:text-secondary-content"
               navigate={~p"/apps-privacy/app/#{@app_label}"}
             >
-              <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> Privacy
+              <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> {dgettext("navigation", "Privacy")}
             </.link>
           </div>
         </div>
@@ -409,16 +409,16 @@ defmodule GsmlgAppWeb.AppComponents do
   @doc """
   Hero section component for page headers
   ## Examples
-      <.hero_section 
-        title="Support Center" 
-        subtitle="We're Here to Help"
+      <.hero_section
+        title={dgettext("navigation", "Support Center")}
+        subtitle={dgettext("user", "We're Here to Help")}
         background="explosion.png"
         gradient="from-black/50 to-black/80"
       />
-      
-      <.hero_section 
-        title="Apps"
-        subtitle="Discover our collection"
+
+      <.hero_section
+        title={dgettext("navigation", "Apps")}
+        subtitle={dgettext("user", "Discover our collection")}
         type="gradient"
         gradient_colors="from-primary/95 via-primary/95 to-secondary/95"
       />

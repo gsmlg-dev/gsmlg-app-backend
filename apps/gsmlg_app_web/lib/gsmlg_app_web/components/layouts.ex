@@ -1,5 +1,6 @@
 defmodule GsmlgAppWeb.Layouts do
   use GsmlgAppWeb, :html
+  use Gettext, backend: GsmlgAppWeb.Gettext
 
   embed_templates "layouts/*"
 
@@ -29,16 +30,16 @@ defmodule GsmlgAppWeb.Layouts do
       ]}
     >
       <:menu class={GsmlgAppWeb.AppComponents.menu_class("home", @current_page)} to="/">
-        Home
+        <%= dgettext("navigation", "Home") %>
       </:menu>
       <:menu class={GsmlgAppWeb.AppComponents.menu_class("apps", @current_page)} to="/apps">
-        Apps
+        <%= dgettext("navigation", "Apps") %>
       </:menu>
       <:menu class={GsmlgAppWeb.AppComponents.menu_class("support", @current_page)} to="/support">
-        Support
+        <%= dgettext("navigation", "Support") %>
       </:menu>
       <:menu class={GsmlgAppWeb.AppComponents.menu_class("about-us", @current_page)} to="/about-us">
-        About Us
+        <%= dgettext("navigation", "About Us") %>
       </:menu>
       <:user_profile></:user_profile>
       {render_slot(@header_slot)}

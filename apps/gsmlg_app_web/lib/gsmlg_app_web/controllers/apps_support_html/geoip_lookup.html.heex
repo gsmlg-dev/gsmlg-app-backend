@@ -1,12 +1,12 @@
 <Layouts.support flash={@flash}>
   <section class="w-full h-full flex flex-col bg-[#202035] text-white gap-12 py-12">
     <header class="w-5/6 lg:w-2/3 xl:w-1/2 flex flex-col justify-center items-center self-center bg-[#1B1B30] p-8 mx-12 rounded-md drop-shadow-md">
-      <h3 class="flex text-4xl justify-center my-4">How can we help?</h3>
+      <h3 class="flex text-4xl justify-center my-4">{dgettext("navigation", "How can we help?")}</h3>
       <form class="flex flex-col w-5/6 lg:w-2/3 text-2xl justify-center">
-        <div class="tooltip tooltip-right" data-tip="under construction, not working yet">
+        <div class="tooltip tooltip-right" data-tip={dgettext("user", "under construction, not working yet")}>
           <div class="join">
             <input
-              placeholder="Search for help documents"
+              placeholder={dgettext("navigation", "Search for help documents")}
               type="search"
               class="input input-bordered join-item bg-gray-900 text-white border-gray-700 focus:border-slate-200"
             />
@@ -20,18 +20,18 @@
     <section class="w-5/6 lg:w-2/3 xl:w-1/2 px-8 py-12 mx-auto mx-12 bg-base-300 rounded-lg shadow-xl">
       <div class="card">
         <div class="card-body">
-          <h2 class="card-title text-2xl mb-6">Popular Topics</h2>
+          <h2 class="card-title text-2xl mb-6">{dgettext("navigation", "Popular Topics")}</h2>
           <div class="menu bg-base-200 rounded-box w-full">
-            <li><a>What is GeoIP?</a></li>
-            <li><a>How is GeoIP work?</a></li>
-            <li><a>How often GeoIP Database update frequency</a></li>
-            <li><a>About Offline Database</a></li>
+            <li><a>{dgettext("user", "What is GeoIP?")}</a></li>
+            <li><a>{dgettext("user", "How is GeoIP work?")}</a></li>
+            <li><a>{dgettext("user", "How often GeoIP Database update frequency")}</a></li>
+            <li><a>{dgettext("user", "About Offline Database")}</a></li>
           </div>
           <div class="divider"></div>
           <div class="form-control">
-            <h3 class="text-xl font-bold mb-4">Contact Support</h3>
-            <p class="mb-4">Write message to our support team.</p>
-            <button class="btn btn-primary w-full">Contact</button>
+            <h3 class="text-xl font-bold mb-4">{dgettext("navigation", "Contact Support")}</h3>
+            <p class="mb-4">{dgettext("user", "Write message to our support team.")}</p>
+            <button class="btn btn-primary w-full">{dgettext("navigation", "Contact")}</button>
           </div>
         </div>
       </div>

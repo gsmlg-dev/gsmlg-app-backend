@@ -1,10 +1,10 @@
 <Layouts.home flash={@flash}>
   <:header_slot>
     <.hero_section
-      title="Professional Tools, Mobile Optimized"
-      subtitle="Network utilities and DevOps tools for developers on the go"
+      title={dgettext("navigation", "Professional Tools, Mobile Optimized")}
+      subtitle={dgettext("navigation", "Network utilities and DevOps tools for developers on the go")}
       background="/images/sky-commet.jpg"
-      cta="Explore All Apps"
+      cta={dgettext("common", "Explore All Apps")}
       cta_link="/apps"
     />
   </:header_slot>
@@ -18,10 +18,10 @@
 <!-- App Preview Section -->
       <div class="text-center">
         <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-          Our Professional Toolkit Includes:
+          <%= dgettext("navigation", "Our Professional Toolkit Includes:") %>
         </h2>
         <p class="text-lg sm:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
-          Essential utilities for developers, system administrators, and IT professionals
+          <%= dgettext("navigation", "Essential utilities for developers, system administrators, and IT professionals") %>
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
@@ -35,9 +35,9 @@
               </div>
             </figure>
             <div class="card-body text-center">
-              <h3 class="card-title text-lg font-bold text-warning">GeoIP Lookup</h3>
+              <h3 class="card-title text-lg font-bold text-warning"><%= dgettext("common", "GeoIP Lookup") %></h3>
               <p class="text-sm text-gray-300">
-                Find geographic locations of IP addresses for network analysis
+                <%= dgettext("navigation", "Find geographic locations of IP addresses for network analysis") %>
               </p>
             </div>
           </div>
@@ -52,9 +52,9 @@
               </div>
             </figure>
             <div class="card-body text-center">
-              <h3 class="card-title text-lg font-bold text-info">Whois Lookup</h3>
+              <h3 class="card-title text-lg font-bold text-info"><%= dgettext("common", "Whois Lookup") %></h3>
               <p class="text-sm text-gray-300">
-                Research domain registration and IP allocation information
+                <%= dgettext("navigation", "Research domain registration and IP allocation information") %>
               </p>
             </div>
           </div>
@@ -73,8 +73,10 @@
               </div>
             </figure>
             <div class="card-body text-center">
-              <h3 class="card-title text-lg font-bold text-success">YellowDog DNS</h3>
-              <p class="text-sm text-gray-300">Advanced DNS querying and benchmarking tools</p>
+              <h3 class="card-title text-lg font-bold text-success"><%= dgettext("common", "YellowDog DNS") %></h3>
+              <p class="text-sm text-gray-300">
+                <%= dgettext("navigation", "Advanced DNS querying and benchmarking tools") %>
+              </p>
             </div>
           </div>
           
@@ -92,9 +94,9 @@
               </div>
             </figure>
             <div class="card-body text-center">
-              <h3 class="card-title text-lg font-bold text-error">Semaphore Client</h3>
+              <h3 class="card-title text-lg font-bold text-error"><%= dgettext("common", "Semaphore Client") %></h3>
               <p class="text-sm text-gray-300">
-                Manage Ansible tasks and DevOps workflows remotely
+                <%= dgettext("navigation", "Manage Ansible tasks and DevOps workflows remotely") %>
               </p>
             </div>
           </div>
@@ -113,16 +115,16 @@
               </div>
             </figure>
             <div class="card-body text-center">
-              <h3 class="card-title text-lg font-bold text-secondary">Simple Mirror</h3>
+              <h3 class="card-title text-lg font-bold text-secondary"><%= dgettext("common", "Simple Mirror") %></h3>
               <p class="text-sm text-gray-300">
-                Everyday utilities optimized for professional use
+                <%= dgettext("navigation", "Everyday utilities optimized for professional use") %>
               </p>
             </div>
           </div>
         </div>
 
         <.link href="/apps" class="btn btn-primary btn-lg">
-          View All Apps & Features <.dm_mdi name="arrow-right" class="w-4 h-4 ml-2" />
+          <%= dgettext("navigation", "View All Apps & Features") %> <.dm_mdi name="arrow-right" class="w-4 h-4 ml-2" />
         </.link>
       </div>
       
@@ -141,15 +143,15 @@
           <div class="flex items-center gap-3 mb-4">
             <div class="w-3 h-3 bg-success rounded-full animate-pulse"></div>
             <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-success to-emerald-400 bg-clip-text text-transparent">
-              Network Diagnostics in Your Pocket
+              <%= dgettext("navigation", "Network Diagnostics in Your Pocket") %>
             </h2>
           </div>
           <div class="space-y-3 sm:space-y-4">
             <p class="text-base sm:text-lg leading-relaxed">
-              Geolocate IPs, query DNS records, and research domains from anywhere
+              <%= dgettext("navigation", "Geolocate IPs, query DNS records, and research domains from anywhere") %>
             </p>
             <p class="text-base sm:text-lg leading-relaxed">
-              Professional network tools optimized for mobile workflows
+              <%= dgettext("navigation", "Professional network tools optimized for mobile workflows") %>
             </p>
           </div>
           <div class="card-actions justify-end mt-4 sm:mt-6">
@@ -158,7 +160,7 @@
               class="btn btn-success btn-sm sm:btn-md lg:btn-wide hover:btn-success transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               <.dm_mdi name="lan" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-              <span class="text-xs sm:text-sm">View Network Tools</span>
+              <span class="text-xs sm:text-sm"><%= dgettext("navigation", "View Network Tools") %></span>
             </.link>
           </div>
         </div>
@@ -179,15 +181,15 @@
           <div class="flex items-center gap-3 mb-4">
             <div class="w-3 h-3 bg-info rounded-full animate-pulse"></div>
             <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-info to-cyan-400 bg-clip-text text-transparent">
-              Infrastructure Management On the Go
+              <%= dgettext("navigation", "Infrastructure Management On the Go") %>
             </h2>
           </div>
           <div class="space-y-3 sm:space-y-4">
             <p class="text-base sm:text-lg leading-relaxed">
-              Run Ansible tasks and manage DevOps workflows from your mobile device
+              <%= dgettext("navigation", "Run Ansible tasks and manage DevOps workflows from your mobile device") %>
             </p>
             <p class="text-base sm:text-lg leading-relaxed">
-              Stay connected to your infrastructure wherever you are
+              <%= dgettext("navigation", "Stay connected to your infrastructure wherever you are") %>
             </p>
           </div>
           <div class="card-actions justify-start mt-4 sm:mt-6">
@@ -196,7 +198,7 @@
               class="btn btn-info btn-sm sm:btn-md lg:btn-wide hover:btn-info transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               <.dm_mdi name="server" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-              <span class="text-xs sm:text-sm">Explore DevOps Tools</span>
+              <span class="text-xs sm:text-sm"><%= dgettext("navigation", "Explore DevOps Tools") %></span>
             </.link>
           </div>
         </div>
@@ -217,15 +219,15 @@
           <div class="flex items-center gap-3 mb-4">
             <div class="w-3 h-3 bg-warning rounded-full animate-pulse"></div>
             <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-warning to-orange-400 bg-clip-text text-transparent">
-              Available Everywhere You Work
+              <%= dgettext("navigation", "Available Everywhere You Work") %>
             </h2>
           </div>
           <div class="space-y-3 sm:space-y-4">
             <p class="text-base sm:text-lg leading-relaxed">
-              iOS, Android, macOS, Windows, and Linux support
+              <%= dgettext("navigation", "iOS, Android, macOS, Windows, and Linux support") %>
             </p>
             <p class="text-base sm:text-lg leading-relaxed">
-              Consistent professional tools across all your devices
+              <%= dgettext("navigation", "Consistent professional tools across all your devices") %>
             </p>
           </div>
           <div class="card-actions justify-end mt-4 sm:mt-6">
@@ -234,7 +236,7 @@
               class="btn btn-warning btn-sm sm:btn-md lg:btn-wide hover:btn-warning transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               <.dm_mdi name="devices" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-              <span class="text-xs sm:text-sm">Download for Your Platform</span>
+              <span class="text-xs sm:text-sm"><%= dgettext("navigation", "Download for Your Platform") %></span>
             </.link>
           </div>
         </div>
@@ -243,7 +245,7 @@
 <!-- Target Audience Section -->
       <div class="text-center py-12">
         <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-12">
-          Built for Technical Professionals
+          <%= dgettext("navigation", "Built for Technical Professionals") %>
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -252,22 +254,22 @@
             <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <.dm_mdi name="application" class="w-8 h-8 text-primary" />
             </div>
-            <h3 class="text-xl font-bold text-primary mb-3">For Developers</h3>
+            <h3 class="text-xl font-bold text-primary mb-3"><%= dgettext("navigation", "For Developers") %></h3>
             <p class="text-gray-300 mb-4">
-              Tools designed specifically for mobile development workflows
+              <%= dgettext("user", "Tools designed specifically for mobile development workflows") %>
             </p>
             <ul class="text-left text-gray-400 space-y-2">
               <li class="flex items-center">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
-                Network diagnostics during field work
+                <%= dgettext("user", "Network diagnostics during field work") %>
               </li>
               <li class="flex items-center">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
-                Domain research for development projects
+                <%= dgettext("user", "Domain research for development projects") %>
               </li>
               <li class="flex items-center">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
-                DNS troubleshooting on the go
+                <%= dgettext("user", "DNS troubleshooting on the go") %>
               </li>
             </ul>
           </div>
@@ -277,20 +279,20 @@
             <div class="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <.dm_mdi name="server" class="w-8 h-8 text-secondary" />
             </div>
-            <h3 class="text-xl font-bold text-secondary mb-3">For System Administrators</h3>
-            <p class="text-gray-300 mb-4">Stay connected to your systems outside the office</p>
+            <h3 class="text-xl font-bold text-secondary mb-3"><%= dgettext("navigation", "For System Administrators") %></h3>
+            <p class="text-gray-300 mb-4"><%= dgettext("user", "Stay connected to your systems outside the office") %></p>
             <ul class="text-left text-gray-400 space-y-2">
               <li class="flex items-center">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
-                Remote server management
+                <%= dgettext("user", "Remote server management") %>
               </li>
               <li class="flex items-center">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
-                Network monitoring from mobile
+                <%= dgettext("user", "Network monitoring from mobile") %>
               </li>
               <li class="flex items-center">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
-                Emergency troubleshooting capabilities
+                <%= dgettext("user", "Emergency troubleshooting capabilities") %>
               </li>
             </ul>
           </div>
@@ -300,20 +302,20 @@
             <div class="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <.dm_mdi name="shield" class="w-8 h-8 text-accent" />
             </div>
-            <h3 class="text-xl font-bold text-accent mb-3">For IT Professionals</h3>
+            <h3 class="text-xl font-bold text-accent mb-3"><%= dgettext("navigation", "For IT Professionals") %></h3>
             <p class="text-gray-300 mb-4">
-              Enterprise-grade utilities optimized for mobile workflows
+              <%= dgettext("user", "Enterprise-grade utilities optimized for mobile workflows") %>
             </p>
             <ul class="text-left text-gray-400 space-y-2">
               <li class="flex items-center">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
-                Cross-platform compatibility
+                <%= dgettext("user", "Cross-platform compatibility") %>
               </li>
               <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> Secure data handling
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> <%= dgettext("user", "Secure data handling") %>
               </li>
               <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> Offline capabilities
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> <%= dgettext("user", "Offline capabilities") %>
               </li>
             </ul>
           </div>
@@ -323,20 +325,20 @@
 <!-- Final CTA Section -->
       <div class="text-center py-16 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl">
         <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-          Ready to Boost Your Mobile Productivity?
+          <%= dgettext("navigation", "Ready to Boost Your Mobile Productivity?") %>
         </h2>
         <p class="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-          Join thousands of professionals using GSMLG tools daily for network diagnostics, infrastructure management, and technical utilities
+          <%= dgettext("user", "Join thousands of professionals using GSMLG tools daily for network diagnostics, infrastructure management, and technical utilities") %>
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <.link href="/apps" class="btn btn-primary btn-lg">
-            <.dm_mdi name="application" class="w-5 h-5 mr-2" /> Browse All Apps
+            <.dm_mdi name="application" class="w-5 h-5 mr-2" /> <%= dgettext("navigation", "Browse All Apps") %>
           </.link>
           <.link
             href="/apps"
             class="btn btn-outline btn-lg border-white text-white hover:bg-white hover:text-black"
           >
-            <.dm_mdi name="download" class="w-5 h-5 mr-2" /> Download for iOS/Android
+            <.dm_mdi name="download" class="w-5 h-5 mr-2" /> <%= dgettext("navigation", "Download for iOS/Android") %>
           </.link>
         </div>
       </div>
