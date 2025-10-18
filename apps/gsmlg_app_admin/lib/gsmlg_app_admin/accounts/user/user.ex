@@ -144,6 +144,9 @@ defmodule GsmlgAppAdmin.Accounts.User do
         identity_field(:email)
         hashed_password_field(:hashed_password)
         sign_in_tokens_enabled?(true)
+        sign_in_enabled?(true)
+        register_action_name(:register_with_default)
+        sign_in_action_name(:sign_in_with_default)
       end
     end
 
@@ -151,6 +154,7 @@ defmodule GsmlgAppAdmin.Accounts.User do
       enabled?(true)
       token_resource(GsmlgAppAdmin.Accounts.Token)
       require_token_presence_for_authentication?(true)
+      signing_secret(Application.get_env(:ash_authentication, :jwt)[:signing_secret])
     end
 
     session_identifier(:jti)
@@ -158,9 +162,8 @@ defmodule GsmlgAppAdmin.Accounts.User do
   end
 
   relationships do
-    has_one :token, GsmlgAppAdmin.Accounts.Token do
-      destination_attribute(:user_id)
-    end
+    # Token relationship is managed by subject field in tokens table
+    # No direct database relationship needed
   end
 
   postgres do

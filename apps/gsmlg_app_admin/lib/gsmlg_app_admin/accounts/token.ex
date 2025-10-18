@@ -5,34 +5,32 @@ defmodule GsmlgAppAdmin.Accounts.Token do
     authorizers: [Ash.Policy.Authorizer]
 
   actions do
-    defaults([:read])
+    defaults([:read, :create, :update, :destroy])
   end
 
   attributes do
-    uuid_primary_key(:id)
-  end
-
-  relationships do
-    belongs_to :user, GsmlgAppAdmin.Accounts.User
+    attribute :jti, :string, allow_nil?: false, primary_key?: true, writable?: true
+    attribute :subject, :string, allow_nil?: false
+    attribute :purpose, :string, allow_nil?: false
+    attribute :expires_at, :utc_datetime_usec, allow_nil?: false
+    attribute :extra_data, :map
+    attribute :created_at, :utc_datetime_usec, allow_nil?: false, default: &DateTime.utc_now/0
+    attribute :updated_at, :utc_datetime_usec, allow_nil?: false, default: &DateTime.utc_now/0
   end
 
   policies do
     policy always() do
       description("""
-      There are currently no usages of user tokens resource that should be publicly accessible.
+      Allow Ash Authentication to manage tokens for user sessions.
       """)
 
-      forbid_if(always())
+      authorize_if(AshAuthentication.Checks.AshAuthenticationInteraction)
     end
   end
 
   postgres do
     table("tokens")
     repo(GsmlgAppAdmin.Repo)
-
-    references do
-      reference(:user, on_delete: :delete, on_update: :update)
-    end
   end
 
   resource do
