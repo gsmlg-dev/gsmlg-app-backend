@@ -53,7 +53,10 @@ defmodule GsmlgAppAdmin.Accounts.AuthenticationTest do
         display_name: "Test User"
       }
 
-      {:ok, user} = User |> Ash.Changeset.for_create(:admin_create, user_attrs) |> Ash.create(actor: admin_actor)
+      {:ok, user} =
+        User
+        |> Ash.Changeset.for_create(:admin_create, user_attrs)
+        |> Ash.create(actor: admin_actor)
 
       assert to_string(user.email) == "test@example.com"
       assert user.username == "testuser"
@@ -61,7 +64,8 @@ defmodule GsmlgAppAdmin.Accounts.AuthenticationTest do
       assert user.last_name == "User"
       assert user.display_name == "Test User"
       assert user.hashed_password != nil
-      assert user.hashed_password != "validpassword123"  # Should be hashed
+      # Should be hashed
+      assert user.hashed_password != "validpassword123"
     end
 
     test "user password is properly hashed" do
@@ -77,12 +81,16 @@ defmodule GsmlgAppAdmin.Accounts.AuthenticationTest do
         display_name: "Hashed User"
       }
 
-      {:ok, user} = User |> Ash.Changeset.for_create(:admin_create, user_attrs) |> Ash.create(actor: admin_actor)
+      {:ok, user} =
+        User
+        |> Ash.Changeset.for_create(:admin_create, user_attrs)
+        |> Ash.create(actor: admin_actor)
 
       # Password should be hashed and not equal to the plaintext password
       assert user.hashed_password != nil
       assert user.hashed_password != "validpassword123"
-      assert String.starts_with?(user.hashed_password, "$2b$")  # Bcrypt hash format
+      # Bcrypt hash format
+      assert String.starts_with?(user.hashed_password, "$2b$")
     end
 
     test "user authentication setup is working" do
@@ -98,12 +106,16 @@ defmodule GsmlgAppAdmin.Accounts.AuthenticationTest do
         display_name: "Auth User"
       }
 
-      {:ok, user} = User |> Ash.Changeset.for_create(:admin_create, user_attrs) |> Ash.create(actor: admin_actor)
+      {:ok, user} =
+        User
+        |> Ash.Changeset.for_create(:admin_create, user_attrs)
+        |> Ash.create(actor: admin_actor)
 
       # Verify user is created with authentication properties
       assert to_string(user.email) == "auth@example.com"
       assert user.hashed_password != nil
-      assert user.hashed_password != "validpassword123"  # Should be hashed
+      # Should be hashed
+      assert user.hashed_password != "validpassword123"
 
       # Test that Bcrypt is working correctly
       assert Bcrypt.verify_pass("validpassword123", user.hashed_password)
@@ -114,6 +126,7 @@ defmodule GsmlgAppAdmin.Accounts.AuthenticationTest do
     test "authentication resource is properly configured" do
       # Test that the User resource has authentication enabled by checking it can be created
       admin_actor = %{is_admin: true}
+
       user_attrs = %{
         email: "config@example.com",
         password: "validpassword123",
@@ -123,7 +136,11 @@ defmodule GsmlgAppAdmin.Accounts.AuthenticationTest do
         display_name: "Config User"
       }
 
-      {:ok, user} = User |> Ash.Changeset.for_create(:admin_create, user_attrs) |> Ash.create(actor: admin_actor)
+      {:ok, user} =
+        User
+        |> Ash.Changeset.for_create(:admin_create, user_attrs)
+        |> Ash.create(actor: admin_actor)
+
       assert user != nil
       assert user.email != nil
     end
@@ -131,6 +148,7 @@ defmodule GsmlgAppAdmin.Accounts.AuthenticationTest do
     test "user resource has password hashing" do
       # Test that password hashing works correctly
       admin_actor = %{is_admin: true}
+
       user_attrs = %{
         email: "hash@example.com",
         password: "validpassword123",
@@ -140,12 +158,16 @@ defmodule GsmlgAppAdmin.Accounts.AuthenticationTest do
         display_name: "Hash User"
       }
 
-      {:ok, user} = User |> Ash.Changeset.for_create(:admin_create, user_attrs) |> Ash.create(actor: admin_actor)
+      {:ok, user} =
+        User
+        |> Ash.Changeset.for_create(:admin_create, user_attrs)
+        |> Ash.create(actor: admin_actor)
 
       # Verify password is hashed with Bcrypt
       assert user.hashed_password != nil
       assert String.starts_with?(user.hashed_password, "$2b$")
-      assert String.length(user.hashed_password) > 50  # Bcrypt hashes are typically 60 chars
+      # Bcrypt hashes are typically 60 chars
+      assert String.length(user.hashed_password) > 50
     end
   end
 end

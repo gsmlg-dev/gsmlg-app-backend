@@ -6,10 +6,9 @@ defmodule GsmlgAppAdminWeb.Layouts do
   slot :inner_block, required: true
 
   attr :flash, :map, required: true
+  attr :current_user, :any, default: nil
 
   def app(assigns) do
-    assigns = assigns |> assign_new(:current_user, fn -> nil end)
-
     ~H"""
     <.dm_simple_appbar
       title="GSMLG APP Admin"

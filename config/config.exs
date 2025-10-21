@@ -25,7 +25,7 @@ config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
 
 # Configure bun (the version is required)
 config :bun,
-  version: "1.2.5",
+  version: "1.2.13",
   gsmlg_app_web: [
     args:
       ~w(assets/js/app.js --bundle --format=esm --target=es2022 --outdir=priv/static/assets --loader:.js=jsx --external:/fonts/* --external:/images/*),

@@ -132,17 +132,18 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
     set(:input_class, """
     appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md
     shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-pale-500
-    focus:border-blue-pale-500 sm:text-sm dark:text-black
+    focus:border-blue-pale-500 sm:text-sm dark:bg-gray-800 dark:text-white dark:border-gray-600
+    dark:placeholder-gray-400
     """)
 
     set(:input_class_with_error, """
     appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md
     shadow-sm placeholder-gray-400 focus:outline-none border-red-400 sm:text-sm
-    dark:text-black
+    dark:bg-gray-800 dark:text-white dark:border-red-600 dark:placeholder-gray-400
     """)
 
     set(:submit_class, """
-    btn btn-primary w-full mt-4 mb-4
+    btn btn-primary w-full mt-4 mb-4 text-white
     """)
 
     set(:error_ul, "text-red-400 font-light my-3 italic text-sm")
@@ -154,7 +155,7 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
     set(:root_class, "w-full mt-2 mb-4")
 
     set(:link_class, """
-    btn btn-outline w-full inline-flex items-center justify-center
+    btn btn-outline w-full inline-flex items-center justify-center dark:border-gray-600 dark:text-white dark:hover:bg-gray-800
     """)
 
     set(:icon_class, "-ml-0.4 mr-2 h-4 w-4")

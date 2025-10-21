@@ -1,9 +1,24 @@
-<Layouts.app flash={@flash}>
+<Layouts.app flash={@flash} current_user={@current_user}>
   <div class="flex flex-col items-center px-4 py-10 sm:px-6 sm:py-28 lg:px-8 xl:px-28 xl:py-32">
     <div class="mx-auto max-w-xl lg:mx-0">
       <h1 class="text-4xl font-bold text-center">
         Best in the World!
       </h1>
+      <%= if @current_user do %>
+        <div class="mt-4 text-center">
+          <p class="text-lg">Welcome back, {@current_user.email}!</p>
+          <p class="mt-2">
+            <.link href="/users" class="btn btn-primary">Manage Users</.link>
+          </p>
+        </div>
+      <% else %>
+        <div class="mt-4 text-center">
+          <p class="text-lg">Please sign in to access the admin panel.</p>
+          <p class="mt-2">
+            <.link href="/sign-in" class="btn btn-primary">Sign In</.link>
+          </p>
+        </div>
+      <% end %>
     </div>
   </div>
 </Layouts.app>

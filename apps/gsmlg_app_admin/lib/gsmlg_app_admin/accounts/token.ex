@@ -9,13 +9,13 @@ defmodule GsmlgAppAdmin.Accounts.Token do
   end
 
   attributes do
-    attribute :jti, :string, allow_nil?: false, primary_key?: true, writable?: true
-    attribute :subject, :string, allow_nil?: false
-    attribute :purpose, :string, allow_nil?: false
-    attribute :expires_at, :utc_datetime_usec, allow_nil?: false
-    attribute :extra_data, :map
-    attribute :created_at, :utc_datetime_usec, allow_nil?: false, default: &DateTime.utc_now/0
-    attribute :updated_at, :utc_datetime_usec, allow_nil?: false, default: &DateTime.utc_now/0
+    attribute(:jti, :string, allow_nil?: false, primary_key?: true, writable?: true)
+    attribute(:subject, :string, allow_nil?: false)
+    attribute(:purpose, :string, allow_nil?: false)
+    attribute(:expires_at, :utc_datetime_usec, allow_nil?: false)
+    attribute(:extra_data, :map)
+    attribute(:created_at, :utc_datetime_usec, allow_nil?: false, default: &DateTime.utc_now/0)
+    attribute(:updated_at, :utc_datetime_usec, allow_nil?: false, default: &DateTime.utc_now/0)
   end
 
   policies do

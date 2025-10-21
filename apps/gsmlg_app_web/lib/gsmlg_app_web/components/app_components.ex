@@ -139,7 +139,9 @@ defmodule GsmlgAppWeb.AppComponents do
             </p>
             <div class="card-actions justify-between items-center">
               <div class="flex items-center gap-4">
-                <span class="text-sm lg:text-base font-semibold">{dgettext("common", "App Store")}:</span>
+                <span class="text-sm lg:text-base font-semibold">
+                  {dgettext("common", "App Store")}:
+                </span>
                 <div class="flex gap-2">
                   <.link
                     :for={store <- @store_link}
@@ -162,7 +164,10 @@ defmodule GsmlgAppWeb.AppComponents do
                   class="btn btn-outline btn-sm lg:btn-md"
                   navigate={~p"/apps-privacy/app/#{@app_label}"}
                 >
-                  <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> {dgettext("navigation", "Privacy")}
+                  <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> {dgettext(
+                    "navigation",
+                    "Privacy"
+                  )}
                 </.link>
               </div>
             </div>
@@ -231,7 +236,10 @@ defmodule GsmlgAppWeb.AppComponents do
             </li>
             <li>
               <.link navigate={~p"/apps-privacy/app/#{@app_label}"}>
-                <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> {dgettext("navigation", "Privacy")}
+                <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> {dgettext(
+                  "navigation",
+                  "Privacy"
+                )}
               </.link>
             </li>
           </ul>
@@ -249,7 +257,9 @@ defmodule GsmlgAppWeb.AppComponents do
 
         <div class="card-actions justify-between items-center">
           <div class="flex items-center gap-2">
-            <span class="text-sm font-semibold text-base-content/60">{dgettext("user", "Available on:")}:</span>
+            <span class="text-sm font-semibold text-base-content/60">
+              {dgettext("user", "Available on:")}:
+            </span>
             <div class="flex gap-2">
               <.link
                 :for={store <- @store_link}
@@ -273,7 +283,10 @@ defmodule GsmlgAppWeb.AppComponents do
               class="btn btn-outline btn-sm hover:bg-secondary hover:text-secondary-content"
               navigate={~p"/apps-privacy/app/#{@app_label}"}
             >
-              <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> {dgettext("navigation", "Privacy")}
+              <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> {dgettext(
+                "navigation",
+                "Privacy"
+              )}
             </.link>
           </div>
         </div>

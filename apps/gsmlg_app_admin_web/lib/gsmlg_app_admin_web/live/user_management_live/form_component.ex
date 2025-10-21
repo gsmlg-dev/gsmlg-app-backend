@@ -9,125 +9,125 @@ defmodule GsmlgAppAdminWeb.UserManagementLive.FormComponent do
     <div>
       <.dm_card>
         <:title>{@title}</:title>
-          <.dm_form
-            :let={f}
-            for={@form}
-            id="user-form"
-            phx-target={@myself}
-            phx-change="validate"
-            phx-submit="save"
-          >
-            <.dm_input
-              field={f[:email]}
-              type="email"
-              label="Email"
-              required
-              maxlength="254"
-              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-            />
-            <.dm_input
-              field={f[:first_name]}
-              type="text"
-              label="First name"
-              maxlength="50"
-              pattern="[A-Za-z\s\-']+"
-              required
-            />
-            <.dm_input
-              field={f[:last_name]}
-              type="text"
-              label="Last name"
-              maxlength="50"
-              pattern="[A-Za-z\s\-']+"
-              required
-            />
-            <.dm_input
-              field={f[:username]}
-              type="text"
-              label="Username"
-              maxlength="20"
-              pattern="[a-zA-Z0-9_]{3,20}"
-              required
-            />
-            <.dm_input
-              field={f[:display_name]}
-              type="text"
-              label="Display name"
-              maxlength="100"
-              required
-            />
+        <.dm_form
+          :let={f}
+          for={@form}
+          id="user-form"
+          phx-target={@myself}
+          phx-change="validate"
+          phx-submit="save"
+        >
+          <.dm_input
+            field={f[:email]}
+            type="email"
+            label="Email"
+            required
+            maxlength="254"
+            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+          />
+          <.dm_input
+            field={f[:first_name]}
+            type="text"
+            label="First name"
+            maxlength="50"
+            pattern="[A-Za-z\s\-']+"
+            required
+          />
+          <.dm_input
+            field={f[:last_name]}
+            type="text"
+            label="Last name"
+            maxlength="50"
+            pattern="[A-Za-z\s\-']+"
+            required
+          />
+          <.dm_input
+            field={f[:username]}
+            type="text"
+            label="Username"
+            maxlength="20"
+            pattern="[a-zA-Z0-9_]{3,20}"
+            required
+          />
+          <.dm_input
+            field={f[:display_name]}
+            type="text"
+            label="Display name"
+            maxlength="100"
+            required
+          />
 
-            <.dm_input
-              field={f[:password]}
-              type="password"
-              label={
-                if @action == :edit,
-                  do: "New password (leave blank to keep current)",
-                  else: "Password"
-              }
-              value={@form[:password].value || ""}
-              minlength="8"
-              maxlength="128"
-              autocomplete="new-password"
-              required={@action != :edit}
-            />
+          <.dm_input
+            field={f[:password]}
+            type="password"
+            label={
+              if @action == :edit,
+                do: "New password (leave blank to keep current)",
+                else: "Password"
+            }
+            value={@form[:password].value || ""}
+            minlength="8"
+            maxlength="128"
+            autocomplete="new-password"
+            required={@action != :edit}
+          />
 
-            <.dm_input
-              field={f[:password_confirmation]}
-              type="password"
-              label="Confirm password"
-              value={@form[:password_confirmation].value || ""}
-              minlength="8"
-              maxlength="128"
-              autocomplete="new-password"
-              required={@action != :edit}
-            />
+          <.dm_input
+            field={f[:password_confirmation]}
+            type="password"
+            label="Confirm password"
+            value={@form[:password_confirmation].value || ""}
+            minlength="8"
+            maxlength="128"
+            autocomplete="new-password"
+            required={@action != :edit}
+          />
 
-            <.dm_input
-              field={f[:role]}
-              type="select"
-              label="Role"
-              options={[
-                {"User", :user},
-                {"Moderator", :moderator},
-                {"Admin", :admin}
-              ]}
-            />
+          <.dm_input
+            field={f[:role]}
+            type="select"
+            label="Role"
+            options={[
+              {"User", :user},
+              {"Moderator", :moderator},
+              {"Admin", :admin}
+            ]}
+          />
 
-            <.dm_input
-              field={f[:status]}
-              type="select"
-              label="Status"
-              options={[
-                {"Active", :active},
-                {"Inactive", :inactive},
-                {"Suspended", :suspended},
-                {"Pending", :pending}
-              ]}
-            />
+          <.dm_input
+            field={f[:status]}
+            type="select"
+            label="Status"
+            options={[
+              {"Active", :active},
+              {"Inactive", :inactive},
+              {"Suspended", :suspended},
+              {"Pending", :pending}
+            ]}
+          />
 
-            <.dm_input
-              field={f[:email_verified]}
-              type="checkbox"
-              label="Email verified"
-            />
+          <.dm_input
+            field={f[:email_verified]}
+            type="checkbox"
+            label="Email verified"
+          />
 
-            <.dm_input
-              field={f[:timezone]}
-              type="text"
-              label="Timezone"
-            />
+          <.dm_input
+            field={f[:timezone]}
+            type="text"
+            label="Timezone"
+          />
 
-            <.dm_input
-              field={f[:language]}
-              type="text"
-              label="Language"
-            />
+          <.dm_input
+            field={f[:language]}
+            type="text"
+            label="Language"
+          />
 
-            <:actions>
-              <.dm_btn phx-disable-with="Saving...">Save User</.dm_btn>
-            </:actions>
-          </.dm_form>
+          <:actions>
+            <.dm_btn phx-disable-with="Saving...">Save User</.dm_btn>
+          </:actions>
+        </.dm_form>
       </.dm_card>
     </div>
     """

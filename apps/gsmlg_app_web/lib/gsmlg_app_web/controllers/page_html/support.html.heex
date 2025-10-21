@@ -3,7 +3,9 @@
     <.hero_section
       title={dgettext("navigation", "Support Center")}
       subtitle={dgettext("navigation", "We're Here to Help")}
-      description={dgettext("user", "Get the support you need for GSMLG's open source software tools")}
+      description={
+        dgettext("user", "Get the support you need for GSMLG's open source software tools")
+      }
       background="/images/explosion.png"
       icon="headset"
     >
@@ -36,7 +38,9 @@
               <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <.dm_mdi name="email" class="w-8 h-8 text-primary" />
               </div>
-              <h3 class="card-title text-lg font-bold text-primary mb-3">{dgettext("navigation", "Email Support")}</h3>
+              <h3 class="card-title text-lg font-bold text-primary mb-3">
+                {dgettext("navigation", "Email Support")}
+              </h3>
               <p class="text-sm text-gray-300 mb-4">
                 {dgettext("user", "Direct support for technical issues and inquiries")}
               </p>
@@ -55,7 +59,9 @@
               <div class="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <.dm_mdi name="github" class="w-8 h-8 text-secondary" />
               </div>
-              <h3 class="card-title text-lg font-bold text-secondary mb-3">{dgettext("common", "GitHub Issues")}</h3>
+              <h3 class="card-title text-lg font-bold text-secondary mb-3">
+                {dgettext("common", "GitHub Issues")}
+              </h3>
               <p class="text-sm text-gray-300 mb-4">
                 {dgettext("user", "Report bugs and request features for our projects")}
               </p>
@@ -63,7 +69,10 @@
                 {dgettext("user", "Community-driven support")}
               </div>
               <a href="https://github.com/gsmlg" target="_blank" class="btn btn-secondary btn-sm">
-                <.dm_mdi name="bug" class="w-4 h-4 mr-2" /> {dgettext("navigation", "Report Issue")}
+                <.dm_mdi name="bug" class="w-4 h-4 mr-2" /> {dgettext(
+                  "navigation",
+                  "Report Issue"
+                )}
               </a>
             </div>
           </div>
@@ -74,7 +83,9 @@
               <div class="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <.dm_mdi name="forum" class="w-8 h-8 text-accent" />
               </div>
-              <h3 class="card-title text-lg font-bold text-accent mb-3">{dgettext("navigation", "Community Forum")}</h3>
+              <h3 class="card-title text-lg font-bold text-accent mb-3">
+                {dgettext("navigation", "Community Forum")}
+              </h3>
               <p class="text-sm text-gray-300 mb-4">
                 {dgettext("user", "Connect with other users and share knowledge")}
               </p>
@@ -86,7 +97,10 @@
                 target="_blank"
                 class="btn btn-accent btn-sm"
               >
-                <.dm_mdi name="account-group" class="w-4 h-4 mr-2" /> {dgettext("navigation", "Join Forum")}
+                <.dm_mdi name="account-group" class="w-4 h-4 mr-2" /> {dgettext(
+                  "navigation",
+                  "Join Forum"
+                )}
               </a>
             </div>
           </div>
@@ -150,7 +164,10 @@
             </div>
             <div class="collapse-content">
               <p class="text-gray-300">
-                {dgettext("user", "GSMLG develops a range of open source software tools including network utilities, DevOps tools, and mobile-optimized applications. Our focus is on creating professional tools for developers, system administrators, and IT professionals.")}
+                {dgettext(
+                  "user",
+                  "GSMLG develops a range of open source software tools including network utilities, DevOps tools, and mobile-optimized applications. Our focus is on creating professional tools for developers, system administrators, and IT professionals."
+                )}
               </p>
             </div>
           </div>
@@ -163,7 +180,10 @@
             </div>
             <div class="collapse-content">
               <p class="text-gray-300">
-                {dgettext("user", "Yes! All our software is open source and free to use under permissive licenses. We believe in the power of open source and community collaboration to create better tools for everyone.")}
+                {dgettext(
+                  "user",
+                  "Yes! All our software is open source and free to use under permissive licenses. We believe in the power of open source and community collaboration to create better tools for everyone."
+                )}
               </p>
             </div>
           </div>
@@ -176,7 +196,10 @@
             </div>
             <div class="collapse-content">
               <p class="text-gray-300">
-                {dgettext("user", "We welcome contributions! You can contribute by reporting bugs, suggesting features, submitting pull requests on GitHub, or helping other users in our community forum. Every contribution helps make our software better.")}
+                {dgettext(
+                  "user",
+                  "We welcome contributions! You can contribute by reporting bugs, suggesting features, submitting pull requests on GitHub, or helping other users in our community forum. Every contribution helps make our software better."
+                )}
               </p>
             </div>
           </div>
@@ -189,7 +212,10 @@
             </div>
             <div class="collapse-content">
               <p class="text-gray-300">
-                {dgettext("user", "While our software is free and community-supported, we do offer priority commercial support for enterprise customers. Contact us at contact@gsmlg.dev for more information about commercial support packages.")}
+                {dgettext(
+                  "user",
+                  "While our software is free and community-supported, we do offer priority commercial support for enterprise customers. Contact us at contact@gsmlg.dev for more information about commercial support packages."
+                )}
               </p>
             </div>
           </div>
@@ -202,7 +228,10 @@
             </div>
             <div class="collapse-content">
               <p class="text-gray-300">
-                {dgettext("user", "Our tools are designed to work across multiple platforms including iOS, Android, macOS, Windows, and Linux. We believe in providing consistent professional tools across all your devices.")}
+                {dgettext(
+                  "user",
+                  "Our tools are designed to work across multiple platforms including iOS, Android, macOS, Windows, and Linux. We believe in providing consistent professional tools across all your devices."
+                )}
               </p>
             </div>
           </div>
@@ -215,7 +244,10 @@
           {dgettext("navigation", "Bug Reporting Guidelines")}
         </h2>
         <p class="text-lg sm:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
-          {dgettext("user", "Help us help you by providing detailed information when reporting issues")}
+          {dgettext(
+            "user",
+            "Help us help you by providing detailed information when reporting issues"
+          )}
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -224,7 +256,9 @@
             <div class="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <.dm_mdi name="check-circle" class="w-8 h-8 text-success" />
             </div>
-            <h3 class="text-xl font-bold text-success mb-3">{dgettext("navigation", "What to Include")}</h3>
+            <h3 class="text-xl font-bold text-success mb-3">
+              {dgettext("navigation", "What to Include")}
+            </h3>
             <ul class="text-left text-gray-300 space-y-2">
               <li class="flex items-start">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2 mt-1 flex-shrink-0" />
@@ -254,7 +288,9 @@
             <div class="w-16 h-16 bg-info/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <.dm_mdi name="lightbulb" class="w-8 h-8 text-info" />
             </div>
-            <h3 class="text-xl font-bold text-info mb-3">{dgettext("navigation", "Best Practices")}</h3>
+            <h3 class="text-xl font-bold text-info mb-3">
+              {dgettext("navigation", "Best Practices")}
+            </h3>
             <ul class="text-left text-gray-300 space-y-2">
               <li class="flex items-start">
                 <.dm_mdi name="check" class="w-4 h-4 text-info mr-2 mt-1 flex-shrink-0" />
@@ -301,10 +337,16 @@
           </div>
           <div class="space-y-3 sm:space-y-4">
             <p class="text-base sm:text-lg leading-relaxed">
-              {dgettext("user", "Join our vibrant community of developers and users who help each other succeed")}
+              {dgettext(
+                "user",
+                "Join our vibrant community of developers and users who help each other succeed"
+              )}
             </p>
             <p class="text-base sm:text-lg leading-relaxed">
-              {dgettext("user", "Share your experiences, learn from others, and contribute to the growth of our open source ecosystem")}
+              {dgettext(
+                "user",
+                "Share your experiences, learn from others, and contribute to the growth of our open source ecosystem"
+              )}
             </p>
             <div class="flex flex-wrap gap-2">
               <span class="badge badge-primary">{dgettext("common", "GitHub Discussions")}</span>
@@ -332,7 +374,10 @@
           {dgettext("navigation", "Still Need Help?")}
         </h2>
         <p class="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-          {dgettext("user", "Our team is here to support you. Don't hesitate to reach out with any questions or concerns.")}
+          {dgettext(
+            "user",
+            "Our team is here to support you. Don't hesitate to reach out with any questions or concerns."
+          )}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <a href="mailto:contact@gsmlg.dev" class="btn btn-primary btn-lg">

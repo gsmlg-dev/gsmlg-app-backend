@@ -5,9 +5,10 @@
   "description": "GSMLG App Admin Website",
   "main": "priv/static/assets/app.js",
   "scripts": {
-    "build": "bun build assets/js/app.js --outdir=priv/static/assets --target=browser --format=esm",
-    "build:deploy": "bun build assets/js/app.js --outdir=priv/static/assets --target=browser --format=esm --minify",
-    "dev": "bun build assets/js/app.js --outdir=priv/static/assets --target=browser --format=esm --watch",
+    "setup:vendor": "mkdir -p assets/vendor/js && cp ../../deps/phoenix/priv/static/phoenix.mjs assets/vendor/js/phoenix.js && cp ../../deps/phoenix_html/priv/static/phoenix_html.js assets/vendor/js/ && cp ../../deps/phoenix_live_view/priv/static/phoenix_live_view.esm.js assets/vendor/js/phoenix_live_view.js",
+    "build": "bun run setup:vendor && bun build assets/js/app.js --outdir=priv/static/assets --target=browser --format=esm",
+    "build:deploy": "bun run setup:vendor && bun build assets/js/app.js --outdir=priv/static/assets --target=browser --format=esm --minify",
+    "dev": "bun run setup:vendor && bun build assets/js/app.js --outdir=priv/static/assets --target=browser --format=esm --watch",
     "test": "echo 'no test'"
   },
   "author": "Jonathan Gao",

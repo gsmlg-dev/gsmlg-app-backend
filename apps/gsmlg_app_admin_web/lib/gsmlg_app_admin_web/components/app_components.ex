@@ -6,7 +6,7 @@ defmodule GsmlgAppAdminWeb.AppComponents do
   use Phoenix.Component
   use PhoenixDuskmoon.Component
 
-    use Gettext, backend: GsmlgAppAdminWeb.Gettext
+  use Gettext, backend: GsmlgAppAdminWeb.Gettext
 
   use GsmlgAppAdminWeb, :verified_routes
 

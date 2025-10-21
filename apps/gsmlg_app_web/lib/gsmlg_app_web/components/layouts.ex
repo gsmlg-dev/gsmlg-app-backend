@@ -30,16 +30,16 @@ defmodule GsmlgAppWeb.Layouts do
       ]}
     >
       <:menu class={GsmlgAppWeb.AppComponents.menu_class("home", @current_page)} to="/">
-        <%= dgettext("navigation", "Home") %>
+        {dgettext("navigation", "Home")}
       </:menu>
       <:menu class={GsmlgAppWeb.AppComponents.menu_class("apps", @current_page)} to="/apps">
-        <%= dgettext("navigation", "Apps") %>
+        {dgettext("navigation", "Apps")}
       </:menu>
       <:menu class={GsmlgAppWeb.AppComponents.menu_class("support", @current_page)} to="/support">
-        <%= dgettext("navigation", "Support") %>
+        {dgettext("navigation", "Support")}
       </:menu>
       <:menu class={GsmlgAppWeb.AppComponents.menu_class("about-us", @current_page)} to="/about-us">
-        <%= dgettext("navigation", "About Us") %>
+        {dgettext("navigation", "About Us")}
       </:menu>
       <:user_profile></:user_profile>
       {render_slot(@header_slot)}

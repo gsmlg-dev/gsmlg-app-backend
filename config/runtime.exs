@@ -65,6 +65,5 @@ if config_env() == :prod do
   config :ash_authentication,
     token_signing_secret: jwt_signing_secret
 
-  config :ash_authentication, :jwt,
-    signing_secret: jwt_signing_secret
+  config :ash_authentication, :jwt, signing_secret: jwt_signing_secret
 end

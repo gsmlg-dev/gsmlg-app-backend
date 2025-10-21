@@ -14,7 +14,7 @@ alias GsmlgAppAdmin.Accounts
 alias GsmlgAppAdmin.Accounts.User
 
 # Create admin user if it doesn't exist
-admin_email = "admin@example.com"
+admin_email = "admin@gsmlg.dev"
 admin_password = "Qwer1234"
 
 IO.puts("Creating admin user...")

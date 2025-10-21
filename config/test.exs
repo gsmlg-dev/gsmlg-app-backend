@@ -48,5 +48,4 @@ config :phoenix, :plug_init_mode, :runtime
 config :ash_authentication,
   token_signing_secret: "test_jwt_signing_secret_for_testing_only"
 
-config :ash_authentication, :jwt,
-  signing_secret: "test_jwt_signing_secret_for_testing_only"
+config :ash_authentication, :jwt, signing_secret: "test_jwt_signing_secret_for_testing_only"

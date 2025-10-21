@@ -1,8 +1,7 @@
-import "phoenix_html"
+import "../vendor/js/phoenix_html.js"
 
-import { Socket } from "phoenix"
-import { LiveSocket } from "phoenix_live_view"
-i
+import { Socket } from "../vendor/js/phoenix.js"
+import { LiveSocket } from "../vendor/js/phoenix_live_view.js"
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, { params: { _csrf_token: csrfToken } })
 
