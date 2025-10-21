@@ -121,8 +121,10 @@ Follow the established conventions:
 ## Environment Variables for Production
 
 - `DATABASE_URL` - PostgreSQL connection string
-- `SECRET_KEY_BASE` - Secret key for Phoenix
-- `PORT` - Server port (default: 4152)
+- `SECRET_KEY_BASE_WEB` - Secret key for public web interface
+- `SECRET_KEY_BASE_ADMIN` - Secret key for admin interface
+- `TOKEN_SIGNING_SECRET` - Token signing secret for authentication
+- `DB_USERNAME`, `DB_PASSWORD`, `DB_HOST`, `DB_NAME` - Database credentials
 
 ## Docker Support
 
@@ -137,5 +139,7 @@ docker build -t gsmlg-app-backend .
 - `devenv.nix` - Nix development environment with PostgreSQL
 - `AGENTS.md` - Additional build/lint/test commands and code style guidelines
 - `.formatter.exs` - Code formatting rules including HEEx files
-- This app use phoenix_duskmoon for ui instead of CoreComponent. The phoenix_dusmoon is a phoenix UI lib.
-- This app use duskmoonui instead of daisyui, duskmoonui is a fork of daisyui, add a tertiary color in the theme.
+
+## UI Framework
+
+This app uses phoenix_duskmoon for UI instead of CoreComponents. phoenix_duskmoon is a Phoenix UI library that provides components and styling. The app uses duskmoonui instead of daisyui, where duskmoonui is a fork of daisyui that adds a tertiary color to the theme.
