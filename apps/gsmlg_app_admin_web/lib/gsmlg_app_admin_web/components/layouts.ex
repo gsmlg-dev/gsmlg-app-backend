@@ -42,6 +42,16 @@ defmodule GsmlgAppAdminWeb.Layouts do
     <.dm_flash_group flash={@flash} />
     <main class="flex w-full min-h-screen">
       <div class="container mx-auto px-4">
+        <%= if @current_user do %>
+          <div class="mb-4 p-4 bg-base-200 rounded-lg">
+            <h2 class="text-lg font-semibold mb-2">Admin Navigation</h2>
+            <div class="flex gap-2">
+              <.link href="/users" class="btn btn-primary">
+                User Management
+              </.link>
+            </div>
+          </div>
+        <% end %>
         {render_slot(@inner_block)}
       </div>
     </main>

@@ -30,6 +30,7 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
     set(:label_class, "mt-2 mb-4 text-2xl tracking-tight font-bold text-gray-900 dark:text-white")
     set(:form_class, nil)
     set(:spacer_class, "py-1")
+    set(:button_text, "Change Password")
     set(:disable_button_text, "Changing password ...")
   end
 
@@ -81,6 +82,7 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
       "If this user exists in our database you will contacted with a sign-in link shortly."
     )
 
+    set(:button_text, "Request Magic Link")
     set(:disable_button_text, "Requesting ...")
   end
 
@@ -100,6 +102,7 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
     set(:label_class, "mt-2 mb-4 text-2xl tracking-tight font-bold text-gray-900 dark:text-white")
     set(:form_class, nil)
     set(:slot_class, "my-4")
+    set(:button_text, "Sign In")
     set(:disable_button_text, "Signing in ...")
   end
 
@@ -108,6 +111,7 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
     set(:label_class, "mt-2 mb-4 text-2xl tracking-tight font-bold text-gray-900 dark:text-white")
     set(:form_class, nil)
     set(:slot_class, "my-4")
+    set(:button_text, "Register")
     set(:disable_button_text, "Registering ...")
   end
 
@@ -122,6 +126,7 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
       "If this user exists in our system, you will be contacted with reset instructions shortly."
     )
 
+    set(:button_text, "Reset Password")
     set(:disable_button_text, "Requesting ...")
   end
 
