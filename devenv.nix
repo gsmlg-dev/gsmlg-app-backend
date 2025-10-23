@@ -42,7 +42,7 @@ in
       { name = "gsmlg_app_admin_test"; }
     ];
     listen_addresses = "localhost";
-    port = 5432;
+    port = 5433;
     settings = {
       max_connections = 200;
       shared_buffers = "512MB";
