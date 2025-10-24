@@ -39,14 +39,18 @@ defmodule GsmlgApp.Umbrella.MixProject do
   defp deps do
     [
       # Required to run "mix format" on ~H/.heex files from the umbrella root
-      {:phoenix_live_view, ">= 1.0.0"}
+      {:phoenix_live_view, ">= 1.0.0"},
+      # Code quality tools
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 
   defp aliases do
     [
       # run `mix setup` in all child apps
-      setup: ["cmd mix setup"]
+      setup: ["cmd mix setup"],
+      lint: ["cmd mix lint"]
     ]
   end
 end

@@ -11,6 +11,7 @@ defmodule GsmlgAppComponent.MixProject do
       lockfile: "../../mix.lock",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
       deps: deps()
     ]
   end
@@ -34,7 +35,15 @@ defmodule GsmlgAppComponent.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:finch, "~> 0.18"},
       {:gettext, "~>0.26 or ~> 1.0"},
-      {:jason, "~> 1.2"}
+      {:jason, "~> 1.2"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
+    ]
+  end
+
+  defp aliases do
+    [
+      lint: ["credo --strict", "dialyzer"]
     ]
   end
 end

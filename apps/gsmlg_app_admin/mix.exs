@@ -45,7 +45,9 @@ defmodule GsmlgAppAdmin.MixProject do
       {:picosat_elixir, "~> 0.2"},
       {:ash, "~> 3.0"},
       {:ash_authentication, "~> 4.0"},
-      {:ash_postgres, "~> 2.0"}
+      {:ash_postgres, "~> 2.0"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -57,7 +59,8 @@ defmodule GsmlgAppAdmin.MixProject do
       setup: ["deps.get", "ecto.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      lint: ["credo --strict", "dialyzer"]
     ]
   end
 end

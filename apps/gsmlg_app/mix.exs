@@ -38,7 +38,9 @@ defmodule GsmlgApp.MixProject do
     [
       {:phoenix_pubsub, "~> 2.1"},
       {:swoosh, "~> 1.3"},
-      {:finch, "~> 0.18"}
+      {:finch, "~> 0.18"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -47,7 +49,8 @@ defmodule GsmlgApp.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get"]
+      setup: ["deps.get"],
+      lint: ["credo --strict", "dialyzer"]
     ]
   end
 end

@@ -51,7 +51,9 @@ defmodule GsmlgAppWeb.MixProject do
       {:gsmlg_app, in_umbrella: true},
       {:gsmlg_whois, "~> 0.2"},
       {:jason, "~> 1.2"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -67,7 +69,8 @@ defmodule GsmlgAppWeb.MixProject do
         "tailwind gsmlg_app_web --minify",
         "bun run build:deploy",
         "phx.digest"
-      ]
+      ],
+      lint: ["credo --strict", "dialyzer"]
     ]
   end
 end
