@@ -19,16 +19,17 @@ defmodule GsmlgAppAdminWeb.UserManagementLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    with {:ok, users} <- fetch_users_with_error_handling() do
-      {:ok,
-       socket
-       |> assign(:page_title, "User Management")
-       |> assign(:users, users)
-       |> assign(:search_query, "")
-       |> assign(:selected_role, "all")
-       |> assign(:selected_status, "all")
-       |> assign(:error, nil)}
-    else
+    case fetch_users_with_error_handling() do
+      {:ok, users} ->
+        {:ok,
+         socket
+         |> assign(:page_title, "User Management")
+         |> assign(:users, users)
+         |> assign(:search_query, "")
+         |> assign(:selected_role, "all")
+         |> assign(:selected_status, "all")
+         |> assign(:error, nil)}
+
       {:error, error} ->
         {:ok,
          socket
@@ -53,28 +54,26 @@ defmodule GsmlgAppAdminWeb.UserManagementLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    try do
-      user = Accounts.get_user!(id)
+    user = Accounts.get_user!(id)
 
+    socket
+    |> assign(:page_title, "Edit User")
+    |> assign(:user, user)
+    |> assign(:error, nil)
+  rescue
+    Ash.Error.Query.NotFound ->
       socket
       |> assign(:page_title, "Edit User")
-      |> assign(:user, user)
-      |> assign(:error, nil)
-    rescue
-      Ash.Error.Query.NotFound ->
-        socket
-        |> assign(:page_title, "Edit User")
-        |> assign(:user, nil)
-        |> assign(:error, "User not found")
-        |> put_flash(:error, "User not found")
+      |> assign(:user, nil)
+      |> assign(:error, "User not found")
+      |> put_flash(:error, "User not found")
 
-      error ->
-        socket
-        |> assign(:page_title, "Edit User")
-        |> assign(:user, nil)
-        |> assign(:error, "Failed to load user: #{inspect(error)}")
-        |> put_flash(:error, "Failed to load user")
-    end
+    error ->
+      socket
+      |> assign(:page_title, "Edit User")
+      |> assign(:user, nil)
+      |> assign(:error, "Failed to load user: #{inspect(error)}")
+      |> put_flash(:error, "Failed to load user")
   end
 
   defp apply_action(socket, :new, _params) do
@@ -112,25 +111,23 @@ defmodule GsmlgAppAdminWeb.UserManagementLive.Index do
   end
 
   def handle_event("delete", %{"id" => id}, socket) do
-    try do
-      user = Ash.get!(User, id)
-      Ash.destroy!(user)
+    user = Ash.get!(User, id)
+    Ash.destroy!(user)
 
+    {:noreply,
+     socket
+     |> put_flash(:info, "User deleted successfully")
+     |> assign(:users, list_users())}
+  rescue
+    Ash.Error.Query.NotFound ->
       {:noreply,
        socket
-       |> put_flash(:info, "User deleted successfully")
-       |> assign(:users, list_users())}
-    rescue
-      Ash.Error.Query.NotFound ->
-        {:noreply,
-         socket
-         |> put_flash(:error, "User not found")}
+       |> put_flash(:error, "User not found")}
 
-      error ->
-        {:noreply,
-         socket
-         |> put_flash(:error, "Failed to delete user: #{inspect(error)}")}
-    end
+    error ->
+      {:noreply,
+       socket
+       |> put_flash(:error, "Failed to delete user: #{inspect(error)}")}
   end
 
   defp list_users do
@@ -162,21 +159,19 @@ defmodule GsmlgAppAdminWeb.UserManagementLive.Index do
 
   # Error handling functions
   defp fetch_users_with_error_handling do
-    try do
-      users = Accounts.list_users()
-      {:ok, users}
-    rescue
-      error ->
-        Logger.error("Failed to fetch users: #{inspect(error)}")
-        {:error, error}
-    catch
-      :exit, reason ->
-        Logger.error("Process exited while fetching users: #{inspect(reason)}")
-        {:error, reason}
+    users = Accounts.list_users()
+    {:ok, users}
+  rescue
+    error ->
+      Logger.error("Failed to fetch users: #{inspect(error)}")
+      {:error, error}
+  catch
+    :exit, reason ->
+      Logger.error("Process exited while fetching users: #{inspect(reason)}")
+      {:error, reason}
 
-      :throw, value ->
-        Logger.error("Thrown value while fetching users: #{inspect(value)}")
-        {:error, value}
-    end
+    :throw, value ->
+      Logger.error("Thrown value while fetching users: #{inspect(value)}")
+      {:error, value}
   end
 end

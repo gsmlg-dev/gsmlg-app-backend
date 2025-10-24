@@ -1,4 +1,10 @@
 defmodule GsmlgAppAdmin.Blog.Post do
+  @moduledoc """
+  The Post resource represents blog posts in the system.
+
+  This resource provides CRUD operations for managing blog posts,
+  including title and content fields stored in PostgreSQL.
+  """
   # Using Ash.Resource turns this module into an Ash resource.
   use Ash.Resource,
     domain: GsmlgAppAdmin.Blog,

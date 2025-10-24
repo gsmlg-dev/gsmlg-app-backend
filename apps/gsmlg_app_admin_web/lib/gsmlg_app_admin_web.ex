@@ -89,8 +89,8 @@ defmodule GsmlgAppAdminWeb do
       import GsmlgAppComponent.App
 
       # Shortcut for generating JS commands
-      alias Phoenix.LiveView.JS
       alias GsmlgAppAdminWeb.Layouts
+      alias Phoenix.LiveView.JS
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())

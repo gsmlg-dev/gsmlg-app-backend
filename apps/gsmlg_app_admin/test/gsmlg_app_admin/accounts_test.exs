@@ -1,6 +1,11 @@
 defmodule GsmlgAppAdmin.AccountsTest do
   use GsmlgAppAdmin.DataCase, async: true
 
+  alias Ash.Domain.Info
+  alias Ash.Error.Changes.InvalidAttribute
+  alias Ash.Error.Changes.InvalidChanges
+  alias Ash.Error.Invalid
+  alias Ash.Error.Unknown
   alias GsmlgAppAdmin.Accounts
   alias GsmlgAppAdmin.Accounts.User
   import GsmlgAppAdmin.TestFixtures
@@ -8,7 +13,7 @@ defmodule GsmlgAppAdmin.AccountsTest do
   describe "domain configuration" do
     test "has correct resources configured" do
       # Test that the domain has the expected resources
-      resources = Ash.Domain.Info.resources(Accounts)
+      resources = Info.resources(Accounts)
 
       assert GsmlgAppAdmin.Accounts.User in resources
       assert GsmlgAppAdmin.Accounts.Token in resources
@@ -17,13 +22,13 @@ defmodule GsmlgAppAdmin.AccountsTest do
     test "domain has correct OTP app configuration" do
       # Test that the domain is configured with the correct OTP app
       assert function_exported?(Accounts, :__info__, 1)
-      assert Ash.Domain.Info.resources(Accounts) != []
+      assert Info.resources(Accounts) != []
     end
   end
 
   describe "resource access" do
     test "can access User resource through domain" do
-      resources = Ash.Domain.Info.resources(Accounts)
+      resources = Info.resources(Accounts)
 
       user_resource =
         Enum.find(resources, fn resource -> resource == GsmlgAppAdmin.Accounts.User end)
@@ -32,7 +37,7 @@ defmodule GsmlgAppAdmin.AccountsTest do
     end
 
     test "can access Token resource through domain" do
-      resources = Ash.Domain.Info.resources(Accounts)
+      resources = Info.resources(Accounts)
 
       token_resource =
         Enum.find(resources, fn resource -> resource == GsmlgAppAdmin.Accounts.Token end)
@@ -113,10 +118,10 @@ defmodule GsmlgAppAdmin.AccountsTest do
         last_name: "User"
       }
 
-      assert {:error, %Ash.Error.Invalid{errors: errors}} = Accounts.create_user(attrs)
+      assert {:error, %Invalid{errors: errors}} = Accounts.create_user(attrs)
 
       assert Enum.any?(errors, fn error ->
-               match?(%Ash.Error.Changes.InvalidAttribute{field: :email}, error)
+               match?(%InvalidAttribute{field: :email}, error)
              end)
     end
 
@@ -128,10 +133,10 @@ defmodule GsmlgAppAdmin.AccountsTest do
         last_name: "User"
       }
 
-      assert {:error, %Ash.Error.Invalid{errors: errors}} = Accounts.create_user(attrs)
+      assert {:error, %Invalid{errors: errors}} = Accounts.create_user(attrs)
 
       assert Enum.any?(errors, fn error ->
-               match?(%Ash.Error.Changes.InvalidChanges{}, error)
+               match?(%InvalidChanges{}, error)
              end)
     end
 
@@ -145,7 +150,7 @@ defmodule GsmlgAppAdmin.AccountsTest do
         last_name: "User"
       }
 
-      assert {:error, %Ash.Error.Invalid{errors: errors}} = Accounts.create_user(attrs)
+      assert {:error, %Invalid{errors: errors}} = Accounts.create_user(attrs)
 
       assert Enum.any?(errors, fn error ->
                String.contains?(Exception.message(error), "already been taken")
@@ -191,7 +196,7 @@ defmodule GsmlgAppAdmin.AccountsTest do
         password_confirmation: "DifferentPass123!"
       }
 
-      assert {:error, %Ash.Error.Unknown{errors: errors}} =
+      assert {:error, %Unknown{errors: errors}} =
                Accounts.update_user(user, update_attrs)
 
       assert Enum.any?(errors, fn error ->

@@ -56,18 +56,20 @@ defmodule GsmlgAppAdmin.EmailService do
   Create user and send welcome email.
   """
   def create_user_and_send_welcome(attrs) do
-    with {:ok, %User{} = user} <- Accounts.create_user(attrs) do
-      # Send welcome email asynchronously
-      Task.start(fn -> send_welcome_email(user) end)
+    case Accounts.create_user(attrs) do
+      {:ok, %User{} = user} ->
+        # Send welcome email asynchronously
+        Task.start(fn -> send_welcome_email(user) end)
 
-      # Send verification email if email is not verified
-      if !user.email_verified do
-        generate_and_send_verification(user)
-      end
+        # Send verification email if email is not verified
+        if !user.email_verified do
+          generate_and_send_verification(user)
+        end
 
-      {:ok, user}
-    else
-      error -> error
+        {:ok, user}
+
+      error ->
+        error
     end
   end
 

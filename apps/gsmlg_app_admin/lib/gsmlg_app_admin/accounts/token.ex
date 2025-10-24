@@ -1,4 +1,15 @@
 defmodule GsmlgAppAdmin.Accounts.Token do
+  @moduledoc """
+  The Token resource represents authentication tokens in the system.
+
+  Tokens are used by AshAuthentication for:
+  - User session management (login tokens)
+  - Password reset functionality
+  - Email verification
+
+  Each token has a purpose, expiration time, and is associated with
+  a user via the subject field.
+  """
   use Ash.Resource,
     domain: GsmlgAppAdmin.Accounts,
     data_layer: AshPostgres.DataLayer,

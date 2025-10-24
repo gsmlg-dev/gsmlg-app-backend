@@ -1,4 +1,10 @@
 defmodule GsmlgAppAdmin.Accounts.Secrets do
+  @moduledoc """
+  Manages authentication secrets for the Accounts domain.
+
+  This module provides secret management for AshAuthentication,
+  including token signing secrets retrieved from application configuration.
+  """
   use AshAuthentication.Secret
 
   def secret_for(

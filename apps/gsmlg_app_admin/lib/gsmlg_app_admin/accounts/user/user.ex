@@ -1,4 +1,18 @@
 defmodule GsmlgAppAdmin.Accounts.User do
+  @moduledoc """
+  The User resource represents user accounts in the system.
+
+  This resource provides:
+  - User authentication via AshAuthentication with password strategy
+  - User profile management (name, email, username, display name)
+  - User status tracking (active, inactive, suspended, pending)
+  - Email verification and security features
+  - Role-based authorization (admin, user, moderator)
+  - User preferences (timezone, language)
+
+  The resource includes custom actions for admin user management
+  and seed data generation.
+  """
   use Ash.Resource,
     extensions: [AshAuthentication],
     domain: GsmlgAppAdmin.Accounts,

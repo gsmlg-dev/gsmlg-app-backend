@@ -1,4 +1,12 @@
 defmodule GsmlgAppAdmin.Accounts do
+  @moduledoc """
+  The Accounts domain manages user accounts and authentication.
+
+  This domain provides functions for user management including:
+  - Creating, reading, updating, and deleting users
+  - Searching and filtering users by various criteria
+  - Managing user authentication and authorization
+  """
   use Ash.Domain, otp_app: :gsmlg_app_admin
 
   alias GsmlgAppAdmin.Accounts.User
