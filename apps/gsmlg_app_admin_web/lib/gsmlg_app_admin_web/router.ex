@@ -39,6 +39,10 @@ defmodule GsmlgAppAdminWeb.Router do
     live "/users/new", UserManagementLive.Index, :new
     live "/users/:id/edit", UserManagementLive.Index, :edit
 
+    # AI Chat routes
+    live "/chat", ChatLive.Index, :index
+    live "/chat/:id", ChatLive.Index, :conversation
+
     reset_route(otp_app: :gsmlg_app_admin)
   end
 

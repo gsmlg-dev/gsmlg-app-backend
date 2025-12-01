@@ -49,6 +49,9 @@ defmodule GsmlgAppAdminWeb.Layouts do
               <.link href="/users" class="btn btn-primary">
                 User Management
               </.link>
+              <.link href="/chat" class="btn btn-secondary">
+                AI Chat
+              </.link>
             </div>
           </div>
         <% end %>

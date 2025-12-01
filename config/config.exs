@@ -64,7 +64,7 @@ config :gsmlg_app_admin,
   ecto_repos: [GsmlgAppAdmin.Repo]
 
 config :gsmlg_app_admin,
-  ash_domains: [GsmlgAppAdmin.Accounts, GsmlgAppAdmin.Blog]
+  ash_domains: [GsmlgAppAdmin.Accounts, GsmlgAppAdmin.Blog, GsmlgAppAdmin.AI]
 
 config :gsmlg_app_admin, GsmlgAppAdmin.Mailer, adapter: Swoosh.Adapters.Local
 

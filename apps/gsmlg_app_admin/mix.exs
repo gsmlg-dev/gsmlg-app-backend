@@ -46,6 +46,7 @@ defmodule GsmlgAppAdmin.MixProject do
       {:ash, "~> 3.0"},
       {:ash_authentication, "~> 4.0"},
       {:ash_postgres, "~> 2.0"},
+      {:instructor, "~> 0.1.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
