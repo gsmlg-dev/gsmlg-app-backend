@@ -6,14 +6,18 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   use GsmlgAppAdminWeb, :live_view
 
   alias GsmlgAppAdmin.AI
-  alias GsmlgAppAdmin.AI.{Client, MockClient, Conversation, Message}
+  alias GsmlgAppAdmin.AI.{Client, MockClient}
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
     {:ok, providers} = AI.list_active_providers()
+
+    # Load user from session
+    current_user = load_user_from_session(session)
 
     socket =
       socket
+      |> assign(:current_user, current_user)
       |> assign(:page_title, "AI Chat")
       |> assign(:providers, providers)
       |> assign(:selected_provider, List.first(providers))
@@ -26,6 +30,28 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
       |> assign(:loading, false)
 
     {:ok, load_conversations(socket)}
+  end
+
+  defp load_user_from_session(session) do
+    case session["user"] do
+      nil ->
+        nil
+
+      user_subject when is_binary(user_subject) ->
+        case Regex.run(~r/id=([a-f0-9-]+)/, user_subject) do
+          [_, user_id] ->
+            case Ash.get(GsmlgAppAdmin.Accounts.User, user_id) do
+              {:ok, user} -> user
+              _ -> nil
+            end
+
+          _ ->
+            nil
+        end
+
+      _ ->
+        nil
+    end
   end
 
   @impl true
@@ -100,7 +126,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   defp ensure_conversation(socket) do
     case socket.assigns.current_conversation do
       nil -> create_conversation(socket)
-      conversation -> socket
+      _conversation -> socket
     end
   end
 
@@ -183,7 +209,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   end
 
   @impl true
-  def handle_info({:stream_complete, result}, socket) do
+  def handle_info({:stream_complete, _result}, socket) do
     conversation = socket.assigns.current_conversation
     content = socket.assigns.streaming_content
 
@@ -220,9 +246,14 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   end
 
   defp load_conversations(socket) do
-    user = socket.assigns.current_user
-    {:ok, conversations} = AI.list_conversations(user.id)
-    assign(socket, :conversations, conversations)
+    case socket.assigns.current_user do
+      nil ->
+        socket
+
+      user ->
+        {:ok, conversations} = AI.list_conversations(user.id)
+        assign(socket, :conversations, conversations)
+    end
   end
 
   defp format_message_for_api(message) do

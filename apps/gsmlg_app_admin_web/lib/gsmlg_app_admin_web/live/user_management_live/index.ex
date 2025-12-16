@@ -15,8 +15,6 @@ defmodule GsmlgAppAdminWeb.UserManagementLive.Index do
   alias GsmlgAppAdmin.Accounts
   alias GsmlgAppAdmin.Accounts.User
 
-  on_mount {GsmlgAppAdminWeb.LiveUserAuth, :live_user_required}
-
   @impl true
   def mount(_params, _session, socket) do
     case fetch_users_with_error_handling() do

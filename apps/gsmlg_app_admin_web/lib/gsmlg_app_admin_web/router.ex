@@ -34,16 +34,23 @@ defmodule GsmlgAppAdminWeb.Router do
 
     get("/", PageController, :home)
 
-    # User management routes
-    live "/users", UserManagementLive.Index, :index
-    live "/users/new", UserManagementLive.Index, :new
-    live "/users/:id/edit", UserManagementLive.Index, :edit
-
-    # AI Chat routes
-    live "/chat", ChatLive.Index, :index
-    live "/chat/:id", ChatLive.Index, :conversation
-
     reset_route(otp_app: :gsmlg_app_admin)
+  end
+
+  scope "/", GsmlgAppAdminWeb do
+    pipe_through(:browser)
+
+    live_session :authenticated,
+      on_mount: [{AshAuthentication.Phoenix.LiveSession, {:load_from_session, otp_app: :gsmlg_app_admin}}] do
+      # User management routes
+      live "/users", UserManagementLive.Index, :index
+      live "/users/new", UserManagementLive.Index, :new
+      live "/users/:id/edit", UserManagementLive.Index, :edit
+
+      # AI Chat routes
+      live "/chat", ChatLive.Index, :index
+      live "/chat/:id", ChatLive.Index, :conversation
+    end
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

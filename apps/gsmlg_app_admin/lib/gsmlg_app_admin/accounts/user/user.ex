@@ -157,7 +157,7 @@ defmodule GsmlgAppAdmin.Accounts.User do
       password :default do
         identity_field(:email)
         hashed_password_field(:hashed_password)
-        sign_in_tokens_enabled?(true)
+        sign_in_tokens_enabled?(false)
         sign_in_enabled?(true)
         register_action_name(:register_with_default)
         sign_in_action_name(:sign_in_with_default)
@@ -167,12 +167,12 @@ defmodule GsmlgAppAdmin.Accounts.User do
     tokens do
       enabled?(true)
       token_resource(GsmlgAppAdmin.Accounts.Token)
-      require_token_presence_for_authentication?(true)
-      signing_secret(Application.compile_env(:ash_authentication, :jwt, [])[:signing_secret])
+      require_token_presence_for_authentication?(false)
+      signing_secret(GsmlgAppAdmin.Accounts.Secrets)
     end
 
     session_identifier(:jti)
-    subject_name(:email)
+    subject_name(:user)
   end
 
   relationships do

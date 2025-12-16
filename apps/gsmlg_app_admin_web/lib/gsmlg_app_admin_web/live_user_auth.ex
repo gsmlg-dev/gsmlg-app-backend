@@ -37,19 +37,27 @@ defmodule GsmlgAppAdminWeb.LiveUserAuth do
   end
 
   defp load_current_user_from_session(session) do
-    # AshAuthentication stores the user in the session
-    # The user should be loaded by the plug in the router pipeline
-    # For LiveView, we need to check if the user_id is in the session
-    case session["ash_authentication_user"] do
+    # AshAuthentication stores the user in the session with key "user"
+    # Format: "jti:user?id=UUID"
+    case session["user"] do
       nil ->
         nil
 
-      user_id ->
-        try do
-          Ash.get(GsmlgAppAdmin.Accounts.User, user_id)
-        rescue
-          _ -> nil
+      user_subject when is_binary(user_subject) ->
+        # Extract UUID from subject string like "jti:user?id=UUID"
+        case Regex.run(~r/id=([a-f0-9-]+)/, user_subject) do
+          [_, user_id] ->
+            case Ash.get(GsmlgAppAdmin.Accounts.User, user_id) do
+              {:ok, user} -> user
+              _ -> nil
+            end
+
+          _ ->
+            nil
         end
+
+      _ ->
+        nil
     end
   end
 end

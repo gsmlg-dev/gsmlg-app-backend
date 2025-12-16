@@ -9,8 +9,6 @@ defmodule GsmlgAppAdmin.AI.Client do
   - OpenAI
   """
 
-  alias GsmlgAppAdmin.AI.Provider
-
   @doc """
   Sends a chat completion request to the specified provider.
 
