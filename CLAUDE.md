@@ -143,3 +143,10 @@ docker build -t gsmlg-app-backend .
 ## UI Framework
 
 This app uses phoenix_duskmoon for UI instead of CoreComponents. phoenix_duskmoon is a Phoenix UI library that provides components and styling. The app uses duskmoonui instead of daisyui, where duskmoonui is a fork of daisyui that adds a tertiary color to the theme.
+
+## Active Technologies
+- Elixir 1.18+ / Erlang/OTP 28 + Phoenix 1.8, Phoenix LiveView 1.1, Ash Framework 3.x, AshPostgres (001-ai-provider-settings)
+- PostgreSQL (via AshPostgres) (001-ai-provider-settings)
+
+## Recent Changes
+- 001-ai-provider-settings: Added Elixir 1.18+ / Erlang/OTP 28 + Phoenix 1.8, Phoenix LiveView 1.1, Ash Framework 3.x, AshPostgres

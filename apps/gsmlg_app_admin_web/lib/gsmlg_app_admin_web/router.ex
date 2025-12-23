@@ -41,11 +41,19 @@ defmodule GsmlgAppAdminWeb.Router do
     pipe_through(:browser)
 
     live_session :authenticated,
-      on_mount: [{AshAuthentication.Phoenix.LiveSession, {:load_from_session, otp_app: :gsmlg_app_admin}}] do
+      on_mount: [
+        {AshAuthentication.Phoenix.LiveSession, {:load_from_session, otp_app: :gsmlg_app_admin}}
+      ] do
       # User management routes
       live "/users", UserManagementLive.Index, :index
       live "/users/new", UserManagementLive.Index, :new
       live "/users/:id/edit", UserManagementLive.Index, :edit
+
+      # Provider Settings routes (must be before /chat/:id to avoid matching "settings" as an ID)
+      live "/chat/settings", ProviderSettingsLive.Index, :index
+      live "/chat/settings/new", ProviderSettingsLive.Form, :new
+      live "/chat/settings/:id", ProviderSettingsLive.Show, :show
+      live "/chat/settings/:id/edit", ProviderSettingsLive.Form, :edit
 
       # AI Chat routes
       live "/chat", ChatLive.Index, :index

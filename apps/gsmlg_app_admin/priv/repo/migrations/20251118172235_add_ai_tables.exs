@@ -7,70 +7,101 @@ defmodule GsmlgAppAdmin.Repo.Migrations.AddAiTables do
 
   use Ecto.Migration
 
-  
-
   def up do
     # Note: users, tokens, and posts tables already exist with required schema
 
-create table(:messages, primary_key: false) do
-add :id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true
-add :role, :text, null: false
-add :content, :text, null: false
-add :tokens, :bigint
-add :metadata, :map, default: %{}
-add :created_at, :utc_datetime_usec, null: false, default: fragment("(now() AT TIME ZONE 'utc')")
-add :conversation_id, :uuid, null: false
-end
+    create table(:messages, primary_key: false) do
+      add :id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true
+      add :role, :text, null: false
+      add :content, :text, null: false
+      add :tokens, :bigint
+      add :metadata, :map, default: %{}
 
-create table(:conversations, primary_key: false) do
-add :id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true
-add :title, :text, null: false
-add :system_prompt, :text
-add :model_params, :map, default: %{}
-add :created_at, :utc_datetime_usec, null: false, default: fragment("(now() AT TIME ZONE 'utc')")
-add :updated_at, :utc_datetime_usec, null: false, default: fragment("(now() AT TIME ZONE 'utc')")
-add :user_id, references(:users, column: :id, name: "conversations_user_id_fkey", type: :uuid, prefix: "public", on_delete: :delete_all), null: false
-add :provider_id, :uuid
-end
+      add :created_at, :utc_datetime_usec,
+        null: false,
+        default: fragment("(now() AT TIME ZONE 'utc')")
 
+      add :conversation_id, :uuid, null: false
+    end
 
+    create table(:conversations, primary_key: false) do
+      add :id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true
+      add :title, :text, null: false
+      add :system_prompt, :text
+      add :model_params, :map, default: %{}
 
-create table(:ai_providers, primary_key: false) do
-add :id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true
-end
+      add :created_at, :utc_datetime_usec,
+        null: false,
+        default: fragment("(now() AT TIME ZONE 'utc')")
 
-alter table(:conversations) do
-modify :provider_id, references(:ai_providers, column: :id, name: "conversations_provider_id_fkey", type: :uuid, prefix: "public", on_delete: :nilify_all)
-end
+      add :updated_at, :utc_datetime_usec,
+        null: false,
+        default: fragment("(now() AT TIME ZONE 'utc')")
 
+      add :user_id,
+          references(:users,
+            column: :id,
+            name: "conversations_user_id_fkey",
+            type: :uuid,
+            prefix: "public",
+            on_delete: :delete_all
+          ),
+          null: false
 
+      add :provider_id, :uuid
+    end
 
-create unique_index(:conversations, [:id], name: "conversations_id_index")
+    create table(:ai_providers, primary_key: false) do
+      add :id, :uuid, null: false, default: fragment("gen_random_uuid()"), primary_key: true
+    end
 
-alter table(:messages) do
-modify :conversation_id, references(:conversations, column: :id, name: "messages_conversation_id_fkey", type: :uuid, prefix: "public", on_delete: :delete_all)
-end
+    alter table(:conversations) do
+      modify :provider_id,
+             references(:ai_providers,
+               column: :id,
+               name: "conversations_provider_id_fkey",
+               type: :uuid,
+               prefix: "public",
+               on_delete: :nilify_all
+             )
+    end
 
+    create unique_index(:conversations, [:id], name: "conversations_id_index")
 
+    alter table(:messages) do
+      modify :conversation_id,
+             references(:conversations,
+               column: :id,
+               name: "messages_conversation_id_fkey",
+               type: :uuid,
+               prefix: "public",
+               on_delete: :delete_all
+             )
+    end
 
-create unique_index(:messages, [:id], name: "messages_id_index")
+    create unique_index(:messages, [:id], name: "messages_id_index")
 
-alter table(:ai_providers) do
-add :name, :text, null: false
-add :slug, :text, null: false
-add :api_base_url, :text, null: false
-add :api_key, :text
-add :model, :text, null: false
-add :available_models, {:array, :text}, default: []
-add :default_params, :map
-add :is_active, :boolean, null: false, default: true
-add :description, :text
-add :created_at, :utc_datetime_usec, null: false, default: fragment("(now() AT TIME ZONE 'utc')")
-add :updated_at, :utc_datetime_usec, null: false, default: fragment("(now() AT TIME ZONE 'utc')")
-end
+    alter table(:ai_providers) do
+      add :name, :text, null: false
+      add :slug, :text, null: false
+      add :api_base_url, :text, null: false
+      add :api_key, :text
+      add :model, :text, null: false
+      add :available_models, {:array, :text}, default: []
+      add :default_params, :map
+      add :is_active, :boolean, null: false, default: true
+      add :description, :text
 
-create unique_index(:ai_providers, [:slug], name: "ai_providers_unique_slug_index")
+      add :created_at, :utc_datetime_usec,
+        null: false,
+        default: fragment("(now() AT TIME ZONE 'utc')")
 
+      add :updated_at, :utc_datetime_usec,
+        null: false,
+        default: fragment("(now() AT TIME ZONE 'utc')")
+    end
+
+    create unique_index(:ai_providers, [:slug], name: "ai_providers_unique_slug_index")
   end
 
   def down do
