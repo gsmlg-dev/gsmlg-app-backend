@@ -114,11 +114,16 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
   @impl true
   def handle_event("send_message", %{"message" => message}, socket) do
-    if String.trim(message) == "" do
-      {:noreply, socket}
-    else
-      socket = ensure_conversation(socket)
-      send_user_message(socket, message)
+    cond do
+      String.trim(message) == "" ->
+        {:noreply, socket}
+
+      is_nil(socket.assigns.current_user) ->
+        {:noreply, put_flash(socket, :error, "Please log in to send messages")}
+
+      true ->
+        socket = ensure_conversation(socket)
+        send_user_message(socket, message)
     end
   end
 
@@ -451,29 +456,36 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
           
     <!-- Input Area -->
           <div class="p-4 bg-base-100 border-t border-base-300">
-            <form phx-submit="send_message" class="flex gap-2">
-              <input
-                type="text"
-                name="message"
-                value={@input}
-                phx-change="update_input"
-                placeholder="Type your message..."
-                class="input input-bordered flex-1"
-                disabled={@loading}
-                autofocus
-              />
-              <button
-                type="submit"
-                class="btn btn-primary"
-                disabled={@loading || String.trim(@input) == ""}
-              >
-                <%= if @loading do %>
-                  <span class="loading loading-spinner loading-sm"></span>
-                <% else %>
-                  <.dm_mdi name="send" class="w-5 h-5" />
-                <% end %>
-              </button>
-            </form>
+            <%= if @current_user do %>
+              <form phx-submit="send_message" class="flex gap-2">
+                <input
+                  type="text"
+                  name="message"
+                  value={@input}
+                  phx-change="update_input"
+                  placeholder="Type your message..."
+                  class="input input-bordered flex-1"
+                  disabled={@loading}
+                  autofocus
+                />
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  disabled={@loading || String.trim(@input) == ""}
+                >
+                  <%= if @loading do %>
+                    <span class="loading loading-spinner loading-sm"></span>
+                  <% else %>
+                    <.dm_mdi name="send" class="w-5 h-5" />
+                  <% end %>
+                </button>
+              </form>
+            <% else %>
+              <div class="alert alert-warning">
+                <.dm_mdi name="alert" class="w-5 h-5" />
+                <span>Please <.link navigate={~p"/sign-in"} class="link link-primary">log in</.link> to start chatting.</span>
+              </div>
+            <% end %>
           </div>
         <% end %>
       </div>
