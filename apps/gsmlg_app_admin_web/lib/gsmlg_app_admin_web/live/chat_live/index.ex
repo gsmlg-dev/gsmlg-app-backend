@@ -9,14 +9,14 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   alias GsmlgAppAdmin.AI.{Client, MockClient}
 
   @impl true
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
     {:ok, providers} = AI.list_active_providers()
 
-    # Load user from session
-    current_user = load_user_from_session(session)
+    # current_user is already loaded by AshAuthentication.Phoenix.LiveSession on_mount
+    current_user = socket.assigns[:current_user]
 
-    # Load saved provider selection from session (T012)
-    selected_provider = load_selected_provider(session, providers)
+    # Load saved provider selection (T012)
+    selected_provider = List.first(providers)
 
     socket =
       socket
@@ -33,34 +33,6 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
       |> assign(:loading, false)
 
     {:ok, load_conversations(socket)}
-  end
-
-  # T012: Load saved provider selection - will be updated from localStorage via JS hook
-  defp load_selected_provider(_session, providers) do
-    # Initial load uses first provider; JS hook will restore from localStorage
-    List.first(providers)
-  end
-
-  defp load_user_from_session(session) do
-    case session["user"] do
-      nil ->
-        nil
-
-      user_subject when is_binary(user_subject) ->
-        case Regex.run(~r/id=([a-f0-9-]+)/, user_subject) do
-          [_, user_id] ->
-            case Ash.get(GsmlgAppAdmin.Accounts.User, user_id) do
-              {:ok, user} -> user
-              _ -> nil
-            end
-
-          _ ->
-            nil
-        end
-
-      _ ->
-        nil
-    end
   end
 
   @impl true
