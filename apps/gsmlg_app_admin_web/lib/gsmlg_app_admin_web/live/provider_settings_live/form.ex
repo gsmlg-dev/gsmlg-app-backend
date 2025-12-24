@@ -176,7 +176,9 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
                 required
               />
               <label class="label">
-                <span class="label-text-alt">URL-friendly identifier (cannot be changed after creation)</span>
+                <span class="label-text-alt">
+                  URL-friendly identifier (cannot be changed after creation)
+                </span>
               </label>
               <%= if @form[:slug].errors != [] do %>
                 <label class="label">
@@ -216,13 +218,17 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
                 type="password"
                 name={@form[:api_key].name}
                 value={@form[:api_key].value}
-                placeholder={if @live_action == :edit, do: "Leave blank to keep current", else: "sk-..."}
+                placeholder={
+                  if @live_action == :edit, do: "Leave blank to keep current", else: "sk-..."
+                }
                 class={"input input-bordered w-full #{if @form[:api_key].errors != [], do: "input-error"}"}
                 autocomplete="off"
               />
               <%= if @live_action == :edit && @provider && @provider.api_key do %>
                 <label class="label">
-                  <span class="label-text-alt">Current key: ****{String.slice(@provider.api_key || "", -4..-1//1)}</span>
+                  <span class="label-text-alt">
+                    Current key: ****{String.slice(@provider.api_key || "", -4..-1//1)}
+                  </span>
                 </label>
               <% end %>
               <%= if @form[:api_key].errors != [] do %>

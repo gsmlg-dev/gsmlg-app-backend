@@ -455,7 +455,10 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
             <% else %>
               <div class="alert alert-warning">
                 <.dm_mdi name="alert" class="w-5 h-5" />
-                <span>Please <.link navigate={~p"/sign-in"} class="link link-primary">log in</.link> to start chatting.</span>
+                <span>
+                  Please <.link navigate={~p"/sign-in"} class="link link-primary">log in</.link>
+                  to start chatting.
+                </span>
               </div>
             <% end %>
           </div>

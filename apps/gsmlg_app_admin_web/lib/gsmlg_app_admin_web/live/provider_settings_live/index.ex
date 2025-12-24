@@ -131,7 +131,10 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Index do
                         />
                       <% end %>
                     </button>
-                    <.link navigate={~p"/chat/settings/#{provider.id}/edit"} class="btn btn-ghost btn-sm">
+                    <.link
+                      navigate={~p"/chat/settings/#{provider.id}/edit"}
+                      class="btn btn-ghost btn-sm"
+                    >
                       <.dm_mdi name="pencil" class="w-4 h-4" />
                     </.link>
                     <button
