@@ -50,15 +50,16 @@ defmodule GsmlgAppAdmin.AI.MockClient do
     last_message = List.last(messages)
     response = select_response(last_message)
 
-    {:ok, %{
-      content: response,
-      model: "mock-model-v1",
-      usage: %{
-        "prompt_tokens" => 50,
-        "completion_tokens" => String.length(response),
-        "total_tokens" => 50 + String.length(response)
-      }
-    }}
+    {:ok,
+     %{
+       content: response,
+       model: "mock-model-v1",
+       usage: %{
+         "prompt_tokens" => 50,
+         "completion_tokens" => String.length(response),
+         "total_tokens" => 50 + String.length(response)
+       }
+     }}
   end
 
   # Private functions

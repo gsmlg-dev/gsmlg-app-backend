@@ -9,18 +9,21 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   alias GsmlgAppAdmin.AI.{Client, MockClient}
 
   @impl true
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
     {:ok, providers} = AI.list_active_providers()
 
-    # Load user from session
-    current_user = load_user_from_session(session)
+    # current_user is already loaded by AshAuthentication.Phoenix.LiveSession on_mount
+    current_user = socket.assigns[:current_user]
+
+    # Load saved provider selection (T012)
+    selected_provider = List.first(providers)
 
     socket =
       socket
       |> assign(:current_user, current_user)
       |> assign(:page_title, "AI Chat")
       |> assign(:providers, providers)
-      |> assign(:selected_provider, List.first(providers))
+      |> assign(:selected_provider, selected_provider)
       |> assign(:conversations, [])
       |> assign(:current_conversation, nil)
       |> assign(:messages, [])
@@ -30,28 +33,6 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
       |> assign(:loading, false)
 
     {:ok, load_conversations(socket)}
-  end
-
-  defp load_user_from_session(session) do
-    case session["user"] do
-      nil ->
-        nil
-
-      user_subject when is_binary(user_subject) ->
-        case Regex.run(~r/id=([a-f0-9-]+)/, user_subject) do
-          [_, user_id] ->
-            case Ash.get(GsmlgAppAdmin.Accounts.User, user_id) do
-              {:ok, user} -> user
-              _ -> nil
-            end
-
-          _ ->
-            nil
-        end
-
-      _ ->
-        nil
-    end
   end
 
   @impl true
@@ -77,7 +58,25 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   def handle_event("select_provider", %{"provider_id" => provider_id}, socket) do
     provider = Enum.find(socket.assigns.providers, &(&1.id == provider_id))
 
-    {:noreply, assign(socket, :selected_provider, provider)}
+    # T011: Persist provider selection via JavaScript localStorage
+    socket =
+      socket
+      |> assign(:selected_provider, provider)
+      |> push_event("save_provider_selection", %{provider_id: provider_id})
+
+    {:noreply, socket}
+  end
+
+  # T012: Handle restoring provider selection from localStorage
+  @impl true
+  def handle_event("restore_provider_selection", %{"provider_id" => provider_id}, socket) do
+    provider = Enum.find(socket.assigns.providers, &(&1.id == provider_id))
+
+    if provider do
+      {:noreply, assign(socket, :selected_provider, provider)}
+    else
+      {:noreply, socket}
+    end
   end
 
   @impl true
@@ -87,11 +86,16 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
   @impl true
   def handle_event("send_message", %{"message" => message}, socket) do
-    if String.trim(message) == "" do
-      {:noreply, socket}
-    else
-      socket = ensure_conversation(socket)
-      send_user_message(socket, message)
+    cond do
+      String.trim(message) == "" ->
+        {:noreply, socket}
+
+      is_nil(socket.assigns.current_user) ->
+        {:noreply, put_flash(socket, :error, "Please log in to send messages")}
+
+      true ->
+        socket = ensure_conversation(socket)
+        send_user_message(socket, message)
     end
   end
 
@@ -147,6 +151,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
   defp send_user_message(socket, content) do
     conversation = socket.assigns.current_conversation
+
     user_message_params = %{
       conversation_id: conversation.id,
       role: :user,
@@ -175,9 +180,10 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
     messages = Enum.map(socket.assigns.messages, &format_message_for_api/1)
 
     # Determine which client to use
-    use_mock? = is_nil(provider) ||
-                provider.api_key == "sk-placeholder-configure-via-env" ||
-                is_nil(provider.api_key)
+    use_mock? =
+      is_nil(provider) ||
+        provider.api_key == "sk-placeholder-configure-via-env" ||
+        is_nil(provider.api_key)
 
     client_module = if use_mock?, do: MockClient, else: Client
 
@@ -209,9 +215,10 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   end
 
   @impl true
-  def handle_info({:stream_complete, _result}, socket) do
+  def handle_info({:stream_complete, result}, socket) do
     conversation = socket.assigns.current_conversation
     content = socket.assigns.streaming_content
+    provider = socket.assigns.selected_provider
 
     # Save assistant message
     assistant_message_params = %{
@@ -221,6 +228,14 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
     }
 
     {:ok, assistant_message} = AI.add_message(conversation.id, assistant_message_params)
+
+    # T029: Increment usage tracking after AI response
+    if provider do
+      # Count messages (1 user + 1 assistant = 2 messages for this exchange)
+      # Estimate tokens from content length (rough approximation: ~4 chars per token)
+      estimated_tokens = estimate_tokens(content, result)
+      AI.increment_provider_usage(provider, 2, estimated_tokens)
+    end
 
     socket =
       socket
@@ -245,6 +260,19 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
     {:noreply, socket}
   end
 
+  # T029: Estimate token count from response
+  defp estimate_tokens(content, result) do
+    # If result contains usage info from the API, use that
+    case result do
+      {:ok, %{usage: %{total_tokens: tokens}}} when is_integer(tokens) ->
+        tokens
+
+      _ ->
+        # Fallback: rough estimate based on content length (~4 chars per token)
+        div(String.length(content), 4)
+    end
+  end
+
   defp load_conversations(socket) do
     case socket.assigns.current_user do
       nil ->
@@ -266,7 +294,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex h-screen bg-base-200">
+    <div class="flex h-screen bg-base-200" id="chat-page" phx-hook="ProviderSelection">
       <!-- Sidebar -->
       <div class="w-64 bg-base-100 border-r border-base-300 flex flex-col">
         <div class="p-4 border-b border-base-300">
@@ -277,8 +305,8 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
             <.dm_mdi name="plus" class="w-5 h-5" /> New Chat
           </button>
         </div>
-
-        <!-- Provider Selection -->
+        
+    <!-- Provider Selection -->
         <div class="p-4 border-b border-base-300">
           <label class="label">
             <span class="label-text font-semibold">AI Provider</span>
@@ -293,13 +321,13 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
                 value={provider.id}
                 selected={@selected_provider && @selected_provider.id == provider.id}
               >
-                <%= provider.name %>
+                {provider.name}
               </option>
             <% end %>
           </select>
         </div>
-
-        <!-- Conversations List -->
+        
+    <!-- Conversations List -->
         <div class="flex-1 overflow-y-auto">
           <%= for conversation <- @conversations do %>
             <div class="p-3 hover:bg-base-200 cursor-pointer border-b border-base-300 group">
@@ -308,9 +336,9 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
                   phx-click={JS.patch(~p"/chat/#{conversation.id}")}
                   class="flex-1"
                 >
-                  <p class="text-sm font-medium truncate"><%= conversation.title %></p>
+                  <p class="text-sm font-medium truncate">{conversation.title}</p>
                   <p class="text-xs text-base-content/60">
-                    <%= Calendar.strftime(conversation.updated_at, "%b %d, %Y") %>
+                    {Calendar.strftime(conversation.updated_at, "%b %d, %Y")}
                   </p>
                 </div>
                 <button
@@ -325,83 +353,113 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
             </div>
           <% end %>
         </div>
+        
+    <!-- Settings Link -->
+        <div class="p-4 border-t border-base-300">
+          <.link navigate={~p"/chat/settings"} class="btn btn-ghost btn-block justify-start">
+            <.dm_mdi name="cog" class="w-5 h-5" /> Settings
+          </.link>
+        </div>
       </div>
-
-      <!-- Main Chat Area -->
+      
+    <!-- Main Chat Area -->
       <div class="flex-1 flex flex-col">
-        <!-- Chat Header -->
-        <div class="p-4 bg-base-100 border-b border-base-300">
-          <h1 class="text-2xl font-bold">
-            <%= @current_conversation && @current_conversation.title || "AI Chat" %>
-          </h1>
-          <%= if @selected_provider do %>
-            <p class="text-sm text-base-content/60">
-              Using <%= @selected_provider.name %> · <%= @selected_provider.model %>
-            </p>
-          <% end %>
-        </div>
-
-        <!-- Messages -->
-        <div class="flex-1 overflow-y-auto p-4 space-y-4" id="messages-container">
-          <%= for message <- @messages do %>
-            <div class={[
-              "chat",
-              message.role == :user && "chat-end" || "chat-start"
-            ]}>
-              <div class="chat-header">
-                <%= if message.role == :user, do: "You", else: "Assistant" %>
-                <time class="text-xs opacity-50">
-                  <%= Calendar.strftime(message.created_at, "%H:%M") %>
-                </time>
-              </div>
+        <%= if Enum.empty?(@providers) do %>
+          <!-- No Provider Configured -->
+          <div class="flex-1 flex items-center justify-center">
+            <div class="text-center p-8 max-w-md">
+              <.dm_mdi name="robot" class="w-20 h-20 mx-auto mb-4 text-base-content/30" />
+              <h2 class="text-2xl font-bold mb-2">No AI Provider Configured</h2>
+              <p class="text-base-content/60 mb-6">
+                To start chatting, you need to configure at least one AI provider.
+              </p>
+              <.link navigate={~p"/chat/settings"} class="btn btn-primary">
+                <.dm_mdi name="cog" class="w-5 h-5 mr-2" /> Configure Providers
+              </.link>
+            </div>
+          </div>
+        <% else %>
+          <!-- Chat Header -->
+          <div class="p-4 bg-base-100 border-b border-base-300">
+            <h1 class="text-2xl font-bold">
+              {(@current_conversation && @current_conversation.title) || "AI Chat"}
+            </h1>
+            <%= if @selected_provider do %>
+              <p class="text-sm text-base-content/60">
+                Using {@selected_provider.name} · {@selected_provider.model}
+              </p>
+            <% end %>
+          </div>
+          
+    <!-- Messages -->
+          <div class="flex-1 overflow-y-auto p-4 space-y-4" id="messages-container">
+            <%= for message <- @messages do %>
               <div class={[
-                "chat-bubble",
-                message.role == :user && "chat-bubble-primary" || "chat-bubble-secondary"
+                "chat",
+                (message.role == :user && "chat-end") || "chat-start"
               ]}>
-                <%= message.content %>
+                <div class="chat-header">
+                  {if message.role == :user, do: "You", else: "Assistant"}
+                  <time class="text-xs opacity-50">
+                    {Calendar.strftime(message.created_at, "%H:%M")}
+                  </time>
+                </div>
+                <div class={[
+                  "chat-bubble",
+                  (message.role == :user && "chat-bubble-primary") || "chat-bubble-secondary"
+                ]}>
+                  {message.content}
+                </div>
               </div>
-            </div>
-          <% end %>
+            <% end %>
 
-          <%= if @streaming do %>
-            <div class="chat chat-start">
-              <div class="chat-header">
-                Assistant
+            <%= if @streaming do %>
+              <div class="chat chat-start">
+                <div class="chat-header">
+                  Assistant
+                </div>
+                <div class="chat-bubble chat-bubble-secondary">
+                  {@streaming_content}
+                  <span class="inline-block w-2 h-4 ml-1 bg-current animate-pulse"></span>
+                </div>
               </div>
-              <div class="chat-bubble chat-bubble-secondary">
-                <%= @streaming_content %>
-                <span class="inline-block w-2 h-4 ml-1 bg-current animate-pulse"></span>
+            <% end %>
+          </div>
+          
+    <!-- Input Area -->
+          <div class="p-4 bg-base-100 border-t border-base-300">
+            <%= if @current_user do %>
+              <form phx-submit="send_message" class="flex gap-2">
+                <input
+                  type="text"
+                  name="message"
+                  value={@input}
+                  phx-change="update_input"
+                  placeholder="Type your message..."
+                  class="input input-bordered flex-1"
+                  disabled={@loading}
+                  autofocus
+                />
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  disabled={@loading || String.trim(@input) == ""}
+                >
+                  <%= if @loading do %>
+                    <span class="loading loading-spinner loading-sm"></span>
+                  <% else %>
+                    <.dm_mdi name="send" class="w-5 h-5" />
+                  <% end %>
+                </button>
+              </form>
+            <% else %>
+              <div class="alert alert-warning">
+                <.dm_mdi name="alert" class="w-5 h-5" />
+                <span>Please <.link navigate={~p"/sign-in"} class="link link-primary">log in</.link> to start chatting.</span>
               </div>
-            </div>
-          <% end %>
-        </div>
-
-        <!-- Input Area -->
-        <div class="p-4 bg-base-100 border-t border-base-300">
-          <form phx-submit="send_message" class="flex gap-2">
-            <input
-              type="text"
-              name="message"
-              value={@input}
-              phx-change="update_input"
-              placeholder="Type your message..."
-              class="input input-bordered flex-1"
-              disabled={@loading}
-              autofocus
-            />
-            <button
-              type="submit"
-              class="btn btn-primary"
-              disabled={@loading || String.trim(@input) == ""}
-            >
-              <%= if @loading do %>
-                <span class="loading loading-spinner loading-sm"></span>
-              <% else %>
-                <.dm_mdi name="send" class="w-5 h-5" />
-              <% end %>
-            </button>
-          </form>
-        </div>
+            <% end %>
+          </div>
+        <% end %>
       </div>
     </div>
     """

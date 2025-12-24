@@ -85,4 +85,83 @@ defmodule GsmlgAppAdmin.AI do
     |> Ash.Query.filter(id == ^id)
     |> Ash.read_one!()
   end
+
+  @doc """
+  Gets a provider by ID, returning {:ok, provider} or {:error, reason}.
+  """
+  def get_provider(id) do
+    require Ash.Query
+
+    Provider
+    |> Ash.Query.filter(id == ^id)
+    |> Ash.read_one()
+  end
+
+  @doc """
+  Lists all providers with usage statistics.
+  """
+  def list_providers_with_usage do
+    require Ash.Query
+
+    Provider
+    |> Ash.Query.sort(name: :asc)
+    |> Ash.Query.load([:masked_api_key])
+    |> Ash.read()
+  end
+
+  @doc """
+  Lists all providers.
+  """
+  def list_providers do
+    require Ash.Query
+
+    Provider
+    |> Ash.Query.sort(name: :asc)
+    |> Ash.read()
+  end
+
+  @doc """
+  Creates a new AI provider.
+  """
+  def create_provider(attrs) do
+    Provider
+    |> Ash.Changeset.for_create(:create, attrs)
+    |> Ash.create()
+  end
+
+  @doc """
+  Updates an existing AI provider.
+  """
+  def update_provider(provider, attrs) do
+    provider
+    |> Ash.Changeset.for_update(:update, attrs)
+    |> Ash.update()
+  end
+
+  @doc """
+  Deletes an AI provider.
+  """
+  def delete_provider(provider) do
+    provider
+    |> Ash.Changeset.for_destroy(:destroy, %{})
+    |> Ash.destroy()
+  end
+
+  @doc """
+  Toggles the active status of a provider.
+  """
+  def toggle_provider_active(provider) do
+    provider
+    |> Ash.Changeset.for_update(:toggle_active, %{})
+    |> Ash.update()
+  end
+
+  @doc """
+  Increments usage statistics for a provider.
+  """
+  def increment_provider_usage(provider, messages \\ 1, tokens \\ 0) do
+    provider
+    |> Ash.Changeset.for_update(:increment_usage, %{messages: messages, tokens: tokens})
+    |> Ash.update()
+  end
 end
