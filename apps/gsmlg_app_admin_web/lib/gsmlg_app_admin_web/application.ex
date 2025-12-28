@@ -9,8 +9,8 @@ defmodule GsmlgAppAdminWeb.Application do
   def start(_type, _args) do
     children = [
       GsmlgAppAdminWeb.Telemetry,
-      # Start a worker by calling: GsmlgAppAdminWeb.Worker.start_link(arg)
-      # {GsmlgAppAdminWeb.Worker, arg},
+      # ETS-based session store - must start before Endpoint
+      GsmlgAppAdminWeb.Session.Store,
       # Start to serve requests, typically the last entry
       GsmlgAppAdminWeb.Endpoint
     ]

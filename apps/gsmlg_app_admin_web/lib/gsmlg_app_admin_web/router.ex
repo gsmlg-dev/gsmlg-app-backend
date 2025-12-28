@@ -10,6 +10,7 @@ defmodule GsmlgAppAdminWeb.Router do
     plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
     plug(:load_from_session, otp_app: :gsmlg_app_admin)
+    plug(GsmlgAppAdminWeb.Plugs.SessionUser)
   end
 
   pipeline :api do
