@@ -68,7 +68,7 @@ defmodule GsmlgAppAdminWeb.Session.Store do
 
     :ets.foldl(
       fn record, acc ->
-        if not expired?(record, now, ttl_seconds), do: acc + 1, else: acc
+        if expired?(record, now, ttl_seconds), do: acc, else: acc + 1
       end,
       0,
       @table_name
@@ -144,15 +144,7 @@ defmodule GsmlgAppAdminWeb.Session.Store do
 
     expired_ids =
       :ets.foldl(
-        fn record, acc ->
-          case record do
-            {sid, _data, _timestamp} ->
-              if expired?(record, now, ttl_seconds), do: [sid | acc], else: acc
-
-            _ ->
-              acc
-          end
-        end,
+        &collect_expired_session(&1, &2, now, ttl_seconds),
         [],
         @table_name
       )
@@ -166,6 +158,12 @@ defmodule GsmlgAppAdminWeb.Session.Store do
   rescue
     ArgumentError -> 0
   end
+
+  defp collect_expired_session({sid, _data, _timestamp} = record, acc, now, ttl_seconds) do
+    if expired?(record, now, ttl_seconds), do: [sid | acc], else: acc
+  end
+
+  defp collect_expired_session(_record, acc, _now, _ttl_seconds), do: acc
 
   defp session_ttl_seconds do
     Application.get_env(:gsmlg_app_admin_web, :session_ttl_seconds, @default_session_ttl_seconds)
