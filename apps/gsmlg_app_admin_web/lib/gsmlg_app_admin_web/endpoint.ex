@@ -1,14 +1,17 @@
 defmodule GsmlgAppAdminWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :gsmlg_app_admin_web
 
-  # The session will be stored in the cookie and signed,
-  # this means its contents can be read but not tampered with.
-  # Set :encryption_salt if you would also like to encrypt it.
+  # Session stored server-side in ETS, only session ID in signed cookie.
+  # ETS table owned by GsmlgAppAdminWeb.Session.Store GenServer.
   @session_options [
-    store: :cookie,
+    store: :ets,
+    table: :gsmlg_admin_sessions,
     key: "_gsmlg_app_admin_web_key",
     signing_salt: "Zq8+Jo4s",
-    same_site: "Lax"
+    same_site: "Lax",
+    http_only: true,
+    secure: Mix.env() == :prod,
+    max_age: 8 * 60 * 60
   ]
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
