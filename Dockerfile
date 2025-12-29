@@ -22,7 +22,10 @@ COPY . /build
 WORKDIR /build
 
 # Install build dependencies for native code compilation (picosat_elixir, etc.)
-RUN apk add --no-cache musl-dev linux-headers
+# Create sys/unistd.h symlink for musl compatibility (picosat_elixir expects glibc path)
+RUN apk add --no-cache musl-dev linux-headers && \
+    mkdir -p /usr/include/sys && \
+    ln -sf /usr/include/unistd.h /usr/include/sys/unistd.h
 
 RUN mix deps.get && bun install
 
