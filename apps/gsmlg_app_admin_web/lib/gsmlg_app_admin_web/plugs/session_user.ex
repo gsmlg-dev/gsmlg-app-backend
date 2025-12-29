@@ -16,16 +16,21 @@ defmodule GsmlgAppAdminWeb.Plugs.SessionUser do
   def init(opts), do: opts
 
   def call(conn, _opts) do
-    case get_session(conn, "user") do
-      nil ->
-        assign(conn, :current_user, nil)
+    # If :load_from_session already assigned current_user, don't overwrite it
+    if conn.assigns[:current_user] do
+      conn
+    else
+      case get_session(conn, "user") do
+        nil ->
+          assign(conn, :current_user, nil)
 
-      subject when is_binary(subject) ->
-        user = load_user_from_subject(subject)
-        assign(conn, :current_user, user)
+        subject when is_binary(subject) ->
+          user = load_user_from_subject(subject)
+          assign(conn, :current_user, user)
 
-      _ ->
-        assign(conn, :current_user, nil)
+        _ ->
+          assign(conn, :current_user, nil)
+      end
     end
   end
 

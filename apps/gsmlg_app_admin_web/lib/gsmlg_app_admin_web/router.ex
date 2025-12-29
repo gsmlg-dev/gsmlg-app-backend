@@ -42,8 +42,10 @@ defmodule GsmlgAppAdminWeb.Router do
     pipe_through(:browser)
 
     live_session :authenticated,
+      layout: {GsmlgAppAdminWeb.Layouts, :app},
       on_mount: [
-        {AshAuthentication.Phoenix.LiveSession, {:load_from_session, otp_app: :gsmlg_app_admin}},
+        {AshAuthentication.Phoenix.LiveSession, {:set_otp_app, :gsmlg_app_admin}},
+        {AshAuthentication.Phoenix.LiveSession, :default},
         {GsmlgAppAdminWeb.LiveUserAuth, :live_user_optional}
       ] do
       # User management routes

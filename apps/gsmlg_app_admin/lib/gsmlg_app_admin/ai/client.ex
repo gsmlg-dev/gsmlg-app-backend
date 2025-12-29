@@ -89,34 +89,75 @@ defmodule GsmlgAppAdmin.AI.Client do
     headers = build_headers(provider)
     url = "#{provider.api_base_url}/chat/completions"
 
-    Req.post(url,
-      headers: headers,
-      json: params,
-      into: fn {:data, data}, {req, resp} ->
-        # Parse SSE format: "data: {...}\n\n"
-        data
-        |> String.split("\n\n", trim: true)
-        |> Enum.each(fn line ->
-          case String.trim_leading(line, "data: ") do
-            "[DONE]" ->
-              :ok
+    result =
+      Req.post(url,
+        headers: headers,
+        json: params,
+        receive_timeout: 60_000,
+        into: fn {:data, data}, {req, resp} ->
+          # Parse SSE format: "data: {...}\n\n"
+          data
+          |> String.split("\n\n", trim: true)
+          |> Enum.each(fn line ->
+            case String.trim_leading(line, "data: ") do
+              "[DONE]" ->
+                :ok
 
-            json_str ->
-              case Jason.decode(json_str) do
-                {:ok, chunk} ->
-                  if content = get_in(chunk, ["choices", Access.at(0), "delta", "content"]) do
-                    callback.(content)
-                  end
+              json_str ->
+                case Jason.decode(json_str) do
+                  {:ok, chunk} ->
+                    delta = get_in(chunk, ["choices", Access.at(0), "delta"]) || %{}
+                    # Handle both regular content and reasoning_content (for models like Zhipu GLM)
+                    content = delta["content"] || delta["reasoning_content"]
+                    if content, do: callback.(content)
 
-                {:error, _} ->
-                  :ok
-              end
-          end
-        end)
+                  {:error, _} ->
+                    :ok
+                end
+            end
+          end)
 
-        {:cont, {req, resp}}
-      end
-    )
+          {:cont, {req, resp}}
+        end
+      )
+
+    # Handle the response properly
+    case result do
+      {:ok, %Req.Response{status: 200}} ->
+        {:ok, :streaming_complete}
+
+      {:ok, %Req.Response{status: status, body: body}} ->
+        error_msg = extract_error_message(body, status)
+        {:error, error_msg}
+
+      {:error, exception} ->
+        {:error, "Request failed: #{inspect(exception)}"}
+    end
+  end
+
+  defp extract_error_message(body, status) when is_map(body) do
+    # Try to extract error message from API response
+    case get_in(body, ["error", "message"]) do
+      nil ->
+        case body["message"] do
+          nil -> "HTTP #{status}: #{inspect(body)}"
+          msg -> "HTTP #{status}: #{msg}"
+        end
+
+      msg ->
+        "HTTP #{status}: #{msg}"
+    end
+  end
+
+  defp extract_error_message(body, status) when is_binary(body) and body != "" do
+    case Jason.decode(body) do
+      {:ok, decoded} -> extract_error_message(decoded, status)
+      {:error, _} -> "HTTP #{status}: #{body}"
+    end
+  end
+
+  defp extract_error_message(_body, status) do
+    "HTTP #{status}: Unknown error"
   end
 
   # Private functions

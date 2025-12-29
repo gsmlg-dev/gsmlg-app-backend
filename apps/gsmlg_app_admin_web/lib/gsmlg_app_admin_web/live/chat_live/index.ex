@@ -56,7 +56,8 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
   @impl true
   def handle_event("select_provider", %{"provider_id" => provider_id}, socket) do
-    provider = Enum.find(socket.assigns.providers, &(&1.id == provider_id))
+    # provider_id from form is a string, provider.id is UUID - need to compare as strings
+    provider = Enum.find(socket.assigns.providers, &(to_string(&1.id) == provider_id))
 
     # T011: Persist provider selection via JavaScript localStorage
     socket =
@@ -70,7 +71,8 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   # T012: Handle restoring provider selection from localStorage
   @impl true
   def handle_event("restore_provider_selection", %{"provider_id" => provider_id}, socket) do
-    provider = Enum.find(socket.assigns.providers, &(&1.id == provider_id))
+    # provider_id from localStorage is a string, provider.id is UUID - need to compare as strings
+    provider = Enum.find(socket.assigns.providers, &(to_string(&1.id) == provider_id))
 
     if provider do
       {:noreply, assign(socket, :selected_provider, provider)}
@@ -121,6 +123,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
       |> assign(:messages, [])
       |> load_conversations()
       |> put_flash(:info, "Conversation deleted")
+      |> push_patch(to: ~p"/chat")
 
     {:noreply, socket}
   end
@@ -220,30 +223,58 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
     content = socket.assigns.streaming_content
     provider = socket.assigns.selected_provider
 
-    # Save assistant message
-    assistant_message_params = %{
-      conversation_id: conversation.id,
-      role: :assistant,
-      content: content
-    }
-
-    {:ok, assistant_message} = AI.add_message(conversation.id, assistant_message_params)
-
-    # T029: Increment usage tracking after AI response
-    if provider do
-      # Count messages (1 user + 1 assistant = 2 messages for this exchange)
-      # Estimate tokens from content length (rough approximation: ~4 chars per token)
-      estimated_tokens = estimate_tokens(content, result)
-      AI.increment_provider_usage(provider, 2, estimated_tokens)
-    end
-
+    # Check for API errors first
     socket =
-      socket
-      |> assign(:loading, false)
-      |> assign(:streaming, false)
-      |> assign(:streaming_content, "")
-      |> update(:messages, fn messages -> messages ++ [assistant_message] end)
-      |> load_conversations()
+      case result do
+        {:error, error_message} ->
+          # API returned an error
+          socket
+          |> assign(:loading, false)
+          |> assign(:streaming, false)
+          |> assign(:streaming_content, "")
+          |> put_flash(:error, error_message)
+
+        {:ok, _} ->
+          # Check if we have content
+          if String.trim(content) != "" do
+            # Success with content - save the assistant message
+            assistant_message_params = %{
+              conversation_id: conversation.id,
+              role: :assistant,
+              content: content
+            }
+
+            case AI.add_message(conversation.id, assistant_message_params) do
+              {:ok, assistant_message} ->
+                # T029: Increment usage tracking after AI response
+                if provider do
+                  estimated_tokens = estimate_tokens(content, result)
+                  AI.increment_provider_usage(provider, 2, estimated_tokens)
+                end
+
+                socket
+                |> assign(:loading, false)
+                |> assign(:streaming, false)
+                |> assign(:streaming_content, "")
+                |> update(:messages, fn messages -> messages ++ [assistant_message] end)
+                |> load_conversations()
+
+              {:error, _error} ->
+                socket
+                |> assign(:loading, false)
+                |> assign(:streaming, false)
+                |> assign(:streaming_content, "")
+                |> put_flash(:error, "Failed to save assistant response")
+            end
+          else
+            # No content received from AI - show error
+            socket
+            |> assign(:loading, false)
+            |> assign(:streaming, false)
+            |> assign(:streaming_content, "")
+            |> put_flash(:error, "No response received from AI provider")
+          end
+      end
 
     {:noreply, socket}
   end
@@ -291,10 +322,19 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
     }
   end
 
+  defp render_markdown(content) when is_binary(content) do
+    case Earmark.as_html(content, %Earmark.Options{code_class_prefix: "language-"}) do
+      {:ok, html, _} -> Phoenix.HTML.raw(html)
+      {:error, _, _} -> content
+    end
+  end
+
+  defp render_markdown(nil), do: ""
+
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex h-screen bg-base-200" id="chat-page" phx-hook="ProviderSelection">
+    <div class="flex h-[calc(100vh-3.5rem)] bg-base-200" id="chat-page" phx-hook="ProviderSelection">
       <!-- Sidebar -->
       <div class="w-64 bg-base-100 border-r border-base-300 flex flex-col">
         <div class="p-4 border-b border-base-300">
@@ -405,10 +445,10 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
                   </time>
                 </div>
                 <div class={[
-                  "chat-bubble",
+                  "chat-bubble prose prose-sm max-w-none",
                   (message.role == :user && "chat-bubble-primary") || "chat-bubble-secondary"
                 ]}>
-                  {message.content}
+                  {render_markdown(message.content)}
                 </div>
               </div>
             <% end %>
@@ -418,8 +458,8 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
                 <div class="chat-header">
                   Assistant
                 </div>
-                <div class="chat-bubble chat-bubble-secondary">
-                  {@streaming_content}
+                <div class="chat-bubble chat-bubble-secondary prose prose-sm max-w-none">
+                  {render_markdown(@streaming_content)}
                   <span class="inline-block w-2 h-4 ml-1 bg-current animate-pulse"></span>
                 </div>
               </div>

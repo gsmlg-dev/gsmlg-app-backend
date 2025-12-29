@@ -171,7 +171,9 @@ defmodule GsmlgAppAdmin.Accounts.User do
       signing_secret(GsmlgAppAdmin.Accounts.Secrets)
     end
 
-    session_identifier(:jti)
+    # Note: session_identifier(:jti) removed because sign_in_tokens_enabled?(false)
+    # means no JWT is generated during sign-in, so JTI cannot be extracted.
+    # With ETS-based sessions, server-side session invalidation is sufficient.
     subject_name(:user)
   end
 

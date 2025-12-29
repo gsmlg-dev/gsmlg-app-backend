@@ -56,6 +56,7 @@ defmodule GsmlgAppAdminWeb.MixProject do
       {:gsmlg_app_admin, in_umbrella: true},
       {:gsmlg_app_component, in_umbrella: true},
       {:jason, "~> 1.2"},
+      {:earmark, "~> 1.4"},
       {:bandit, "~> 1.5"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}

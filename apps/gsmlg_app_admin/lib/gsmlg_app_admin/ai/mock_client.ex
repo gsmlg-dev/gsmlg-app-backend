@@ -18,6 +18,10 @@ defmodule GsmlgAppAdmin.AI.MockClient do
 
   @doc """
   Simulates a streaming chat completion with a callback function.
+
+  Unlike the real client which uses Req streaming, this mock streams
+  synchronously within the calling process (typically a Task), so the
+  Task can properly signal completion to the LiveView.
   """
   def stream_with_callback(_provider, messages, callback, _opts \\ []) do
     # Get the last user message
@@ -27,20 +31,17 @@ defmodule GsmlgAppAdmin.AI.MockClient do
     response = select_response(last_message)
 
     # Stream the response character by character with realistic delays
-    spawn(fn ->
-      response
-      |> String.graphemes()
-      |> Enum.each(fn char ->
-        callback.(char)
-        # Random delay between 20-50ms to simulate real streaming
-        Process.sleep(Enum.random(20..50))
-      end)
-
-      # Signal completion
-      send(self(), {:stream_complete, :ok})
+    # Note: We do this synchronously so the Task calling this function
+    # knows when streaming is complete and can send {:stream_complete, result}
+    response
+    |> String.graphemes()
+    |> Enum.each(fn char ->
+      callback.(char)
+      # Random delay between 20-50ms to simulate real streaming
+      Process.sleep(Enum.random(20..50))
     end)
 
-    {:ok, :streaming}
+    {:ok, :streaming_complete}
   end
 
   @doc """

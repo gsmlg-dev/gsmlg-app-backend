@@ -6,8 +6,6 @@ defmodule GsmlgAppAdminWeb.LiveUserAuth do
   import Phoenix.Component
   use GsmlgAppAdminWeb, :verified_routes
 
-  require Logger
-
   def on_mount(:live_user_optional, _params, session, socket) do
     current_user = socket.assigns[:current_user] || load_current_user_from_session(session)
 
