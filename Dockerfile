@@ -21,6 +21,9 @@ COPY . /build
 
 WORKDIR /build
 
+# Install build dependencies for native code compilation (picosat_elixir, etc.)
+RUN apk add --no-cache musl-dev linux-headers
+
 RUN mix deps.get && bun install
 
 RUN install -m 755 -D $MIX_TAILWIND_PATH /build/_build/tailwind-linux-x64 && install -m 755 -D $MIX_BUN_PATH /build/_build/bun
