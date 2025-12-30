@@ -44,12 +44,39 @@ defmodule GsmlgAppAdmin.AI do
   end
 
   @doc """
+  Gets a conversation by ID with its messages loaded.
+  Returns {:ok, conversation} or {:error, reason}.
+  """
+  def get_conversation_with_messages(id) do
+    require Ash.Query
+
+    Conversation
+    |> Ash.Query.filter(id == ^id)
+    |> Ash.Query.load(:messages)
+    |> Ash.read_one()
+    |> case do
+      {:ok, nil} -> {:error, :not_found}
+      {:ok, conversation} -> {:ok, conversation}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  @doc """
   Creates a new conversation.
   """
   def create_conversation(attrs) do
     Conversation
     |> Ash.Changeset.for_create(:create, attrs)
     |> Ash.create()
+  end
+
+  @doc """
+  Updates a conversation.
+  """
+  def update_conversation(conversation, attrs) do
+    conversation
+    |> Ash.Changeset.for_update(:update, attrs)
+    |> Ash.update()
   end
 
   @doc """

@@ -16,6 +16,7 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
 
   defp apply_action(socket, :new, _params) do
     form = AshPhoenix.Form.for_create(Provider, :create, as: "provider")
+    preset = ProviderPresets.get("generic")
 
     socket
     |> assign(:page_title, "Add Provider")
@@ -23,11 +24,20 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
     |> assign(:form, to_form(form))
     |> assign(:preset_options, ProviderPresets.options())
     |> assign(:selected_preset, "generic")
+    |> assign(:supported_models, preset.available_models)
+    |> assign(:selected_models, [])
+    |> assign(:new_model_input, "")
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     provider = AI.get_provider!(id)
     form = AshPhoenix.Form.for_update(provider, :update, as: "provider")
+
+    # Try to find the preset for this provider to get all supported models
+    preset = find_preset_for_provider(provider)
+
+    supported_models =
+      if preset, do: preset.available_models, else: provider.available_models || []
 
     socket
     |> assign(:page_title, "Edit Provider")
@@ -35,6 +45,18 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
     |> assign(:form, to_form(form))
     |> assign(:preset_options, nil)
     |> assign(:selected_preset, nil)
+    |> assign(:supported_models, supported_models)
+    |> assign(:selected_models, provider.available_models || [])
+    |> assign(:new_model_input, "")
+  end
+
+  # Find a matching preset for an existing provider based on slug or API URL
+  defp find_preset_for_provider(provider) do
+    ProviderPresets.all()
+    |> Enum.find(fn preset ->
+      preset.slug == provider.slug ||
+        String.contains?(provider.api_base_url || "", preset.api_base_url)
+    end)
   end
 
   @impl true
@@ -54,6 +76,7 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
 
   @impl true
   def handle_event("select_preset", %{"preset" => preset_id}, socket) do
+    preset = ProviderPresets.get(preset_id)
     preset_params = ProviderPresets.to_form_params(preset_id)
 
     form =
@@ -61,14 +84,91 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
       |> AshPhoenix.Form.validate(preset_params)
       |> to_form()
 
+    supported_models = if preset, do: preset.available_models, else: []
+    # By default, select all models from the preset
+    selected_models = supported_models
+
     {:noreply,
      socket
      |> assign(:selected_preset, preset_id)
-     |> assign(:form, form)}
+     |> assign(:form, form)
+     |> assign(:supported_models, supported_models)
+     |> assign(:selected_models, selected_models)}
+  end
+
+  @impl true
+  def handle_event("toggle_model", %{"model" => model}, socket) do
+    selected = socket.assigns.selected_models
+
+    selected =
+      if model in selected do
+        List.delete(selected, model)
+      else
+        [model | selected]
+      end
+
+    {:noreply, assign(socket, :selected_models, selected)}
+  end
+
+  @impl true
+  def handle_event("add_models", %{"new_model" => input}, socket) do
+    add_models_to_list(socket, input)
+  end
+
+  @impl true
+  def handle_event("add_models", _params, socket) do
+    add_models_to_list(socket, socket.assigns.new_model_input)
+  end
+
+  defp add_models_to_list(socket, input) do
+    # Parse input - split by newlines and filter empty/duplicate
+    new_models =
+      (input || "")
+      |> String.split(~r/[\r\n]+/)
+      |> Enum.map(&String.trim/1)
+      |> Enum.filter(&(&1 != ""))
+      |> Enum.uniq()
+      |> Enum.reject(&(&1 in socket.assigns.supported_models))
+
+    if length(new_models) > 0 do
+      supported = socket.assigns.supported_models ++ new_models
+      selected = socket.assigns.selected_models ++ new_models
+
+      {:noreply,
+       socket
+       |> assign(:supported_models, supported)
+       |> assign(:selected_models, selected)
+       |> assign(:new_model_input, "")}
+    else
+      {:noreply, assign(socket, :new_model_input, "")}
+    end
+  end
+
+  @impl true
+  def handle_event("remove_model", %{"model" => model}, socket) do
+    supported = List.delete(socket.assigns.supported_models, model)
+    selected = List.delete(socket.assigns.selected_models, model)
+
+    {:noreply,
+     socket
+     |> assign(:supported_models, supported)
+     |> assign(:selected_models, selected)}
+  end
+
+  @impl true
+  def handle_event("update_new_model", %{"new_model" => value}, socket) do
+    {:noreply, assign(socket, :new_model_input, value)}
+  end
+
+  @impl true
+  def handle_event("update_new_model", %{"value" => value}, socket) do
+    {:noreply, assign(socket, :new_model_input, value)}
   end
 
   @impl true
   def handle_event("save", %{"provider" => provider_params}, socket) do
+    # Add selected models to the params
+    provider_params = Map.put(provider_params, "available_models", socket.assigns.selected_models)
     save_provider(socket, socket.assigns.live_action, provider_params)
   end
 
@@ -258,6 +358,74 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
                     {Enum.map(@form[:model].errors, fn {msg, _} -> msg end) |> Enum.join(", ")}
                   </span>
                 </label>
+              <% end %>
+            </div>
+
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Available Models</span>
+              </label>
+              <p class="text-sm text-base-content/70 mb-2">
+                Manage models for this provider. Check models to make them available in conversations.
+              </p>
+              
+    <!-- Add new models (batch input supported) -->
+              <div class="mb-3">
+                <textarea
+                  name="new_model"
+                  placeholder="Enter model names (one per line)"
+                  class="textarea textarea-bordered w-full text-sm"
+                  rows="3"
+                  phx-change="update_new_model"
+                  phx-debounce="100"
+                >{@new_model_input}</textarea>
+                <div class="flex justify-end mt-2">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-primary"
+                    phx-click="add_models"
+                    disabled={@new_model_input == nil or String.trim(@new_model_input) == ""}
+                  >
+                    <.dm_mdi name="plus" class="w-4 h-4" /> Add Models
+                  </button>
+                </div>
+              </div>
+
+              <%= if length(@supported_models) > 0 do %>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 p-4 bg-base-200 rounded-lg">
+                  <%= for model <- @supported_models do %>
+                    <div class="flex items-center justify-between hover:bg-base-300 rounded px-2 py-1">
+                      <label class="label cursor-pointer justify-start gap-3 flex-1">
+                        <input
+                          type="checkbox"
+                          checked={model in @selected_models}
+                          phx-click="toggle_model"
+                          phx-value-model={model}
+                          class="checkbox checkbox-sm checkbox-primary"
+                        />
+                        <span class="label-text text-sm">{model}</span>
+                      </label>
+                      <button
+                        type="button"
+                        phx-click="remove_model"
+                        phx-value-model={model}
+                        class="btn btn-ghost btn-xs text-error"
+                        title="Remove model"
+                      >
+                        <.dm_mdi name="close" class="w-4 h-4" />
+                      </button>
+                    </div>
+                  <% end %>
+                </div>
+                <label class="label">
+                  <span class="label-text-alt">
+                    {length(@selected_models)} of {length(@supported_models)} models enabled
+                  </span>
+                </label>
+              <% else %>
+                <div class="p-4 bg-base-200 rounded-lg text-center text-base-content/60">
+                  No models added yet. Add models using the input above.
+                </div>
               <% end %>
             </div>
 

@@ -17,6 +17,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
     # Load saved provider selection (T012)
     selected_provider = List.first(providers)
+    selected_model = if selected_provider, do: selected_provider.model, else: nil
 
     socket =
       socket
@@ -24,6 +25,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
       |> assign(:page_title, "AI Chat")
       |> assign(:providers, providers)
       |> assign(:selected_provider, selected_provider)
+      |> assign(:selected_model, selected_model)
       |> assign(:conversations, [])
       |> assign(:current_conversation, nil)
       |> assign(:messages, [])
@@ -31,6 +33,8 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
       |> assign(:streaming, false)
       |> assign(:streaming_content, "")
       |> assign(:loading, false)
+      |> assign(:editing_conversation, nil)
+      |> assign(:edit_title, "")
 
     {:ok, load_conversations(socket)}
   end
@@ -46,36 +50,80 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   end
 
   defp apply_action(socket, :conversation, %{"id" => id}) do
-    conversation = AI.get_conversation_with_messages!(id)
+    case AI.get_conversation_with_messages(id) do
+      {:ok, conversation} ->
+        socket
+        |> assign(:current_conversation, conversation)
+        |> assign(:messages, conversation.messages || [])
+        |> assign(:page_title, conversation.title)
 
-    socket
-    |> assign(:current_conversation, conversation)
-    |> assign(:messages, conversation.messages || [])
-    |> assign(:page_title, conversation.title)
+      {:error, _} ->
+        # Conversation was deleted or doesn't exist, redirect to chat index
+        socket
+        |> assign(:current_conversation, nil)
+        |> assign(:messages, [])
+        |> put_flash(:error, "Conversation not found")
+        |> push_navigate(to: ~p"/chat")
+    end
   end
 
   @impl true
-  def handle_event("select_provider", %{"provider_id" => provider_id}, socket) do
-    # provider_id from form is a string, provider.id is UUID - need to compare as strings
-    provider = Enum.find(socket.assigns.providers, &(to_string(&1.id) == provider_id))
+  def handle_event("select_provider", %{"provider_model" => provider_model}, socket) do
+    # Parse provider_id:model format
+    case String.split(provider_model, ":", parts: 2) do
+      [provider_id, model] ->
+        provider = Enum.find(socket.assigns.providers, &(to_string(&1.id) == provider_id))
 
-    # T011: Persist provider selection via JavaScript localStorage
-    socket =
-      socket
-      |> assign(:selected_provider, provider)
-      |> push_event("save_provider_selection", %{provider_id: provider_id})
+        # T011: Persist provider selection via JavaScript localStorage
+        socket =
+          socket
+          |> assign(:selected_provider, provider)
+          |> assign(:selected_model, model)
+          |> push_event("save_provider_selection", %{provider_model: provider_model})
 
-    {:noreply, socket}
+        {:noreply, socket}
+
+      _ ->
+        {:noreply, socket}
+    end
   end
 
   # T012: Handle restoring provider selection from localStorage
   @impl true
+  def handle_event("restore_provider_selection", %{"provider_model" => provider_model}, socket) do
+    # Parse provider_id:model format
+    case String.split(provider_model, ":", parts: 2) do
+      [provider_id, model] ->
+        provider = Enum.find(socket.assigns.providers, &(to_string(&1.id) == provider_id))
+
+        if provider do
+          socket =
+            socket
+            |> assign(:selected_provider, provider)
+            |> assign(:selected_model, model)
+
+          {:noreply, socket}
+        else
+          {:noreply, socket}
+        end
+
+      _ ->
+        {:noreply, socket}
+    end
+  end
+
+  # Legacy handler for old format
+  @impl true
   def handle_event("restore_provider_selection", %{"provider_id" => provider_id}, socket) do
-    # provider_id from localStorage is a string, provider.id is UUID - need to compare as strings
     provider = Enum.find(socket.assigns.providers, &(to_string(&1.id) == provider_id))
 
     if provider do
-      {:noreply, assign(socket, :selected_provider, provider)}
+      socket =
+        socket
+        |> assign(:selected_provider, provider)
+        |> assign(:selected_model, provider.model)
+
+      {:noreply, socket}
     else
       {:noreply, socket}
     end
@@ -124,6 +172,70 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
       |> load_conversations()
       |> put_flash(:info, "Conversation deleted")
       |> push_patch(to: ~p"/chat")
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("edit_conversation_title", %{"id" => id}, socket) do
+    conversation = Enum.find(socket.assigns.conversations, &(to_string(&1.id) == id))
+
+    socket =
+      socket
+      |> assign(:editing_conversation, conversation)
+      |> assign(:edit_title, (conversation && conversation.title) || "")
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("update_edit_title", %{"title" => title}, socket) do
+    {:noreply, assign(socket, :edit_title, title)}
+  end
+
+  @impl true
+  def handle_event("save_conversation_title", _params, socket) do
+    conversation = socket.assigns.editing_conversation
+    new_title = String.trim(socket.assigns.edit_title)
+
+    socket =
+      if conversation && new_title != "" do
+        case AI.update_conversation(conversation, %{title: new_title}) do
+          {:ok, updated_conversation} ->
+            # Update current_conversation if it's the one being edited
+            socket =
+              if socket.assigns.current_conversation &&
+                   socket.assigns.current_conversation.id == updated_conversation.id do
+                assign(socket, :current_conversation, updated_conversation)
+              else
+                socket
+              end
+
+            socket
+            |> assign(:editing_conversation, nil)
+            |> assign(:edit_title, "")
+            |> load_conversations()
+            |> put_flash(:info, "Conversation title updated")
+
+          {:error, _} ->
+            socket
+            |> put_flash(:error, "Failed to update conversation title")
+        end
+      else
+        socket
+        |> assign(:editing_conversation, nil)
+        |> assign(:edit_title, "")
+      end
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("cancel_edit_title", _params, socket) do
+    socket =
+      socket
+      |> assign(:editing_conversation, nil)
+      |> assign(:edit_title, "")
 
     {:noreply, socket}
   end
@@ -180,6 +292,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   @impl true
   def handle_info({:request_ai_response, _conversation_id}, socket) do
     provider = socket.assigns.selected_provider
+    selected_model = socket.assigns.selected_model
     messages = Enum.map(socket.assigns.messages, &format_message_for_api/1)
 
     # Determine which client to use
@@ -193,6 +306,9 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
     # Stream response
     parent = self()
 
+    # Pass the selected model to override provider's default model
+    opts = if selected_model, do: [model: selected_model], else: []
+
     Task.async(fn ->
       result =
         client_module.stream_with_callback(
@@ -201,7 +317,8 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
           fn chunk ->
             send(parent, {:stream_chunk, chunk})
             chunk
-          end
+          end,
+          opts
         )
 
       send(parent, {:stream_complete, result})
@@ -222,6 +339,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
     conversation = socket.assigns.current_conversation
     content = socket.assigns.streaming_content
     provider = socket.assigns.selected_provider
+    selected_model = socket.assigns.selected_model
 
     # Check for API errors first
     socket =
@@ -237,11 +355,18 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
         {:ok, _} ->
           # Check if we have content
           if String.trim(content) != "" do
-            # Success with content - save the assistant message
+            # Success with content - save the assistant message with model info
+            model_name = selected_model || (provider && provider.model) || "Assistant"
+            provider_name = if provider, do: provider.name, else: nil
+
             assistant_message_params = %{
               conversation_id: conversation.id,
               role: :assistant,
-              content: content
+              content: content,
+              metadata: %{
+                model: model_name,
+                provider: provider_name
+              }
             }
 
             case AI.add_message(conversation.id, assistant_message_params) do
@@ -331,6 +456,52 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
   defp render_markdown(nil), do: ""
 
+  # Get the sender name for a message (user's name or model name)
+  defp get_message_sender(message) do
+    case message.role do
+      :user ->
+        "You"
+
+      :assistant ->
+        # Try to get model name from metadata, fallback to "Assistant"
+        case message.metadata do
+          %{"model" => model} when is_binary(model) and model != "" -> model
+          _ -> "Assistant"
+        end
+
+      :system ->
+        "System"
+    end
+  end
+
+  # Get the current model name for streaming display
+  defp get_current_model_name(nil, _selected_model), do: "Assistant"
+
+  defp get_current_model_name(_provider, selected_model)
+       when is_binary(selected_model) and selected_model != "" do
+    selected_model
+  end
+
+  defp get_current_model_name(provider, _selected_model) do
+    provider.model || "Assistant"
+  end
+
+  # Get all models for a provider (available_models or just the default model)
+  defp get_provider_models(provider) do
+    case provider.available_models do
+      models when is_list(models) and length(models) > 0 ->
+        # Include the default model if not in the list
+        if provider.model in models do
+          models
+        else
+          [provider.model | models]
+        end
+
+      _ ->
+        [provider.model]
+    end
+  end
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -351,20 +522,28 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
           <label class="label">
             <span class="label-text font-semibold">AI Provider</span>
           </label>
-          <select
-            class="select select-bordered w-full"
-            phx-change="select_provider"
-            name="provider_id"
-          >
-            <%= for provider <- @providers do %>
-              <option
-                value={provider.id}
-                selected={@selected_provider && @selected_provider.id == provider.id}
-              >
-                {provider.name}
-              </option>
-            <% end %>
-          </select>
+          <form phx-change="select_provider">
+            <select
+              class="select select-bordered w-full"
+              name="provider_model"
+            >
+              <%= for provider <- @providers do %>
+                <optgroup label={provider.name}>
+                  <%= for model <- get_provider_models(provider) do %>
+                    <option
+                      value={"#{provider.id}:#{model}"}
+                      selected={
+                        @selected_provider && @selected_provider.id == provider.id &&
+                          @selected_model == model
+                      }
+                    >
+                      {model}
+                    </option>
+                  <% end %>
+                </optgroup>
+              <% end %>
+            </select>
+          </form>
         </div>
         
     <!-- Conversations List -->
@@ -381,14 +560,25 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
                     {Calendar.strftime(conversation.updated_at, "%b %d, %Y")}
                   </p>
                 </div>
-                <button
-                  phx-click="delete_conversation"
-                  phx-value-id={conversation.id}
-                  class="btn btn-ghost btn-xs opacity-0 group-hover:opacity-100"
-                  data-confirm="Delete this conversation?"
-                >
-                  <.dm_mdi name="delete" class="w-4 h-4" />
-                </button>
+                <div class="flex gap-1 opacity-0 group-hover:opacity-100">
+                  <button
+                    phx-click="edit_conversation_title"
+                    phx-value-id={conversation.id}
+                    class="btn btn-ghost btn-xs"
+                    title="Edit title"
+                  >
+                    <.dm_mdi name="pencil" class="w-4 h-4" />
+                  </button>
+                  <button
+                    phx-click="delete_conversation"
+                    phx-value-id={conversation.id}
+                    class="btn btn-ghost btn-xs"
+                    data-confirm="Delete this conversation?"
+                    title="Delete conversation"
+                  >
+                    <.dm_mdi name="delete" class="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           <% end %>
@@ -421,14 +611,35 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
         <% else %>
           <!-- Chat Header -->
           <div class="p-4 bg-base-100 border-b border-base-300">
-            <h1 class="text-2xl font-bold">
-              {(@current_conversation && @current_conversation.title) || "AI Chat"}
-            </h1>
-            <%= if @selected_provider do %>
-              <p class="text-sm text-base-content/60">
-                Using {@selected_provider.name} · {@selected_provider.model}
-              </p>
-            <% end %>
+            <div class="flex items-center justify-between">
+              <h1 class="text-2xl font-bold">
+                {(@current_conversation && @current_conversation.title) || "AI Chat"}
+              </h1>
+              <!-- Model Selector in Header -->
+              <form phx-change="select_provider" class="flex items-center gap-2">
+                <span class="text-sm text-base-content/60">Model:</span>
+                <select
+                  class="select select-bordered select-sm"
+                  name="provider_model"
+                >
+                  <%= for provider <- @providers do %>
+                    <optgroup label={provider.name}>
+                      <%= for model <- get_provider_models(provider) do %>
+                        <option
+                          value={"#{provider.id}:#{model}"}
+                          selected={
+                            @selected_provider && @selected_provider.id == provider.id &&
+                              @selected_model == model
+                          }
+                        >
+                          {model}
+                        </option>
+                      <% end %>
+                    </optgroup>
+                  <% end %>
+                </select>
+              </form>
+            </div>
           </div>
           
     <!-- Messages -->
@@ -439,7 +650,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
                 (message.role == :user && "chat-end") || "chat-start"
               ]}>
                 <div class="chat-header">
-                  {if message.role == :user, do: "You", else: "Assistant"}
+                  {get_message_sender(message)}
                   <time class="text-xs opacity-50">
                     {Calendar.strftime(message.created_at, "%H:%M")}
                   </time>
@@ -456,7 +667,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
             <%= if @streaming do %>
               <div class="chat chat-start">
                 <div class="chat-header">
-                  Assistant
+                  {get_current_model_name(@selected_provider, @selected_model)}
                 </div>
                 <div class="chat-bubble chat-bubble-secondary prose prose-sm max-w-none">
                   {render_markdown(@streaming_content)}
@@ -469,17 +680,18 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
     <!-- Input Area -->
           <div class="p-4 bg-base-100 border-t border-base-300">
             <%= if @current_user do %>
-              <form phx-submit="send_message" class="flex gap-2">
-                <input
-                  type="text"
+              <form phx-submit="send_message" class="flex gap-2 items-end">
+                <textarea
+                  id="message-input"
                   name="message"
-                  value={@input}
                   phx-change="update_input"
-                  placeholder="Type your message..."
-                  class="input input-bordered flex-1"
+                  phx-hook="AutoResizeTextarea"
+                  placeholder="Type your message... (Enter to send, Shift+Enter for new line)"
+                  class="textarea textarea-bordered flex-1 min-h-[2.5rem] max-h-[12rem] resize-none overflow-y-auto"
                   disabled={@loading}
+                  rows="1"
                   autofocus
-                />
+                ><%= @input %></textarea>
                 <button
                   type="submit"
                   class="btn btn-primary"
@@ -504,6 +716,39 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
           </div>
         <% end %>
       </div>
+      
+    <!-- Edit Title Modal -->
+      <%= if @editing_conversation do %>
+        <div class="modal modal-open">
+          <div class="modal-box">
+            <h3 class="font-bold text-lg">Edit Conversation Title</h3>
+            <form phx-submit="save_conversation_title" class="mt-4">
+              <input
+                type="text"
+                name="title"
+                value={@edit_title}
+                phx-change="update_edit_title"
+                class="input input-bordered w-full"
+                placeholder="Enter conversation title"
+                autofocus
+              />
+              <div class="modal-action">
+                <button type="button" phx-click="cancel_edit_title" class="btn">
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  disabled={String.trim(@edit_title) == ""}
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="modal-backdrop" phx-click="cancel_edit_title"></div>
+        </div>
+      <% end %>
     </div>
     """
   end

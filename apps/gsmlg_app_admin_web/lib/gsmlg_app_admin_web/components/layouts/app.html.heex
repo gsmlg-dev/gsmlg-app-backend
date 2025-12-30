@@ -6,16 +6,16 @@
   </:logo>
   <:user_profile>
     <%= if @current_user do %>
-      <div tabindex="0" role="button" class="btn btn-ghost">
-        <div class="w-20 flex justify-center items-center">
+      <div tabindex="0" role="button" class="btn btn-ghost self-center">
+        <div class="flex justify-center items-center">
           {@current_user.email}
         </div>
       </div>
       <ul
         tabindex="0"
-        class="mt-3 z-[1] p-2 menu menu-sm dropdown-content bg-primary text-primary-content rounded-box w-52"
+        class="p-2 menu menu-sm dropdown-content bg-primary text-primary-content rounded-box w-36"
       >
-        <li>
+        <li class="btn btn-primary">
           <.link href="/sign-out">Sign Out</.link>
         </li>
       </ul>
