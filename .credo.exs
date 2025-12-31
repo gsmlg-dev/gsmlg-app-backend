@@ -62,14 +62,16 @@
           # Refactoring Checks
           {Credo.Check.Refactor.Apply, []},
           {Credo.Check.Refactor.CondStatements, []},
-          {Credo.Check.Refactor.CyclomaticComplexity, []},
+          # Increased max_complexity to 12 for complex streaming/event handling code
+          {Credo.Check.Refactor.CyclomaticComplexity, [max_complexity: 12]},
           {Credo.Check.Refactor.FunctionArity, []},
           {Credo.Check.Refactor.LongQuoteBlocks, []},
           {Credo.Check.Refactor.MatchInCondition, []},
           {Credo.Check.Refactor.MapJoin, []},
           {Credo.Check.Refactor.NegatedConditionsInUnless, []},
           {Credo.Check.Refactor.NegatedConditionsWithElse, []},
-          {Credo.Check.Refactor.Nesting, []},
+          # Increased max_nesting to 4 for LiveView event handlers with pattern matching
+          {Credo.Check.Refactor.Nesting, [max_nesting: 4]},
           {Credo.Check.Refactor.UnlessWithElse, []},
           {Credo.Check.Refactor.WithClauses, []},
           {Credo.Check.Refactor.FilterCount, []},

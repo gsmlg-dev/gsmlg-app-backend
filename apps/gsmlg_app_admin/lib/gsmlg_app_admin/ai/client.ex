@@ -107,6 +107,7 @@ defmodule GsmlgAppAdmin.AI.Client do
                 case Jason.decode(json_str) do
                   {:ok, chunk} ->
                     delta = get_in(chunk, ["choices", Access.at(0), "delta"]) || %{}
+
                     # Handle both regular content and reasoning_content (for models like Zhipu GLM)
                     content = delta["content"] || delta["reasoning_content"]
                     if content, do: callback.(content)
