@@ -33,11 +33,11 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
     provider = AI.get_provider!(id)
     form = AshPhoenix.Form.for_update(provider, :update, as: "provider")
 
-    # Try to find the preset for this provider to get all supported models
-    preset = find_preset_for_provider(provider)
-
-    supported_models =
-      if preset, do: preset.available_models, else: provider.available_models || []
+    # Use only the provider's available_models (no preset merging to avoid non-existent models)
+    # Remove duplicates
+    available = provider.available_models || []
+    supported_models = Enum.uniq(available)
+    selected_models = Enum.uniq(available)
 
     socket
     |> assign(:page_title, "Edit Provider")
@@ -46,17 +46,8 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
     |> assign(:preset_options, nil)
     |> assign(:selected_preset, nil)
     |> assign(:supported_models, supported_models)
-    |> assign(:selected_models, provider.available_models || [])
+    |> assign(:selected_models, selected_models)
     |> assign(:new_model_input, "")
-  end
-
-  # Find a matching preset for an existing provider based on slug or API URL
-  defp find_preset_for_provider(provider) do
-    ProviderPresets.all()
-    |> Enum.find(fn preset ->
-      preset.slug == provider.slug ||
-        String.contains?(provider.api_base_url || "", preset.api_base_url)
-    end)
   end
 
   @impl true
@@ -120,30 +111,6 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
     add_models_to_list(socket, socket.assigns.new_model_input)
   end
 
-  defp add_models_to_list(socket, input) do
-    # Parse input - split by newlines and filter empty/duplicate
-    new_models =
-      (input || "")
-      |> String.split(~r/[\r\n]+/)
-      |> Enum.map(&String.trim/1)
-      |> Enum.filter(&(&1 != ""))
-      |> Enum.uniq()
-      |> Enum.reject(&(&1 in socket.assigns.supported_models))
-
-    if length(new_models) > 0 do
-      supported = socket.assigns.supported_models ++ new_models
-      selected = socket.assigns.selected_models ++ new_models
-
-      {:noreply,
-       socket
-       |> assign(:supported_models, supported)
-       |> assign(:selected_models, selected)
-       |> assign(:new_model_input, "")}
-    else
-      {:noreply, assign(socket, :new_model_input, "")}
-    end
-  end
-
   @impl true
   def handle_event("remove_model", %{"model" => model}, socket) do
     supported = List.delete(socket.assigns.supported_models, model)
@@ -195,6 +162,30 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
 
       {:error, form} ->
         {:noreply, assign(socket, :form, to_form(form))}
+    end
+  end
+
+  defp add_models_to_list(socket, input) do
+    # Parse input - split by newlines and filter empty/duplicate
+    new_models =
+      (input || "")
+      |> String.split(~r/[\r\n]+/)
+      |> Enum.map(&String.trim/1)
+      |> Enum.filter(&(&1 != ""))
+      |> Enum.uniq()
+      |> Enum.reject(&(&1 in socket.assigns.supported_models))
+
+    if length(new_models) > 0 do
+      supported = socket.assigns.supported_models ++ new_models
+      selected = socket.assigns.selected_models ++ new_models
+
+      {:noreply,
+       socket
+       |> assign(:supported_models, supported)
+       |> assign(:selected_models, selected)
+       |> assign(:new_model_input, "")}
+    else
+      {:noreply, assign(socket, :new_model_input, "")}
     end
   end
 

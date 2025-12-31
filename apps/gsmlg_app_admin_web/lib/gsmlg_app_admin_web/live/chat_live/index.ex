@@ -486,19 +486,16 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
     provider.model || "Assistant"
   end
 
-  # Get all models for a provider (available_models or just the default model)
+  # Get all models for a provider (only from available_models, no duplicates)
   defp get_provider_models(provider) do
     case provider.available_models do
       models when is_list(models) and length(models) > 0 ->
-        # Include the default model if not in the list
-        if provider.model in models do
-          models
-        else
-          [provider.model | models]
-        end
+        # Only show models from available_models, remove duplicates
+        Enum.uniq(models)
 
       _ ->
-        [provider.model]
+        # Fallback to default model only if no available_models configured
+        if provider.model && provider.model != "", do: [provider.model], else: []
     end
   end
 
