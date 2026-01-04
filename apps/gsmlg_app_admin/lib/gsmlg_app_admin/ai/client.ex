@@ -108,9 +108,15 @@ defmodule GsmlgAppAdmin.AI.Client do
                   {:ok, chunk} ->
                     delta = get_in(chunk, ["choices", Access.at(0), "delta"]) || %{}
 
-                    # Handle both regular content and reasoning_content (for models like Zhipu GLM)
-                    content = delta["content"] || delta["reasoning_content"]
-                    if content, do: callback.(content)
+                    # Handle reasoning_content separately (for models like Zhipu GLM)
+                    if reasoning = delta["reasoning_content"] do
+                      callback.({:thinking, reasoning})
+                    end
+
+                    # Handle regular content
+                    if content = delta["content"] do
+                      callback.({:content, content})
+                    end
 
                   {:error, _} ->
                     :ok

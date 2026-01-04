@@ -32,6 +32,9 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
       |> assign(:input, "")
       |> assign(:streaming, false)
       |> assign(:streaming_content, "")
+      |> assign(:streaming_thinking, "")
+      |> assign(:streaming_start_time, nil)
+      |> assign(:streaming_token_count, 0)
       |> assign(:loading, false)
       |> assign(:editing_conversation, nil)
       |> assign(:edit_title, "")
@@ -281,7 +284,11 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
       |> assign(:loading, true)
       |> assign(:streaming, true)
       |> assign(:streaming_content, "")
+      |> assign(:streaming_thinking, "")
+      |> assign(:streaming_start_time, System.monotonic_time(:millisecond))
+      |> assign(:streaming_token_count, 0)
       |> update(:messages, fn messages -> messages ++ [user_message] end)
+      |> push_event("stream_start", %{})
 
     # Send to AI in background
     send(self(), {:request_ai_response, conversation.id})
@@ -328,18 +335,69 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   end
 
   @impl true
-  def handle_info({:stream_chunk, chunk}, socket) do
-    updated_content = socket.assigns.streaming_content <> chunk
+  def handle_info({:stream_chunk, {:thinking, chunk}}, socket) do
+    # Handle thinking/reasoning content separately
+    updated_thinking = socket.assigns.streaming_thinking <> chunk
+    # Estimate tokens: roughly 4 characters per token
+    chunk_tokens = max(1, div(String.length(chunk), 4))
+    new_token_count = socket.assigns.streaming_token_count + chunk_tokens
 
-    {:noreply, assign(socket, :streaming_content, updated_content)}
+    socket =
+      socket
+      |> assign(:streaming_thinking, updated_thinking)
+      |> assign(:streaming_token_count, new_token_count)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({:stream_chunk, {:content, chunk}}, socket) do
+    # Handle regular content
+    updated_content = socket.assigns.streaming_content <> chunk
+    # Estimate tokens: roughly 4 characters per token
+    chunk_tokens = max(1, div(String.length(chunk), 4))
+    new_token_count = socket.assigns.streaming_token_count + chunk_tokens
+
+    socket =
+      socket
+      |> assign(:streaming_content, updated_content)
+      |> assign(:streaming_token_count, new_token_count)
+      |> push_event("stream_chunk", %{content: updated_content})
+
+    {:noreply, socket}
   end
 
   @impl true
   def handle_info({:stream_complete, result}, socket) do
     conversation = socket.assigns.current_conversation
     content = socket.assigns.streaming_content
+    streaming_thinking = socket.assigns.streaming_thinking
     provider = socket.assigns.selected_provider
     selected_model = socket.assigns.selected_model
+    start_time = socket.assigns.streaming_start_time
+    token_count = socket.assigns.streaming_token_count
+
+    # Calculate response speed
+    end_time = System.monotonic_time(:millisecond)
+    duration_seconds = max(1, end_time - (start_time || end_time)) / 1000
+    tokens_per_second = Float.round(token_count / duration_seconds, 1)
+
+    # Use streaming_thinking if available (from API reasoning_content field)
+    # Otherwise, try to parse <think>...</think> tags from content
+    {thinking, answer} =
+      if streaming_thinking != "" do
+        {streaming_thinking, content}
+      else
+        parse_thinking_content(content)
+      end
+
+    # For full content storage, combine thinking + answer
+    full_content =
+      if thinking && thinking != "" do
+        "<think>#{thinking}</think>\n\n#{answer}"
+      else
+        content
+      end
 
     # Check for API errors first
     socket =
@@ -350,11 +408,16 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
           |> assign(:loading, false)
           |> assign(:streaming, false)
           |> assign(:streaming_content, "")
+          |> assign(:streaming_thinking, "")
+          |> assign(:streaming_start_time, nil)
+          |> assign(:streaming_token_count, 0)
           |> put_flash(:error, error_message)
 
         {:ok, _} ->
-          # Check if we have content
-          if String.trim(content) != "" do
+          # Check if we have content (either regular content or thinking)
+          has_content = String.trim(content) != "" || String.trim(streaming_thinking) != ""
+
+          if has_content do
             # Success with content - save the assistant message with model info
             model_name = selected_model || (provider && provider.model) || "Assistant"
             provider_name = if provider, do: provider.name, else: nil
@@ -362,10 +425,15 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
             assistant_message_params = %{
               conversation_id: conversation.id,
               role: :assistant,
-              content: content,
+              content: full_content,
               metadata: %{
                 model: model_name,
-                provider: provider_name
+                provider: provider_name,
+                thinking: thinking,
+                answer: answer,
+                tokens: token_count,
+                duration_seconds: Float.round(duration_seconds, 2),
+                tokens_per_second: tokens_per_second
               }
             }
 
@@ -373,7 +441,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
               {:ok, assistant_message} ->
                 # T029: Increment usage tracking after AI response
                 if provider do
-                  estimated_tokens = estimate_tokens(content, result)
+                  estimated_tokens = estimate_tokens(full_content, result)
                   AI.increment_provider_usage(provider, 2, estimated_tokens)
                 end
 
@@ -381,7 +449,11 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
                 |> assign(:loading, false)
                 |> assign(:streaming, false)
                 |> assign(:streaming_content, "")
+                |> assign(:streaming_thinking, "")
+                |> assign(:streaming_start_time, nil)
+                |> assign(:streaming_token_count, 0)
                 |> update(:messages, fn messages -> messages ++ [assistant_message] end)
+                |> push_event("stream_end", %{content: answer})
                 |> load_conversations()
 
               {:error, _error} ->
@@ -389,6 +461,9 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
                 |> assign(:loading, false)
                 |> assign(:streaming, false)
                 |> assign(:streaming_content, "")
+                |> assign(:streaming_thinking, "")
+                |> assign(:streaming_start_time, nil)
+                |> assign(:streaming_token_count, 0)
                 |> put_flash(:error, "Failed to save assistant response")
             end
           else
@@ -397,6 +472,9 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
             |> assign(:loading, false)
             |> assign(:streaming, false)
             |> assign(:streaming_content, "")
+            |> assign(:streaming_thinking, "")
+            |> assign(:streaming_start_time, nil)
+            |> assign(:streaming_token_count, 0)
             |> put_flash(:error, "No response received from AI provider")
           end
       end
@@ -447,16 +525,59 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
     }
   end
 
-  defp render_markdown(content) when is_binary(content) do
-    case Earmark.as_html(content, %Earmark.Options{code_class_prefix: "language-"}) do
-      {:ok, html, _} -> Phoenix.HTML.raw(html)
-      {:error, _, _} -> content
+  # Parse thinking content from AI response
+  # Supports <think>...</think> tags used by models like DeepSeek
+  defp parse_thinking_content(content) when is_binary(content) do
+    # Try to match <think>...</think> pattern (case insensitive)
+    case Regex.run(~r/<think>(.*?)<\/think>/is, content) do
+      [full_match, thinking] ->
+        # Remove the thinking block from content to get the answer
+        answer = String.replace(content, full_match, "") |> String.trim()
+        {String.trim(thinking), answer}
+
+      nil ->
+        # No thinking tags found, return empty thinking and full content as answer
+        {nil, content}
     end
   end
 
-  defp render_markdown(nil), do: ""
+  defp parse_thinking_content(nil), do: {nil, nil}
+
+  # Get thinking and answer from message metadata or parse from content
+  # Handles both atom keys (newly created) and string keys (loaded from DB)
+  defp get_message_thinking(message) do
+    metadata = message.metadata || %{}
+    thinking = metadata[:thinking] || metadata["thinking"]
+
+    if is_binary(thinking) and thinking != "", do: thinking, else: nil
+  end
+
+  defp get_message_answer(message) do
+    metadata = message.metadata || %{}
+    answer = metadata[:answer] || metadata["answer"]
+
+    if is_binary(answer) and answer != "", do: answer, else: message.content
+  end
+
+  # Get response stats from message metadata
+  # Handles both atom keys (newly created) and string keys (loaded from DB)
+  defp get_message_stats(message) do
+    metadata = message.metadata || %{}
+
+    # Try both atom and string keys for tokens_per_second
+    tps = metadata[:tokens_per_second] || metadata["tokens_per_second"]
+
+    if is_number(tps) do
+      tokens = metadata[:tokens] || metadata["tokens"] || 0
+      duration = metadata[:duration_seconds] || metadata["duration_seconds"] || 0
+      %{tokens_per_second: tps, tokens: tokens, duration: duration}
+    else
+      nil
+    end
+  end
 
   # Get the sender name for a message (user's name or model name)
+  # Handles both atom keys (newly created) and string keys (loaded from DB)
   defp get_message_sender(message) do
     case message.role do
       :user ->
@@ -464,15 +585,25 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
       :assistant ->
         # Try to get model name from metadata, fallback to "Assistant"
-        case message.metadata do
-          %{"model" => model} when is_binary(model) and model != "" -> model
-          _ -> "Assistant"
-        end
+        metadata = message.metadata || %{}
+        model = metadata[:model] || metadata["model"]
+
+        if is_binary(model) and model != "", do: model, else: "Assistant"
 
       :system ->
         "System"
     end
   end
+
+  # Calculate streaming speed (tokens per second)
+  defp get_streaming_speed(token_count, start_time) when is_integer(start_time) and token_count > 0 do
+    elapsed_ms = System.monotonic_time(:millisecond) - start_time
+    elapsed_seconds = max(elapsed_ms, 100) / 1000
+
+    Float.round(token_count / elapsed_seconds, 1)
+  end
+
+  defp get_streaming_speed(_token_count, _start_time), do: nil
 
   # Get the current model name for streaming display
   defp get_current_model_name(nil, _selected_model), do: "Assistant"
@@ -646,29 +777,83 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
                 "chat",
                 (message.role == :user && "chat-end") || "chat-start"
               ]}>
-                <div class="chat-header">
+                <div class="chat-header flex items-center gap-2">
                   {get_message_sender(message)}
                   <time class="text-xs opacity-50">
                     {Calendar.strftime(message.created_at, "%H:%M")}
                   </time>
+                  <%= if message.role == :assistant do %>
+                    <% stats = get_message_stats(message) %>
+                    <%= if stats do %>
+                      <span class="text-xs opacity-50">
+                        {stats.tokens}tokens({stats.tokens_per_second}t/s)
+                      </span>
+                    <% end %>
+                  <% end %>
+                  <!-- Copy button -->
+                  <button
+                    phx-hook="CopyContent"
+                    id={"copy-#{message.id}"}
+                    data-content={message.content}
+                    class="btn btn-ghost btn-xs opacity-50 hover:opacity-100"
+                    title="Copy to clipboard"
+                  >
+                    <.dm_mdi name="content-copy" class="w-4 h-4" />
+                  </button>
                 </div>
                 <div class={[
-                  "chat-bubble prose prose-sm max-w-none",
+                  "chat-bubble max-w-[80%] overflow-x-auto",
                   (message.role == :user && "chat-bubble-primary") || "chat-bubble-secondary"
                 ]}>
-                  {render_markdown(message.content)}
+                  <%= if message.role == :assistant do %>
+                    <% thinking = get_message_thinking(message) %>
+                    <%= if thinking do %>
+                      <!-- Thinking collapsible box using web component -->
+                      <thinking-box>
+                        <el-dm-markdown theme="auto">{thinking}</el-dm-markdown>
+                      </thinking-box>
+                      <!-- Answer content -->
+                      <el-dm-markdown theme="auto">{get_message_answer(message)}</el-dm-markdown>
+                    <% else %>
+                      <el-dm-markdown theme="auto">{message.content}</el-dm-markdown>
+                    <% end %>
+                  <% else %>
+                    <el-dm-markdown theme="auto">{message.content}</el-dm-markdown>
+                  <% end %>
                 </div>
               </div>
             <% end %>
 
             <%= if @streaming do %>
-              <div class="chat chat-start">
-                <div class="chat-header">
+              <div
+                class="chat chat-start"
+                id="streaming-message"
+                phx-hook="StreamingMarkdown"
+              >
+                <div class="chat-header flex items-center gap-2">
                   {get_current_model_name(@selected_provider, @selected_model)}
+                  <span class="text-xs opacity-50">
+                    <%= if @streaming_token_count > 0 do %>
+                      <% speed = get_streaming_speed(@streaming_token_count, @streaming_start_time) %>
+                      ~{@streaming_token_count}tokens<%= if speed do %>({speed}t/s)<% end %>
+                    <% end %>
+                  </span>
+                  <%!-- Show "Thinking..." only when thinking is active and content hasn't started --%>
+                  <%= if @streaming_thinking != "" and @streaming_content == "" do %>
+                    <span class="badge badge-ghost badge-sm">
+                      <.dm_mdi name="brain" class="w-3 h-3 mr-1" /> Thinking...
+                    </span>
+                  <% end %>
                 </div>
-                <div class="chat-bubble chat-bubble-secondary prose prose-sm max-w-none">
-                  {render_markdown(@streaming_content)}
-                  <span class="inline-block w-2 h-4 ml-1 bg-current animate-pulse"></span>
+                <div class="chat-bubble chat-bubble-secondary max-w-[80%] overflow-x-auto">
+                  <%= if @streaming_thinking != "" do %>
+                    <%!-- streaming attribute only when thinking is still active (content not started) --%>
+                    <thinking-box {if @streaming_content == "", do: [streaming: true], else: []}>
+                      <el-dm-markdown theme="auto" {if @streaming_content == "", do: [streaming: true], else: []}>{@streaming_thinking}</el-dm-markdown>
+                    </thinking-box>
+                  <% end %>
+                  <!-- Answer content -->
+                  <el-dm-markdown theme="auto" streaming>{@streaming_content}</el-dm-markdown>
                 </div>
               </div>
             <% end %>
@@ -683,7 +868,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
                   name="message"
                   phx-change="update_input"
                   phx-hook="AutoResizeTextarea"
-                  placeholder="Type your message... (Enter to send, Shift+Enter for new line)"
+                  placeholder="Type your message... (Cmd+Enter or Ctrl+Enter to send)"
                   class="textarea textarea-bordered flex-1 min-h-[2.5rem] max-h-[12rem] resize-none overflow-y-auto"
                   disabled={@loading}
                   rows="1"

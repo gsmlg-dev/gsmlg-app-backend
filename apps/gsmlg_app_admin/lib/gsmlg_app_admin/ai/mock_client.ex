@@ -33,10 +33,11 @@ defmodule GsmlgAppAdmin.AI.MockClient do
     # Stream the response character by character with realistic delays
     # Note: We do this synchronously so the Task calling this function
     # knows when streaming is complete and can send {:stream_complete, result}
+    # Uses {:content, char} tuple format to match real client
     response
     |> String.graphemes()
     |> Enum.each(fn char ->
-      callback.(char)
+      callback.({:content, char})
       # Random delay between 20-50ms to simulate real streaming
       Process.sleep(Enum.random(20..50))
     end)
