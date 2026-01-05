@@ -167,6 +167,30 @@ mix release gsmlg_app_admin
 mix release gsmlg_app
 ```
 
+### Release Database Commands
+
+In production releases, Mix is not available. Use these commands for database operations:
+
+```bash
+# Run migrations
+bin/gsmlg_app_backend eval "GsmlgAppAdmin.Release.migrate"
+
+# Create database
+bin/gsmlg_app_backend eval "GsmlgAppAdmin.Release.create"
+
+# Run seeds
+bin/gsmlg_app_backend eval "GsmlgAppAdmin.Release.seed"
+
+# Full setup (create + migrate + seed)
+bin/gsmlg_app_backend eval "GsmlgAppAdmin.Release.setup"
+
+# Check migration status
+bin/gsmlg_app_backend eval "GsmlgAppAdmin.Release.migration_status"
+
+# Rollback to specific version
+bin/gsmlg_app_backend eval "GsmlgAppAdmin.Release.rollback(GsmlgAppAdmin.Repo, 20240101000000)"
+```
+
 ## Project Structure
 
 ```
