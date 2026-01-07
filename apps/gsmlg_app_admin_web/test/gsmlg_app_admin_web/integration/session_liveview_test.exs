@@ -51,18 +51,15 @@ defmodule GsmlgAppAdminWeb.Integration.SessionLiveViewTest do
       assert html =~ "User Management" or html =~ "Users"
     end
 
-    test "unauthenticated user accessing LiveView gets session handled gracefully", %{conn: conn} do
+    test "unauthenticated user accessing LiveView gets redirected to sign-in", %{conn: conn} do
       # Access LiveView without signing in
       conn = init_test_session(conn, %{})
 
-      # The LiveView should load but current_user should be nil
-      # (since we use :live_user_optional, not :live_user_required)
-      {:ok, _view, html} =
-        conn
-        |> live("/users")
+      # Should redirect to sign-in with return_to parameter
+      {:error, {:redirect, %{to: redirect_url}}} = live(conn, "/users")
 
-      # Page should still load (just without user-specific content)
-      assert html =~ "User"
+      assert redirect_url =~ "/sign-in"
+      assert redirect_url =~ "return_to"
     end
 
     test "session user is available in LiveView socket assigns", %{conn: conn, user: user} do

@@ -22,7 +22,8 @@ defmodule GsmlgAppAdminWeb.LiveUserAuth do
     if current_user do
       {:cont, assign(socket, :current_user, current_user)}
     else
-      {:halt, Phoenix.LiveView.redirect(socket, to: ~p"/sign-in")}
+      redirect_url = build_sign_in_url(socket)
+      {:halt, Phoenix.LiveView.redirect(socket, to: redirect_url)}
     end
   end
 
@@ -33,6 +34,24 @@ defmodule GsmlgAppAdminWeb.LiveUserAuth do
       {:halt, Phoenix.LiveView.redirect(socket, to: ~p"/")}
     else
       {:cont, assign(socket, :current_user, nil)}
+    end
+  end
+
+  defp build_sign_in_url(socket) do
+    case get_current_path(socket) do
+      nil -> ~p"/sign-in"
+      "/" -> ~p"/sign-in"
+      path -> ~p"/sign-in?return_to=#{URI.encode_www_form(path)}"
+    end
+  end
+
+  defp get_current_path(socket) do
+    case Phoenix.LiveView.get_connect_info(socket, :uri) do
+      %URI{path: path, query: query} when is_binary(path) ->
+        if query, do: "#{path}?#{query}", else: path
+
+      _ ->
+        nil
     end
   end
 

@@ -52,7 +52,7 @@ defmodule GsmlgAppAdminWeb.Integration.SessionSignOutTest do
       assert session_user_after == nil
     end
 
-    test "accessing protected page after sign-out has no user session", %{conn: conn, user: user} do
+    test "accessing protected page after sign-out redirects to sign-in", %{conn: conn, user: user} do
       # Sign in
       conn =
         conn
@@ -73,10 +73,11 @@ defmodule GsmlgAppAdminWeb.Integration.SessionSignOutTest do
       # Access home page after sign-out
       conn2 = get(recycle(conn), "/")
 
-      # Page should load (home is accessible without auth)
-      assert conn2.status == 200
+      # Should redirect to sign-in (protected page requires auth)
+      assert conn2.status == 302
+      assert redirected_to(conn2) =~ "/sign-in"
 
-      # But user session should be cleared
+      # User session should be cleared
       assert get_session(conn2, "user") == nil
     end
 

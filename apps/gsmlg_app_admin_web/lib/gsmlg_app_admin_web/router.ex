@@ -11,6 +11,7 @@ defmodule GsmlgAppAdminWeb.Router do
     plug(:put_secure_browser_headers)
     plug(:load_from_session, otp_app: :gsmlg_app_admin)
     plug(GsmlgAppAdminWeb.Plugs.SessionUser)
+    plug(GsmlgAppAdminWeb.Plugs.StoreReturnTo)
   end
 
   pipeline :api do
@@ -18,6 +19,11 @@ defmodule GsmlgAppAdminWeb.Router do
     plug(:load_from_bearer, opt_app: :gsmlg_app_admin)
   end
 
+  pipeline :require_auth do
+    plug(GsmlgAppAdminWeb.Plugs.RequireAuth)
+  end
+
+  # Public authentication routes
   scope "/", GsmlgAppAdminWeb do
     pipe_through(:browser)
 
@@ -30,12 +36,15 @@ defmodule GsmlgAppAdminWeb.Router do
     )
 
     sign_out_route(AuthController)
-    # plug AshAuthentication.Plug, user: Accounts.User
     auth_routes_for(GsmlgAppAdmin.Accounts.User, to: AuthController)
+    reset_route(otp_app: :gsmlg_app_admin)
+  end
+
+  # Protected controller routes
+  scope "/", GsmlgAppAdminWeb do
+    pipe_through([:browser, :require_auth])
 
     get("/", PageController, :home)
-
-    reset_route(otp_app: :gsmlg_app_admin)
   end
 
   scope "/", GsmlgAppAdminWeb do
@@ -46,7 +55,7 @@ defmodule GsmlgAppAdminWeb.Router do
       on_mount: [
         {AshAuthentication.Phoenix.LiveSession, {:set_otp_app, :gsmlg_app_admin}},
         {AshAuthentication.Phoenix.LiveSession, :default},
-        {GsmlgAppAdminWeb.LiveUserAuth, :live_user_optional}
+        {GsmlgAppAdminWeb.LiveUserAuth, :live_user_required}
       ] do
       # User management routes
       live "/users", UserManagementLive.Index, :index

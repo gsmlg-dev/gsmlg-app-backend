@@ -596,7 +596,8 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   end
 
   # Calculate streaming speed (tokens per second)
-  defp get_streaming_speed(token_count, start_time) when is_integer(start_time) and token_count > 0 do
+  defp get_streaming_speed(token_count, start_time)
+       when is_integer(start_time) and token_count > 0 do
     elapsed_ms = System.monotonic_time(:millisecond) - start_time
     elapsed_seconds = max(elapsed_ms, 100) / 1000
 
@@ -834,8 +835,9 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
                   {get_current_model_name(@selected_provider, @selected_model)}
                   <span class="text-xs opacity-50">
                     <%= if @streaming_token_count > 0 do %>
-                      <% speed = get_streaming_speed(@streaming_token_count, @streaming_start_time) %>
-                      ~{@streaming_token_count}tokens<%= if speed do %>({speed}t/s)<% end %>
+                      <% speed = get_streaming_speed(@streaming_token_count, @streaming_start_time) %> ~{@streaming_token_count}tokens<%= if speed do %>
+                        ({speed}t/s)
+                      <% end %>
                     <% end %>
                   </span>
                   <%!-- Show "Thinking..." only when thinking is active and content hasn't started --%>
@@ -849,7 +851,12 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
                   <%= if @streaming_thinking != "" do %>
                     <%!-- streaming attribute only when thinking is still active (content not started) --%>
                     <thinking-box {if @streaming_content == "", do: [streaming: true], else: []}>
-                      <el-dm-markdown theme="auto" {if @streaming_content == "", do: [streaming: true], else: []}>{@streaming_thinking}</el-dm-markdown>
+                      <el-dm-markdown
+                        theme="auto"
+                        {if @streaming_content == "", do: [streaming: true], else: []}
+                      >
+                        {@streaming_thinking}
+                      </el-dm-markdown>
                     </thinking-box>
                   <% end %>
                   <!-- Answer content -->
