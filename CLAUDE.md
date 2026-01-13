@@ -149,6 +149,7 @@ This app uses phoenix_duskmoon for UI instead of CoreComponents. phoenix_duskmoo
 - PostgreSQL (via AshPostgres) (001-ai-provider-settings)
 - Elixir 1.18+ / Erlang/OTP 28 + Phoenix 1.8, Phoenix LiveView 1.1, AshAuthentication, Plug.Session (002-ets-session)
 - ETS (Erlang Term Storage) for sessions, PostgreSQL for user data (via AshPostgres) (002-ets-session)
+- PostgreSQL (via AshPostgres for admin), static Elixir term file (for app_web cache) (003-apps-management)
 
 ## Recent Changes
 - 001-ai-provider-settings: Added Elixir 1.18+ / Erlang/OTP 28 + Phoenix 1.8, Phoenix LiveView 1.1, Ash Framework 3.x, AshPostgres

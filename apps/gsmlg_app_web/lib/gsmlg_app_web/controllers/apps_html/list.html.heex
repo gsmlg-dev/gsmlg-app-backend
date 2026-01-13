@@ -29,13 +29,16 @@
 
   <div class="container mx-auto px-4 py-8">
     <!-- Stats Section -->
+    <% app_count = length(@apps) %>
+    <% ios_count = Enum.count(@apps, fn app -> "ios" in app.platforms end) %>
+    <% android_count = Enum.count(@apps, fn app -> "android" in app.platforms end) %>
     <div class="stats shadow-lg mb-8 w-full bg-base-100">
       <div class="stat place-items-center">
         <div class="stat-figure text-primary">
           <.dm_mdi name="apps" class="w-8 h-8" />
         </div>
         <div class="stat-title">{dgettext("common", "Total Apps")}</div>
-        <div class="stat-value text-primary">5</div>
+        <div class="stat-value text-primary">{app_count}</div>
         <div class="stat-desc text-base-content/60">
           {dgettext("common", "Across all platforms")}
         </div>
@@ -46,7 +49,7 @@
           <.dm_mdi name="apple" class="w-8 h-8" />
         </div>
         <div class="stat-title">{dgettext("common", "iOS Apps")}</div>
-        <div class="stat-value text-secondary">3</div>
+        <div class="stat-value text-secondary">{ios_count}</div>
         <div class="stat-desc text-base-content/60">
           {dgettext("user", "Available on App Store")}
         </div>
@@ -57,7 +60,7 @@
           <.dm_mdi name="android" class="w-8 h-8" />
         </div>
         <div class="stat-title">{dgettext("common", "Android Apps")}</div>
-        <div class="stat-value text-accent">5</div>
+        <div class="stat-value text-accent">{android_count}</div>
         <div class="stat-desc text-base-content/60">
           {dgettext("user", "Available on Play Store")}
         </div>
@@ -80,122 +83,18 @@
     
 <!-- Apps Grid -->
     <div class="space-y-6">
-      <.enhanced_app_section
-        name={dgettext("common", "GeoIP Lookup")}
-        app_label="geoip_lookup"
-        icon_path="/images/icons/geoip_lookup.png"
-        platforms={["ios", "android"]}
-        category="network"
-      >
-        <:description>
-          {dgettext("user", "Find geography location of IP Address with precision and accuracy.")}
-        </:description>
-        <:description>
-          {dgettext(
-            "user",
-            "See data source location of web requests and analyze network traffic patterns."
-          )}
-        </:description>
-        <:store_link link="https://apps.apple.com/cn/app/geoip-lookup/id1672850313">
-          <.appstore_icon class="w-6 h-6" />
-        </:store_link>
-        <:store_link link="https://play.google.com/store/apps/details?id=com.gsmlg.geoip_lookup">
-          <.playstore_icon class="w-6 h-6" />
-        </:store_link>
-      </.enhanced_app_section>
-
-      <.enhanced_app_section
-        name={dgettext("common", "Whois Lookup")}
-        app_label="whois_lookup"
-        icon_path="/images/icons/whois_lookup.png"
-        platforms={["ios", "android"]}
-        category="network"
-      >
-        <:description>
-          {dgettext("user", "Find registrant information of domain, IP or AS numbers instantly.")}
-        </:description>
-        <:description>
-          {dgettext(
-            "user",
-            "Get comprehensive information about your domain, IP or AS with detailed reports."
-          )}
-        </:description>
-        <:store_link link="https://apps.apple.com/cn/app/lookup-whois-info/id6446807576">
-          <.appstore_icon class="w-6 h-6" />
-        </:store_link>
-        <:store_link link="https://play.google.com/store/apps/details?id=com.gsmlg.whois_lookup">
-          <.playstore_icon class="w-6 h-6" />
-        </:store_link>
-      </.enhanced_app_section>
-
-      <.enhanced_app_section
-        name={dgettext("common", "Simple Mirror")}
-        app_label="simple_mirror"
-        icon_path="/images/icons/simple_mirror.png"
-        platforms={["android"]}
-        category="utility"
-      >
-        <:description>
-          {dgettext(
-            "user",
-            "Check your reflection anytime, anywhere with our premium mirror app!"
-          )}
-        </:description>
-        <:description>
-          {dgettext("user", "Easy to use, completely private, and absolutely free with no ads.")}
-        </:description>
-        <:store_link link="https://play.google.com/store/apps/details?id=com.gsmlg.mirror">
-          <.playstore_icon class="w-6 h-6" />
-        </:store_link>
-      </.enhanced_app_section>
-
-      <.enhanced_app_section
-        name={dgettext("common", "YellowDog DNS")}
-        app_label="yellowdog_dns"
-        icon_path="/images/icons/yellowdog_dns.png"
-        platforms={["android"]}
-        category="network"
-      >
-        <:description>
-          {dgettext("user", "Query custom DNS queries and all types of resource records!")}
-        </:description>
-        <:description>
-          {dgettext(
-            "user",
-            "Run comprehensive DNS benchmarks to determine the performance of DNS servers."
-          )}
-        </:description>
-        <:store_link link="https://play.google.com/store/apps/details?id=com.gsmlg.yellowdog">
-          <.playstore_icon class="w-6 h-6" />
-        </:store_link>
-      </.enhanced_app_section>
-
-      <.enhanced_app_section
-        name={dgettext("common", "Semaphore Client")}
-        app_label="semaphore_client"
-        icon_path="/images/icons/semaphore_client.png"
-        platforms={["android", "ios"]}
-        category="development"
-      >
-        <:description>
-          {dgettext("user", "Run Ansible tasks directly from your phone with full control.")}
-        </:description>
-        <:description>
-          {dgettext(
-            "user",
-            "Configure and monitor ansible tasks with real-time updates and notifications."
-          )}
-        </:description>
-        <:store_link link="https://play.google.com/store/apps/details?id=org.gsmlg.semaphore">
-          <.playstore_icon class="w-6 h-6" />
-        </:store_link>
-        <:store_link link="https://f-droid.org/en/packages/org.gsmlg.semaphore/">
-          <.fdroid_icon class="w-6 h-6" />
-        </:store_link>
-        <:store_link link="https://apps.apple.com/us/app/ansible-semaphore-client/id6458789575">
-          <.appstore_icon class="w-6 h-6" />
-        </:store_link>
-      </.enhanced_app_section>
+      <%= if Enum.empty?(@apps) do %>
+        <div class="card bg-base-200 p-8 text-center">
+          <div class="flex flex-col items-center gap-4">
+            <.dm_mdi name="apps" class="w-16 h-16 text-base-content/50" />
+            <p class="text-lg text-base-content/70">
+              {dgettext("user", "No apps available at the moment.")}
+            </p>
+          </div>
+        </div>
+      <% else %>
+        <.cached_app_card :for={app <- @apps} app={app} />
+      <% end %>
     </div>
   </div>
 </Layouts.app>

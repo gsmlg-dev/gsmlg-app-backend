@@ -1,0 +1,205 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Apps Management API",
+    "description": "Public API endpoint for fetching app listings. Used by app_web for cache synchronization.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4153",
+      "description": "Development server (admin_web)"
+    },
+    {
+      "url": "{ADMIN_API_URL}",
+      "description": "Production server (via environment variable)",
+      "variables": {
+        "ADMIN_API_URL": {
+          "default": "https://admin.example.com"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/api/apps": {
+      "get": {
+        "summary": "List all active apps",
+        "description": "Returns a list of all active (non-deleted) apps with their store links, ordered by display_order. This endpoint is public and does not require authentication.",
+        "operationId": "listApps",
+        "tags": ["Apps"],
+        "responses": {
+          "200": {
+            "description": "Successful response with list of apps",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppsResponse"
+                },
+                "example": {
+                  "data": [
+                    {
+                      "name": "GeoIP Lookup",
+                      "label": "geoip_lookup",
+                      "short_description": "Find geography location of IP Address with precision and accuracy.",
+                      "long_description": "See data source location of web requests and analyze network traffic patterns.",
+                      "icon_path": "/images/icons/geoip_lookup.png",
+                      "platforms": ["ios", "android"],
+                      "category": "network",
+                      "display_order": 1,
+                      "store_links": [
+                        {
+                          "store_type": "appstore",
+                          "url": "https://apps.apple.com/cn/app/geoip-lookup/id1672850313"
+                        },
+                        {
+                          "store_type": "playstore",
+                          "url": "https://play.google.com/store/apps/details?id=com.gsmlg.geoip_lookup"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AppsResponse": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/App"
+            }
+          }
+        }
+      },
+      "App": {
+        "type": "object",
+        "required": [
+          "name",
+          "label",
+          "short_description",
+          "icon_path",
+          "platforms",
+          "category",
+          "display_order",
+          "store_links"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Display name of the app",
+            "example": "GeoIP Lookup"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 50,
+            "pattern": "^[a-z0-9_]+$",
+            "description": "URL-friendly unique identifier",
+            "example": "geoip_lookup"
+          },
+          "short_description": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Brief tagline for the app",
+            "example": "Find geography location of IP Address with precision and accuracy."
+          },
+          "long_description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Detailed description of the app",
+            "example": "See data source location of web requests and analyze network traffic patterns."
+          },
+          "icon_path": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Path to the app icon image",
+            "example": "/images/icons/geoip_lookup.png"
+          },
+          "platforms": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["ios", "android", "macos", "windows", "linux"]
+            },
+            "minItems": 1,
+            "description": "List of supported platforms",
+            "example": ["ios", "android"]
+          },
+          "category": {
+            "type": "string",
+            "enum": ["network", "utility", "development"],
+            "description": "App category",
+            "example": "network"
+          },
+          "display_order": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Position for manual sorting (lower = first)",
+            "example": 1
+          },
+          "store_links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StoreLink"
+            },
+            "description": "List of app store links"
+          }
+        }
+      },
+      "StoreLink": {
+        "type": "object",
+        "required": ["store_type", "url"],
+        "properties": {
+          "store_type": {
+            "type": "string",
+            "enum": ["appstore", "playstore", "fdroid", "other"],
+            "description": "Type of app store",
+            "example": "appstore"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to the app store page",
+            "example": "https://apps.apple.com/cn/app/geoip-lookup/id1672850313"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["message"],
+            "properties": {
+              "message": {
+                "type": "string",
+                "description": "Error message",
+                "example": "Internal server error"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
