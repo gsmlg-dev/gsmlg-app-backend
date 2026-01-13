@@ -23,6 +23,13 @@ defmodule GsmlgAppAdminWeb.Router do
     plug(GsmlgAppAdminWeb.Plugs.RequireAuth)
   end
 
+  # Public API routes (no authentication required)
+  scope "/api", GsmlgAppAdminWeb.Api do
+    pipe_through(:api)
+
+    get "/apps", AppsController, :index
+  end
+
   # Public authentication routes
   scope "/", GsmlgAppAdminWeb do
     pipe_through(:browser)
@@ -61,6 +68,11 @@ defmodule GsmlgAppAdminWeb.Router do
       live "/users", UserManagementLive.Index, :index
       live "/users/new", UserManagementLive.Index, :new
       live "/users/:id/edit", UserManagementLive.Index, :edit
+
+      # Apps management routes
+      live "/apps", AppsManagementLive.Index, :index
+      live "/apps/new", AppsManagementLive.Index, :new
+      live "/apps/:id/edit", AppsManagementLive.Index, :edit
 
       # Provider Settings routes (must be before /chat/:id to avoid matching "settings" as an ID)
       live "/chat/settings", ProviderSettingsLive.Index, :index

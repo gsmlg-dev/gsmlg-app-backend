@@ -296,6 +296,139 @@ defmodule GsmlgAppWeb.AppComponents do
   end
 
   @doc """
+  App card component that renders from cached data (maps instead of slots).
+
+  This is designed to work with data loaded from GsmlgAppWeb.AppsCache.
+  """
+  attr(:app, :map, required: true, doc: "App map from cache")
+  attr(:class, :string, default: nil)
+  attr(:id, :string, default: nil)
+
+  def cached_app_card(assigns) do
+    assigns = assign_new(assigns, :id, fn -> "app-#{assigns.app.label}" end)
+
+    ~H"""
+    <.dm_card
+      id={@id}
+      class={[
+        "bg-base-100 shadow-2xl hover:shadow-3xl transition-all duration-300",
+        "border border-base-300 hover:border-primary",
+        "group cursor-pointer card-hover-lift",
+        @class
+      ]}
+    >
+      <:title class="flex items-center gap-4">
+        <div class="avatar">
+          <div class="w-16 h-16 rounded-2xl ring-4 ring-primary ring-offset-2 group-hover:scale-110 transition-transform duration-300">
+            <img src={@app.icon_path} alt={@app.name} />
+          </div>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-primary">{@app.name}</h2>
+          <div class="flex gap-2 mt-1">
+            <div class="badge badge-xs bg-accent text-accent-content capitalize">
+              {@app.category}
+            </div>
+            <.platform_chips platforms={@app.platforms} />
+          </div>
+        </div>
+      </:title>
+
+      <:action>
+        <div class="dropdown dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-circle btn-ghost btn-sm">
+            <.dm_mdi name="dots-vertical" class="w-4 h-4" />
+          </div>
+          <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+            <li>
+              <.link navigate={~p"/apps-support/app/#{@app.label}"}>
+                <.dm_mdi name="headset" class="w-4 h-4" /> {dgettext("navigation", "Support")}
+              </.link>
+            </li>
+            <li>
+              <.link navigate={~p"/apps-privacy/app/#{@app.label}"}>
+                <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> {dgettext(
+                  "navigation",
+                  "Privacy"
+                )}
+              </.link>
+            </li>
+          </ul>
+        </div>
+      </:action>
+
+      <div class="card-body">
+        <div class="space-y-3">
+          <p class="text-base-content/80 leading-relaxed">{@app.short_description}</p>
+          <%= if @app.long_description do %>
+            <p class="text-base-content/80 leading-relaxed">{@app.long_description}</p>
+          <% end %>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="card-actions justify-between items-center">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-semibold text-base-content/60">
+              {dgettext("user", "Available on:")}:
+            </span>
+            <div class="flex gap-2">
+              <.link
+                :for={store <- @app.store_links}
+                class="btn btn-circle btn-ghost btn-sm hover:scale-110 transition-transform duration-200"
+                target="_blank"
+                href={store.url}
+              >
+                <.store_icon type={store.store_type} />
+              </.link>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <.link
+              class="btn btn-outline btn-sm hover:bg-primary hover:text-primary-content"
+              navigate={~p"/apps-support/app/#{@app.label}"}
+            >
+              <.dm_mdi name="headset" class="w-4 h-4" /> {dgettext("navigation", "Support")}
+            </.link>
+            <.link
+              class="btn btn-outline btn-sm hover:bg-secondary hover:text-secondary-content"
+              navigate={~p"/apps-privacy/app/#{@app.label}"}
+            >
+              <.dm_mdi name="shield-lock-outline" class="w-4 h-4" /> {dgettext(
+                "navigation",
+                "Privacy"
+              )}
+            </.link>
+          </div>
+        </div>
+      </div>
+    </.dm_card>
+    """
+  end
+
+  @doc """
+  Store icon component based on store type.
+  """
+  attr(:type, :string, required: true)
+  attr(:class, :string, default: "w-6 h-6")
+
+  def store_icon(assigns) do
+    ~H"""
+    <%= case @type do %>
+      <% "appstore" -> %>
+        <.appstore_icon class={@class} />
+      <% "playstore" -> %>
+        <.playstore_icon class={@class} />
+      <% "fdroid" -> %>
+        <.fdroid_icon class={@class} />
+      <% _ -> %>
+        <.dm_mdi name="link" class={@class} />
+    <% end %>
+    """
+  end
+
+  @doc """
   Platform badge component for header
   """
   attr(:name, :string, required: true)
