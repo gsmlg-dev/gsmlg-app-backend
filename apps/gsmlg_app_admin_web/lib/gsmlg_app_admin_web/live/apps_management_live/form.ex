@@ -405,7 +405,9 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Form do
         end)
 
         # Create new links
-        Enum.with_index(store_links, fn link, index ->
+        store_links
+        |> Enum.with_index()
+        |> Enum.each(fn {link, index} ->
           if link.url && link.url != "" do
             Apps.create_store_link(%{
               app_id: app.id,
@@ -467,7 +469,7 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Form do
   end
 
   defp format_errors(errors) do
-    Enum.map(errors, fn {msg, _} -> msg end) |> Enum.join(", ")
+    Enum.map_join(errors, ", ", fn {msg, _} -> msg end)
   end
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
