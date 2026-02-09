@@ -140,7 +140,7 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Index do
             />
             <span class="label-text text-sm">Show deleted</span>
           </label>
-          <.link navigate={~p"/apps/new"} class="btn btn-primary">
+          <.link patch={~p"/apps/new"} class="btn btn-primary">
             <.dm_mdi name="plus" class="w-4 h-4 mr-2" /> Add App
           </.link>
         </div>
@@ -159,7 +159,7 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Index do
                 <% end %>
               </p>
               <%= unless @show_deleted do %>
-                <.link navigate={~p"/apps/new"} class="btn btn-primary">
+                <.link patch={~p"/apps/new"} class="btn btn-primary">
                   Add Your First App
                 </.link>
               <% end %>
@@ -225,7 +225,7 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Index do
                         onchange="this.dispatchEvent(new Event('blur', {bubbles: true})); this.setAttribute('phx-value-order', this.value)"
                       />
                     </div>
-                    <.link navigate={~p"/apps/#{app.id}/edit"} class="btn btn-ghost btn-sm">
+                    <.link patch={~p"/apps/#{app.id}/edit"} class="btn btn-ghost btn-sm">
                       <.dm_mdi name="pencil" class="w-4 h-4" />
                     </.link>
                     <%= if app.is_active do %>
