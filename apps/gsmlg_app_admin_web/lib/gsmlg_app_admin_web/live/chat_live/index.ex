@@ -369,6 +369,43 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
   @impl true
   def handle_info({:stream_complete, result}, socket) do
+    socket = handle_stream_complete_result(socket, result)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({ref, _result}, socket) when is_reference(ref) do
+    # Ignore async task completion messages
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({:DOWN, _ref, :process, _pid, _reason}, socket) do
+    # Ignore task down messages
+    {:noreply, socket}
+  end
+
+  defp handle_stream_complete_result(socket, {:error, error_message}) do
+    socket
+    |> reset_streaming_state()
+    |> put_flash(:error, error_message)
+  end
+
+  defp handle_stream_complete_result(socket, {:ok, _}) do
+    content = socket.assigns.streaming_content
+    streaming_thinking = socket.assigns.streaming_thinking
+    has_content = String.trim(content) != "" || String.trim(streaming_thinking) != ""
+
+    if has_content do
+      save_assistant_response(socket)
+    else
+      socket
+      |> reset_streaming_state()
+      |> put_flash(:error, "No response received from AI provider")
+    end
+  end
+
+  defp save_assistant_response(socket) do
     conversation = socket.assigns.current_conversation
     content = socket.assigns.streaming_content
     streaming_thinking = socket.assigns.streaming_thinking
@@ -399,99 +436,47 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
         content
       end
 
-    # Check for API errors first
-    socket =
-      case result do
-        {:error, error_message} ->
-          # API returned an error
-          socket
-          |> assign(:loading, false)
-          |> assign(:streaming, false)
-          |> assign(:streaming_content, "")
-          |> assign(:streaming_thinking, "")
-          |> assign(:streaming_start_time, nil)
-          |> assign(:streaming_token_count, 0)
-          |> put_flash(:error, error_message)
+    # Build assistant message params
+    model_name = selected_model || (provider && provider.model) || "Assistant"
+    provider_name = if provider, do: provider.name, else: nil
 
-        {:ok, _} ->
-          # Check if we have content (either regular content or thinking)
-          has_content = String.trim(content) != "" || String.trim(streaming_thinking) != ""
+    assistant_message_params = %{
+      conversation_id: conversation.id,
+      role: :assistant,
+      content: full_content,
+      metadata: %{
+        model: model_name,
+        provider: provider_name,
+        thinking: thinking,
+        answer: answer,
+        tokens: token_count,
+        duration_seconds: Float.round(duration_seconds, 2),
+        tokens_per_second: tokens_per_second
+      }
+    }
 
-          if has_content do
-            # Success with content - save the assistant message with model info
-            model_name = selected_model || (provider && provider.model) || "Assistant"
-            provider_name = if provider, do: provider.name, else: nil
+    case AI.add_message(conversation.id, assistant_message_params) do
+      {:ok, assistant_message} ->
+        track_provider_usage(provider, full_content, {:ok, nil})
 
-            assistant_message_params = %{
-              conversation_id: conversation.id,
-              role: :assistant,
-              content: full_content,
-              metadata: %{
-                model: model_name,
-                provider: provider_name,
-                thinking: thinking,
-                answer: answer,
-                tokens: token_count,
-                duration_seconds: Float.round(duration_seconds, 2),
-                tokens_per_second: tokens_per_second
-              }
-            }
+        socket
+        |> reset_streaming_state()
+        |> update(:messages, fn messages -> messages ++ [assistant_message] end)
+        |> push_event("stream_end", %{content: answer})
+        |> load_conversations()
 
-            case AI.add_message(conversation.id, assistant_message_params) do
-              {:ok, assistant_message} ->
-                # T029: Increment usage tracking after AI response
-                if provider do
-                  estimated_tokens = estimate_tokens(full_content, result)
-                  AI.increment_provider_usage(provider, 2, estimated_tokens)
-                end
-
-                socket
-                |> assign(:loading, false)
-                |> assign(:streaming, false)
-                |> assign(:streaming_content, "")
-                |> assign(:streaming_thinking, "")
-                |> assign(:streaming_start_time, nil)
-                |> assign(:streaming_token_count, 0)
-                |> update(:messages, fn messages -> messages ++ [assistant_message] end)
-                |> push_event("stream_end", %{content: answer})
-                |> load_conversations()
-
-              {:error, _error} ->
-                socket
-                |> assign(:loading, false)
-                |> assign(:streaming, false)
-                |> assign(:streaming_content, "")
-                |> assign(:streaming_thinking, "")
-                |> assign(:streaming_start_time, nil)
-                |> assign(:streaming_token_count, 0)
-                |> put_flash(:error, "Failed to save assistant response")
-            end
-          else
-            # No content received from AI - show error
-            socket
-            |> assign(:loading, false)
-            |> assign(:streaming, false)
-            |> assign(:streaming_content, "")
-            |> assign(:streaming_thinking, "")
-            |> assign(:streaming_start_time, nil)
-            |> assign(:streaming_token_count, 0)
-            |> put_flash(:error, "No response received from AI provider")
-          end
-      end
-
-    {:noreply, socket}
+      {:error, _error} ->
+        socket
+        |> reset_streaming_state()
+        |> put_flash(:error, "Failed to save assistant response")
+    end
   end
 
-  @impl true
-  def handle_info({ref, _result}, socket) when is_reference(ref) do
-    # Ignore async task completion messages
-    {:noreply, socket}
-  end
+  defp track_provider_usage(nil, _content, _result), do: :ok
 
-  @impl true
-  def handle_info({:DOWN, _ref, :process, _pid, _reason}, socket) do
-    # Ignore task down messages
-    {:noreply, socket}
+  defp track_provider_usage(provider, content, result) do
+    estimated_tokens = estimate_tokens(content, result)
+    AI.increment_provider_usage(provider, 2, estimated_tokens)
   end
 
   # T029: Estimate token count from response
@@ -616,6 +601,17 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
   defp get_current_model_name(provider, _selected_model) do
     provider.model || "Assistant"
+  end
+
+  # Reset streaming-related socket assigns to their default values
+  defp reset_streaming_state(socket) do
+    socket
+    |> assign(:loading, false)
+    |> assign(:streaming, false)
+    |> assign(:streaming_content, "")
+    |> assign(:streaming_thinking, "")
+    |> assign(:streaming_start_time, nil)
+    |> assign(:streaming_token_count, 0)
   end
 
   # Get all models for a provider (only from available_models, no duplicates)
