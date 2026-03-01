@@ -1,2 +1,2 @@
-import "phoenix_html";
+import "../../../../deps/phoenix_html/priv/static/phoenix_html.js";
 
