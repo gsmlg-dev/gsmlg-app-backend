@@ -30,7 +30,7 @@ mix lint                     # Credo + Dialyzer across all apps
 - Elixir 1.18+ / Erlang/OTP 28 + Phoenix 1.8 + LiveView 1.1
 - Ash Framework 3.x with AshPostgres + AshAuthentication
 - PostgreSQL (UUID primary keys), Bandit HTTP server
-- Tailwind CSS 4.1.11 + Bun 1.2.5 for frontend
+- Tailwind CSS 4.1.11 + @duskmoon-dev/core (CSS framework) + Bun 1.2.5 for frontend
 - ETS for sessions, PostgreSQL for persistent data
 
 ## Ash Framework Domains
@@ -70,14 +70,32 @@ Router:  live "/things",         ThingLive.Index, :index
 - **Modal display**: `<.dm_modal :if={@live_action in [:new, :edit]}>`
 - **CRITICAL**: Links to modal routes MUST use `patch=` not `navigate=`. `navigate` remounts the LiveView and breaks the modal pattern.
 
-## UI Framework: phoenix_duskmoon
+## UI Framework
 
-Uses `phoenix_duskmoon` instead of CoreComponents. It's a daisyui fork adding tertiary color support.
+This project uses two companion libraries for its UI layer:
 
-- Components prefixed with `.dm_` (e.g., `.dm_modal`, `.dm_mdi`)
-- Icons: `.dm_mdi name="icon-name"` (Material Design Icons)
-- CSS classes: daisyui conventions (`btn-primary`, `badge-success`, `card`, `chat-bubble-secondary`)
+- **`@duskmoon-dev/core`** — CSS framework, a Tailwind CSS v4 plugin providing Material Design 3 components (btn, card, badge, modal, tabs, dropdown, menu, navbar, drawer, etc.) with OKLCH color system and built-in themes (sunshine, moonlight). Repo: https://github.com/duskmoon-dev/duskmoonui
+- **`phoenix_duskmoon`** — Elixir/Phoenix component library providing LiveView function components (`.dm_modal`, `.dm_mdi`, `.dm_bsi`, etc.) and custom web elements (`<el-dm-markdown>`, `<thinking-box>`). Repo: https://github.com/duskmoon-dev/phoenix-duskmoon-ui
+
+**CSS setup** (in each app's `assets/css/app.css`):
+```css
+@plugin "@duskmoon-dev/core/plugin";       /* Registers color tokens as Tailwind utilities */
+@import "@duskmoon-dev/core/themes/sunshine"; /* Light theme */
+@import "@duskmoon-dev/core/themes/moonlight"; /* Dark theme */
+@import "@duskmoon-dev/core/components";      /* All component styles */
+```
+
+**Component conventions:**
+- Phoenix components prefixed with `.dm_` (e.g., `.dm_modal`, `.dm_mdi`)
+- Icons: `.dm_mdi name="icon-name"` (Material Design Icons), `.dm_bsi name="icon-name"` (Bootstrap Icons)
+- CSS classes follow daisyui-like conventions (`btn-primary`, `badge-success`, `card`, `tabs-boxed`)
 - Custom web components: `<el-dm-markdown>` (markdown rendering), `<thinking-box>` (collapsible reasoning)
+
+**IMPORTANT — Upstream issue policy:** When encountering bugs or missing features in `@duskmoon-dev/core` or `phoenix_duskmoon`, file an issue on the corresponding GitHub repository with the label `internal request`:
+- CSS/theme issues → https://github.com/duskmoon-dev/duskmoonui/issues
+- Elixir component issues → https://github.com/duskmoon-dev/phoenix-duskmoon-ui/issues
+
+Do NOT silently work around library bugs with local hacks. File the issue first, then add a temporary workaround in `app.css` with a comment referencing the issue URL.
 
 ## Apps Management: Dual-Layer Cache
 
@@ -97,7 +115,12 @@ Admin CRUD → Public API → Public Web binary cache:
 
 ## Development Environment (Nix)
 
-`devenv.nix` provides PostgreSQL 14 on **port 5433** (not default 5432). Databases `gsmlg_app_admin_dev` and `gsmlg_app_admin_test` pre-created. User: `gsmlg_app`/`gsmlg_app`.
+`devenv.nix` provides PostgreSQL 14 via **Unix socket** (no TCP, avoids port conflicts). Databases `gsmlg_app_admin_dev` and `gsmlg_app_admin_test` pre-created. User: `gsmlg_app`/`gsmlg_app`.
+
+devenv exports these env vars (used by all Mix environments):
+- `DATABASE_URL` — dev database connection URL
+- `DATABASE_URL_TEST` — test database connection URL
+- `PGHOST` — Unix socket directory (Postgrex `socket_dir`)
 
 ## Docker Multi-Stage Builds
 

@@ -38,12 +38,11 @@ config :gsmlg_app_web, dev_routes: true
 ### Admin Part
 
 # Configure your database
+# DATABASE_URL and PGHOST are exported by devenv (see devenv.nix)
+# PGHOST points to the Unix socket directory — Postgrex uses it via socket_dir
 config :gsmlg_app_admin, GsmlgAppAdmin.Repo,
-  username: System.get_env("DB_USERNAME") || "gsmlg_app",
-  password: System.get_env("DB_PASSWORD") || "gsmlg_app",
-  hostname: System.get_env("DB_HOST") || "localhost",
-  port: String.to_integer(System.get_env("DB_PORT") || "5433"),
-  database: System.get_env("DB_NAME") || "gsmlg_app_admin_dev",
+  url: System.get_env("DATABASE_URL", "ecto://gsmlg_app:gsmlg_app@localhost/gsmlg_app_admin_dev"),
+  socket_dir: System.get_env("PGHOST"),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
