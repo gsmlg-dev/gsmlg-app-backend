@@ -26,7 +26,7 @@ defmodule GsmlgAppWeb.Layouts do
         @extra_header_class
       ]}
       nav_class={[
-        "bg-black text-slate-400"
+        "bg-black text-slate-400 z-50"
       ]}
     >
       <:menu class={GsmlgAppWeb.AppComponents.menu_class("home", @current_page)} to="/">
