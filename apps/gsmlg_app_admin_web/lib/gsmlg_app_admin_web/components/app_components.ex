@@ -42,7 +42,7 @@ defmodule GsmlgAppAdminWeb.AppComponents do
           <.dm_mdi name="facebook" class="w-8 h-8 text-slate-600" />
         </div>
         <p class="my-4 text-md">
-          Copyright © 2023 G.S.M.L.G. All rights reserved.
+          Copyright © 2025 G.S.M.L.G. All rights reserved.
         </p>
       </:copyright>
     </.dm_page_footer>

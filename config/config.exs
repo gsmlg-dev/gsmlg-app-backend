@@ -24,19 +24,19 @@ config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
   live_view: [signing_salt: "eNwXe6VH"]
 
 # Configure bun (the version is required)
+# Use system bun from Nix when available (avoids glibc issues with downloaded binary)
 config :bun,
   version: "1.2.13",
+  path: System.find_executable("bun"),
   gsmlg_app_web: [
     args:
-      ~w(assets/js/app.js --bundle --format=esm --target=es2022 --outdir=priv/static/assets --loader:.js=jsx --external:/fonts/* --external:/images/*),
-    cd: Path.expand("../apps/gsmlg_app_web", __DIR__),
-    env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
+      ~w(build assets/js/app.js --bundle --format=esm --target=browser --outdir=priv/static/assets --loader:.js=jsx --external:/fonts/* --external:/images/*),
+    cd: Path.expand("../apps/gsmlg_app_web", __DIR__)
   ],
   gsmlg_app_admin_web: [
     args:
-      ~w(assets/js/app.js --bundle --format=esm --target=es2022 --outdir=priv/static/assets --external:/fonts/* --external:/images/*),
-    cd: Path.expand("../apps/gsmlg_app_admin_web", __DIR__),
-    env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
+      ~w(build assets/js/app.js --bundle --format=esm --target=browser --outdir=priv/static/assets --external:/fonts/* --external:/images/*),
+    cd: Path.expand("../apps/gsmlg_app_admin_web", __DIR__)
   ]
 
 # Configure tailwind (the version is required)

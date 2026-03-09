@@ -8,16 +8,15 @@ config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
   server: false
 
 # Configure your database
-#
-# The MIX_TEST_PARTITION environment variable can be used
-# to provide built-in test partitioning in CI environment.
-# Run `mix help test` for more information.
+# DATABASE_URL_TEST and PGHOST are exported by devenv (see devenv.nix)
+# MIX_TEST_PARTITION is appended for CI test partitioning
 config :gsmlg_app_admin, GsmlgAppAdmin.Repo,
-  username: System.get_env("POSTGRES_USER", "gsmlg_app"),
-  password: System.get_env("POSTGRES_PASSWORD", "gsmlg_app"),
-  hostname: System.get_env("POSTGRES_HOST", "localhost"),
-  port: String.to_integer(System.get_env("POSTGRES_PORT") || System.get_env("DB_PORT") || "5433"),
-  database: "gsmlg_app_admin_test#{System.get_env("MIX_TEST_PARTITION")}",
+  url:
+    System.get_env(
+      "DATABASE_URL_TEST",
+      "ecto://gsmlg_app:gsmlg_app@localhost/gsmlg_app_admin_test#{System.get_env("MIX_TEST_PARTITION")}"
+    ),
+  socket_dir: System.get_env("PGHOST"),
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10,
   queue_target: 5000,

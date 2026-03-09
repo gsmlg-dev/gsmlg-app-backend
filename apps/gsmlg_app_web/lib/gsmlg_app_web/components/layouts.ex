@@ -5,7 +5,8 @@ defmodule GsmlgAppWeb.Layouts do
   embed_templates "layouts/*"
 
   @doc """
-  Base layout component that provides common structure for all layouts
+  Base layout component that provides common structure for all layouts.
+  Uses dm_page_header for scroll-based navigation with hero content support.
   """
   slot :header_slot
   slot :inner_block, required: true
@@ -25,56 +26,48 @@ defmodule GsmlgAppWeb.Layouts do
         @header_class,
         @extra_header_class
       ]}
-      nav_class={[
-        "bg-black text-slate-400"
-      ]}
+      nav_class="bg-black text-slate-400 z-50"
     >
-      <:menu class={GsmlgAppWeb.AppComponents.menu_class("home", @current_page)} to="/">
+      <:menu class={menu_active_class("home", @current_page)} to="/">
         {dgettext("navigation", "Home")}
       </:menu>
-      <:menu class={GsmlgAppWeb.AppComponents.menu_class("apps", @current_page)} to="/apps">
+      <:menu class={menu_active_class("apps", @current_page)} to="/apps">
         {dgettext("navigation", "Apps")}
       </:menu>
-      <:menu class={GsmlgAppWeb.AppComponents.menu_class("support", @current_page)} to="/support">
+      <:menu class={menu_active_class("support", @current_page)} to="/support">
         {dgettext("navigation", "Support")}
       </:menu>
-      <:menu class={GsmlgAppWeb.AppComponents.menu_class("about-us", @current_page)} to="/about-us">
+      <:menu class={menu_active_class("about-us", @current_page)} to="/about-us">
         {dgettext("navigation", "About Us")}
       </:menu>
       <:user_profile></:user_profile>
       {render_slot(@header_slot)}
     </.dm_page_header>
-    <main class={[
-      "flex flex-col",
-      "min-h-[calc(100vh-50%)] w-full",
-      @main_class
-    ]}>
-      <div class={[
-        "w-full min-w-full min-h-full",
-        "mx-auto max-w-2xl",
-        "flex flex-col items-center"
-      ]}>
+    <main class={["flex flex-col min-h-[calc(100vh-50%)] w-full", @main_class]}>
+      <div class="w-full min-w-full min-h-full mx-auto flex flex-col items-center">
         <.dm_flash_group flash={@flash} />
         <a name="page"></a>
         {render_slot(@inner_block)}
       </div>
     </main>
-
     <.app_footer />
     """
   end
 
+  defp menu_active_class(page, current_page) when page == current_page,
+    do: "border-b-2 text-slate-200 border-slate-200 uppercase"
+
+  defp menu_active_class(_page, _current_page),
+    do: "uppercase"
+
   slot :header_slot
   slot :inner_block, required: true
-
   attr :flash, :map, required: true
 
   def app(assigns) do
     ~H"""
     <.base_layout flash={@flash} current_page="apps">
-      <:header_slot>
-        {render_slot(@header_slot)}
-      </:header_slot>
+      <:header_slot>{render_slot(@header_slot)}</:header_slot>
       {render_slot(@inner_block)}
     </.base_layout>
     """
@@ -82,7 +75,6 @@ defmodule GsmlgAppWeb.Layouts do
 
   slot :header_slot
   slot :inner_block, required: true
-
   attr :flash, :map, required: true
 
   def home(assigns) do
@@ -92,9 +84,7 @@ defmodule GsmlgAppWeb.Layouts do
       current_page="home"
       extra_header_class="bg-[url(/images/sky-commet.jpg)] bg-no-repeat bg-cover h-screen"
     >
-      <:header_slot>
-        {render_slot(@header_slot)}
-      </:header_slot>
+      <:header_slot>{render_slot(@header_slot)}</:header_slot>
       {render_slot(@inner_block)}
     </.base_layout>
     """
@@ -102,19 +92,12 @@ defmodule GsmlgAppWeb.Layouts do
 
   slot :header_slot
   slot :inner_block, required: true
-
   attr :flash, :map, required: true
 
   def support(assigns) do
     ~H"""
-    <.base_layout
-      flash={@flash}
-      current_page="support"
-      main_class="min-h-[20vh] w-full"
-    >
-      <:header_slot>
-        {render_slot(@header_slot)}
-      </:header_slot>
+    <.base_layout flash={@flash} current_page="support" main_class="min-h-[20vh] w-full">
+      <:header_slot>{render_slot(@header_slot)}</:header_slot>
       {render_slot(@inner_block)}
     </.base_layout>
     """
@@ -122,19 +105,12 @@ defmodule GsmlgAppWeb.Layouts do
 
   slot :header_slot
   slot :inner_block, required: true
-
   attr :flash, :map, required: true
 
   def privacy(assigns) do
     ~H"""
-    <.base_layout
-      flash={@flash}
-      current_page="privacy"
-      main_class="min-h-[20vh] w-full"
-    >
-      <:header_slot>
-        {render_slot(@header_slot)}
-      </:header_slot>
+    <.base_layout flash={@flash} current_page="privacy" main_class="min-h-[20vh] w-full">
+      <:header_slot>{render_slot(@header_slot)}</:header_slot>
       {render_slot(@inner_block)}
     </.base_layout>
     """
@@ -142,15 +118,12 @@ defmodule GsmlgAppWeb.Layouts do
 
   slot :header_slot
   slot :inner_block, required: true
-
   attr :flash, :map, required: true
 
   def about(assigns) do
     ~H"""
     <.base_layout flash={@flash} current_page="about-us">
-      <:header_slot>
-        {render_slot(@header_slot)}
-      </:header_slot>
+      <:header_slot>{render_slot(@header_slot)}</:header_slot>
       {render_slot(@inner_block)}
     </.base_layout>
     """

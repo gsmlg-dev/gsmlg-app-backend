@@ -474,22 +474,10 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
   defp track_provider_usage(nil, _content, _result), do: :ok
 
-  defp track_provider_usage(provider, content, result) do
-    estimated_tokens = estimate_tokens(content, result)
+  defp track_provider_usage(provider, content, _result) do
+    # Rough estimate based on content length (~4 chars per token)
+    estimated_tokens = div(String.length(content), 4)
     AI.increment_provider_usage(provider, 2, estimated_tokens)
-  end
-
-  # T029: Estimate token count from response
-  defp estimate_tokens(content, result) do
-    # If result contains usage info from the API, use that
-    case result do
-      {:ok, %{usage: %{total_tokens: tokens}}} when is_integer(tokens) ->
-        tokens
-
-      _ ->
-        # Fallback: rough estimate based on content length (~4 chars per token)
-        div(String.length(content), 4)
-    end
   end
 
   defp load_conversations(socket) do

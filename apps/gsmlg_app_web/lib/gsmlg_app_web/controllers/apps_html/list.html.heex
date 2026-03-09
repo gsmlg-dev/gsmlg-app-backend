@@ -11,7 +11,7 @@
       icon="apps"
       class="rounded-b-3xl shadow-2xl"
     >
-      <div class="w-full max-w-2xl bg-black/10 backdrop-blur-sm rounded-2xl p-8 animate-fade-in animation-delay-400 mx-auto">
+      <div class="w-full max-w-3xl mx-auto animate-fade-in animation-delay-400">
         <div class="flex flex-wrap justify-center gap-3">
           <.platform_badge name={dgettext("common", "iOS")} icon="apple" color="info" />
           <.platform_badge name={dgettext("common", "Android")} icon="android" color="success" />
@@ -27,74 +27,156 @@
     </.hero_section>
   </:header_slot>
 
-  <div class="container mx-auto px-4 py-8">
-    <!-- Stats Section -->
+  <div class="min-h-screen bg-gradient-to-b from-black via-gray-950 to-black">
+    <!-- Stats Bar -->
     <% app_count = length(@apps) %>
     <% ios_count = Enum.count(@apps, fn app -> "ios" in app.platforms end) %>
     <% android_count = Enum.count(@apps, fn app -> "android" in app.platforms end) %>
-    <div class="stats shadow-lg mb-8 w-full bg-base-100">
-      <div class="stat place-items-center">
-        <div class="stat-figure text-primary">
-          <.dm_mdi name="apps" class="w-8 h-8" />
-        </div>
-        <div class="stat-title">{dgettext("common", "Total Apps")}</div>
-        <div class="stat-value text-primary">{app_count}</div>
-        <div class="stat-desc text-base-content/60">
-          {dgettext("common", "Across all platforms")}
-        </div>
-      </div>
+    <% desktop_count =
+      Enum.count(@apps, fn app ->
+        Enum.any?(["macos", "windows", "linux"], &(&1 in app.platforms))
+      end) %>
 
-      <div class="stat place-items-center">
-        <div class="stat-figure text-secondary">
-          <.dm_mdi name="apple" class="w-8 h-8" />
-        </div>
-        <div class="stat-title">{dgettext("common", "iOS Apps")}</div>
-        <div class="stat-value text-secondary">{ios_count}</div>
-        <div class="stat-desc text-base-content/60">
-          {dgettext("user", "Available on App Store")}
-        </div>
-      </div>
-
-      <div class="stat place-items-center">
-        <div class="stat-figure text-accent">
-          <.dm_mdi name="android" class="w-8 h-8" />
-        </div>
-        <div class="stat-title">{dgettext("common", "Android Apps")}</div>
-        <div class="stat-value text-accent">{android_count}</div>
-        <div class="stat-desc text-base-content/60">
-          {dgettext("user", "Available on Play Store")}
-        </div>
-      </div>
-    </div>
-    
-<!-- Filter Tabs -->
-    <div class="tabs tabs-boxed mb-8 bg-base-100 p-1">
-      <a class="tab tab-active" phx-click="filter" phx-value-filter="all">
-        {dgettext("navigation", "All Apps")}
-      </a>
-      <a class="tab" phx-click="filter" phx-value-filter="ios">{dgettext("common", "iOS")}</a>
-      <a class="tab" phx-click="filter" phx-value-filter="android">
-        {dgettext("common", "Android")}
-      </a>
-      <a class="tab" phx-click="filter" phx-value-filter="desktop">
-        {dgettext("common", "Desktop")}
-      </a>
-    </div>
-    
-<!-- Apps Grid -->
-    <div class="space-y-6">
-      <%= if Enum.empty?(@apps) do %>
-        <div class="card bg-base-200 p-8 text-center">
-          <div class="flex flex-col items-center gap-4">
-            <.dm_mdi name="apps" class="w-16 h-16 text-base-content/50" />
-            <p class="text-lg text-base-content/70">
-              {dgettext("user", "No apps available at the moment.")}
-            </p>
+    <div class="relative z-10 pt-12 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-5xl mx-auto">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-card rounded-2xl p-5 text-center animate-fade-in-up animation-delay-100">
+            <div class="flex items-center justify-center gap-2 mb-2">
+              <.dm_mdi name="apps" class="w-5 h-5 text-primary" />
+            </div>
+            <div class="text-3xl font-bold text-white stat-number mb-1">{app_count}</div>
+            <div class="text-xs text-gray-400 uppercase tracking-wider">
+              {dgettext("common", "Total Apps")}
+            </div>
+          </div>
+          <div class="glass-card rounded-2xl p-5 text-center animate-fade-in-up animation-delay-200">
+            <div class="flex items-center justify-center gap-2 mb-2">
+              <.dm_mdi name="apple" class="w-5 h-5 text-gray-300" />
+            </div>
+            <div class="text-3xl font-bold text-white stat-number mb-1">{ios_count}</div>
+            <div class="text-xs text-gray-400 uppercase tracking-wider">
+              {dgettext("common", "iOS Apps")}
+            </div>
+          </div>
+          <div class="glass-card rounded-2xl p-5 text-center animate-fade-in-up animation-delay-300">
+            <div class="flex items-center justify-center gap-2 mb-2">
+              <.dm_mdi name="android" class="w-5 h-5 text-success" />
+            </div>
+            <div class="text-3xl font-bold text-white stat-number mb-1">{android_count}</div>
+            <div class="text-xs text-gray-400 uppercase tracking-wider">
+              {dgettext("common", "Android Apps")}
+            </div>
+          </div>
+          <div class="glass-card rounded-2xl p-5 text-center animate-fade-in-up animation-delay-400">
+            <div class="flex items-center justify-center gap-2 mb-2">
+              <.dm_mdi name="monitor" class="w-5 h-5 text-info" />
+            </div>
+            <div class="text-3xl font-bold text-white stat-number mb-1">{desktop_count}</div>
+            <div class="text-xs text-gray-400 uppercase tracking-wider">
+              {dgettext("common", "Desktop Apps")}
+            </div>
           </div>
         </div>
-      <% else %>
-        <.cached_app_card :for={app <- @apps} app={app} />
-      <% end %>
+      </div>
+    </div>
+    
+<!-- Apps Listing -->
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+      <!-- CSS-only Filter Tabs -->
+      <div class="css-tabs">
+        <input type="radio" name="app-tabs" id="tab-all" class="css-tab-radio" checked />
+        <input type="radio" name="app-tabs" id="tab-ios" class="css-tab-radio" />
+        <input type="radio" name="app-tabs" id="tab-android" class="css-tab-radio" />
+        <input type="radio" name="app-tabs" id="tab-desktop" class="css-tab-radio" />
+
+        <div class="css-tab-labels">
+          <label for="tab-all" class="css-tab-label">
+            <.dm_mdi name="view-grid" class="w-4 h-4" />
+            <span>{dgettext("navigation", "All Apps")}</span>
+          </label>
+          <label for="tab-ios" class="css-tab-label">
+            <.dm_mdi name="apple" class="w-4 h-4" />
+            <span>{dgettext("common", "iOS")}</span>
+          </label>
+          <label for="tab-android" class="css-tab-label">
+            <.dm_mdi name="android" class="w-4 h-4" />
+            <span>{dgettext("common", "Android")}</span>
+          </label>
+          <label for="tab-desktop" class="css-tab-label">
+            <.dm_mdi name="monitor" class="w-4 h-4" />
+            <span>{dgettext("common", "Desktop")}</span>
+          </label>
+        </div>
+        
+<!-- All Apps Panel -->
+        <div class="css-tab-panel" id="panel-all">
+          <div class="space-y-5">
+            <%= if Enum.empty?(@apps) do %>
+              <div class="glass-card rounded-2xl p-12 text-center">
+                <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-6">
+                  <.dm_mdi name="package-variant" class="w-10 h-10 text-gray-500" />
+                </div>
+                <h3 class="text-xl font-semibold text-gray-300 mb-2">
+                  {dgettext("user", "No apps available at the moment.")}
+                </h3>
+                <p class="text-gray-500">
+                  {dgettext("user", "Check back soon for new releases.")}
+                </p>
+              </div>
+            <% else %>
+              <.cached_app_card :for={app <- @apps} app={app} />
+            <% end %>
+          </div>
+        </div>
+        
+<!-- iOS Panel -->
+        <div class="css-tab-panel" id="panel-ios">
+          <div class="space-y-5">
+            <% ios_apps = Enum.filter(@apps, fn app -> "ios" in app.platforms end) %>
+            <%= if Enum.empty?(ios_apps) do %>
+              <div class="glass-card rounded-2xl p-12 text-center">
+                <.dm_mdi name="apple" class="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                <p class="text-gray-400">{dgettext("user", "No iOS apps available.")}</p>
+              </div>
+            <% else %>
+              <.cached_app_card :for={app <- ios_apps} app={app} />
+            <% end %>
+          </div>
+        </div>
+        
+<!-- Android Panel -->
+        <div class="css-tab-panel" id="panel-android">
+          <div class="space-y-5">
+            <% android_apps = Enum.filter(@apps, fn app -> "android" in app.platforms end) %>
+            <%= if Enum.empty?(android_apps) do %>
+              <div class="glass-card rounded-2xl p-12 text-center">
+                <.dm_mdi name="android" class="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                <p class="text-gray-400">{dgettext("user", "No Android apps available.")}</p>
+              </div>
+            <% else %>
+              <.cached_app_card :for={app <- android_apps} app={app} />
+            <% end %>
+          </div>
+        </div>
+        
+<!-- Desktop Panel -->
+        <div class="css-tab-panel" id="panel-desktop">
+          <div class="space-y-5">
+            <% desktop_apps =
+              Enum.filter(@apps, fn app ->
+                Enum.any?(["macos", "windows", "linux"], &(&1 in app.platforms))
+              end) %>
+            <%= if Enum.empty?(desktop_apps) do %>
+              <div class="glass-card rounded-2xl p-12 text-center">
+                <.dm_mdi name="monitor" class="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                <p class="text-gray-400">{dgettext("user", "No desktop apps available.")}</p>
+              </div>
+            <% else %>
+              <.cached_app_card :for={app <- desktop_apps} app={app} />
+            <% end %>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </Layouts.app>

@@ -1,4 +1,4 @@
-<.dm_simple_appbar class="bg-primary text-primary-content sticky top-0 z-100">
+<.dm_simple_appbar class="appbar-primary sticky top-0 z-100">
   <:logo>
     <.link href="/" class="text-xl font-bold hover:opacity-80">
       GSMLG APP Admin
@@ -6,23 +6,23 @@
   </:logo>
   <:user_profile>
     <%= if @current_user do %>
-      <div tabindex="0" role="button" class="btn btn-ghost self-center">
-        <div class="flex justify-center items-center">
-          {@current_user.email}
-        </div>
-      </div>
-      <ul
-        tabindex="0"
-        class="p-2 menu menu-sm dropdown-content bg-primary text-primary-content rounded-box w-36"
-      >
-        <li class="btn btn-primary">
-          <.link href="/sign-out">Sign Out</.link>
-        </li>
-      </ul>
+      <.dm_dropdown position="bottom">
+        <:trigger class="btn btn-ghost self-center">
+          <div class="flex justify-center items-center gap-2">
+            <.dm_mdi name="account-circle" class="w-5 h-5" />
+            {@current_user.email}
+          </div>
+        </:trigger>
+        <:content>
+          <.link href="/sign-out" class="popover-menu-item">
+            <.dm_mdi name="logout" class="w-4 h-4" /> Sign Out
+          </.link>
+        </:content>
+      </.dm_dropdown>
     <% else %>
-      <a href="/sign-in" class="btn btn-ghost">
-        Sign In
-      </a>
+      <.dm_btn variant="ghost">
+        <a href="/sign-in">Sign In</a>
+      </.dm_btn>
     <% end %>
   </:user_profile>
 </.dm_simple_appbar>
