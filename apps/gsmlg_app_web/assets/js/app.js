@@ -1,5 +1,8 @@
 import "../../../../deps/phoenix_html/priv/static/phoenix_html.js";
 
+// Register duskmoon custom elements
+import "@duskmoon-dev/elements/register";
+
 // PageHeader scroll behavior (replaces phx-hook="PageHeader" which requires LiveSocket)
 // Shows fixed nav when header scrolls out of view using IntersectionObserver
 document.addEventListener("DOMContentLoaded", () => {

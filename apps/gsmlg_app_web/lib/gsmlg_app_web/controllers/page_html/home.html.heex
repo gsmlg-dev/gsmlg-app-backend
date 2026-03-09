@@ -13,223 +13,299 @@
 
   <div
     id="page"
-    class="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black py-8 sm:py-12"
+    class="min-h-screen bg-gradient-to-b from-black via-gray-950 to-black"
   >
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 space-y-12 sm:space-y-16">
+    <!-- Highlight Stats Bar -->
+    <div class="relative -mt-12 z-10 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-5xl mx-auto">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-card rounded-2xl p-5 text-center animate-fade-in-up animation-delay-100">
+            <div class="text-3xl font-bold text-white stat-number mb-1">5+</div>
+            <div class="text-sm text-gray-400">{dgettext("common", "Professional Apps")}</div>
+          </div>
+          <div class="glass-card rounded-2xl p-5 text-center animate-fade-in-up animation-delay-200">
+            <div class="text-3xl font-bold text-white stat-number mb-1">5</div>
+            <div class="text-sm text-gray-400">{dgettext("common", "Platforms")}</div>
+          </div>
+          <div class="glass-card rounded-2xl p-5 text-center animate-fade-in-up animation-delay-300">
+            <div class="text-3xl font-bold text-success stat-number mb-1">100%</div>
+            <div class="text-sm text-gray-400">{dgettext("common", "Open Source")}</div>
+          </div>
+          <div class="glass-card rounded-2xl p-5 text-center animate-fade-in-up animation-delay-400">
+            <div class="text-3xl font-bold text-info stat-number mb-1">24/7</div>
+            <div class="text-sm text-gray-400">{dgettext("common", "Available")}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 space-y-20 sm:space-y-32">
       <!-- Network Tools Section -->
-      <div class="card lg:card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
-        <figure class="lg:w-1/2 relative overflow-hidden max-h-96 lg:max-h-none">
+      <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div class="relative rounded-3xl overflow-hidden aspect-[4/3] lg:aspect-auto lg:h-full feature-card">
           <img
             src="/images/space-earth-light.jpg"
             alt="Network Tools"
-            class="w-full h-full object-cover rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none transition-transform duration-500 group-hover:scale-110"
+            class="w-full h-full object-cover"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div class="absolute inset-0 bg-gradient-to-tr from-black/70 via-black/30 to-transparent">
           </div>
-        </figure>
-        <div class="card-body lg:w-1/2 bg-gradient-to-br from-gray-900 to-black text-neutral-300 p-4 sm:p-6">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-3 h-3 bg-success rounded-full animate-pulse"></div>
-            <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-success to-emerald-400 bg-clip-text text-transparent">
-              {dgettext("navigation", "Network Diagnostics in Your Pocket")}
-            </h2>
-          </div>
-          <div class="space-y-3 sm:space-y-4">
-            <p class="text-base sm:text-lg leading-relaxed">
-              {dgettext(
-                "navigation",
-                "Geolocate IPs, query DNS records, and research domains from anywhere"
-              )}
-            </p>
-            <p class="text-base sm:text-lg leading-relaxed">
-              {dgettext("navigation", "Professional network tools optimized for mobile workflows")}
-            </p>
-          </div>
-          <div class="card-actions justify-end mt-4 sm:mt-6">
-            <.link
-              href="/apps"
-              class="btn btn-success btn-sm sm:btn-md lg:btn-wide hover:btn-success transition-all duration-300 shadow-lg hover:shadow-xl"
-            >
-              <.dm_mdi name="lan" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-              <span class="text-xs sm:text-sm">
-                {dgettext("navigation", "View Network Tools")}
+          <div class="absolute bottom-6 left-6">
+            <div class="glass-card rounded-xl px-4 py-2 flex items-center gap-2">
+              <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+              <span class="text-sm text-gray-200 font-medium">
+                {dgettext("common", "Active & Maintained")}
               </span>
-            </.link>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-6">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-success/15 flex items-center justify-center">
+              <.dm_mdi name="lan" class="w-6 h-6 text-success glow-success" />
+            </div>
+            <span class="text-sm font-semibold text-success uppercase tracking-widest">
+              {dgettext("common", "Network Tools")}
+            </span>
+          </div>
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
+            {dgettext("navigation", "Network Diagnostics in Your Pocket")}
+          </h2>
+          <p class="text-lg text-gray-400 leading-relaxed">
+            {dgettext(
+              "navigation",
+              "Geolocate IPs, query DNS records, and research domains from anywhere"
+            )}
+          </p>
+          <ul class="space-y-3">
+            <li class="flex items-center gap-3 text-gray-300">
+              <.dm_mdi name="check-circle" class="w-5 h-5 text-success shrink-0" />
+              <span>{dgettext("user", "IP geolocation & WHOIS lookups")}</span>
+            </li>
+            <li class="flex items-center gap-3 text-gray-300">
+              <.dm_mdi name="check-circle" class="w-5 h-5 text-success shrink-0" />
+              <span>{dgettext("user", "DNS record queries & diagnostics")}</span>
+            </li>
+            <li class="flex items-center gap-3 text-gray-300">
+              <.dm_mdi name="check-circle" class="w-5 h-5 text-success shrink-0" />
+              <span>{dgettext("user", "Domain research & availability checks")}</span>
+            </li>
+          </ul>
+          <div class="pt-2">
+            <.dm_btn
+              variant="success"
+              size="lg"
+              class="shadow-lg shadow-success/20 hover:shadow-xl hover:shadow-success/30 transition-all duration-300"
+            >
+              <.link href="/apps" class="flex items-center gap-2">
+                <.dm_mdi name="arrow-right" class="w-5 h-5" />
+                {dgettext("navigation", "View Network Tools")}
+              </.link>
+            </.dm_btn>
           </div>
         </div>
       </div>
       
-<!-- DevOps Section -->
-      <div class="card lg:card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
-        <figure class="lg:w-1/2 lg:order-last relative overflow-hidden max-h-96 lg:max-h-none">
+<!-- DevOps Section (reversed layout) -->
+      <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div class="space-y-6 lg:order-first">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-info/15 flex items-center justify-center">
+              <.dm_mdi name="server" class="w-6 h-6 text-info glow-info" />
+            </div>
+            <span class="text-sm font-semibold text-info uppercase tracking-widest">
+              {dgettext("common", "DevOps")}
+            </span>
+          </div>
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
+            {dgettext("navigation", "Infrastructure Management On the Go")}
+          </h2>
+          <p class="text-lg text-gray-400 leading-relaxed">
+            {dgettext(
+              "navigation",
+              "Run Ansible tasks and manage DevOps workflows from your mobile device"
+            )}
+          </p>
+          <ul class="space-y-3">
+            <li class="flex items-center gap-3 text-gray-300">
+              <.dm_mdi name="check-circle" class="w-5 h-5 text-info shrink-0" />
+              <span>{dgettext("user", "Ansible playbook execution")}</span>
+            </li>
+            <li class="flex items-center gap-3 text-gray-300">
+              <.dm_mdi name="check-circle" class="w-5 h-5 text-info shrink-0" />
+              <span>{dgettext("user", "Infrastructure monitoring & alerts")}</span>
+            </li>
+            <li class="flex items-center gap-3 text-gray-300">
+              <.dm_mdi name="check-circle" class="w-5 h-5 text-info shrink-0" />
+              <span>{dgettext("user", "Secure remote management")}</span>
+            </li>
+          </ul>
+          <div class="pt-2">
+            <.dm_btn
+              variant="info"
+              size="lg"
+              class="shadow-lg shadow-info/20 hover:shadow-xl hover:shadow-info/30 transition-all duration-300"
+            >
+              <.link href="/apps" class="flex items-center gap-2">
+                <.dm_mdi name="arrow-right" class="w-5 h-5" />
+                {dgettext("navigation", "Explore DevOps Tools")}
+              </.link>
+            </.dm_btn>
+          </div>
+        </div>
+        <div class="relative rounded-3xl overflow-hidden aspect-[4/3] lg:aspect-auto lg:h-full feature-card lg:order-last">
           <img
             src="/images/teal-pannel.jpg"
             alt="DevOps Tools"
-            class="w-full h-full object-cover rounded-t-lg lg:rounded-r-lg lg:rounded-tl-none transition-transform duration-500 group-hover:scale-110"
+            class="w-full h-full object-cover"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div class="absolute inset-0 bg-gradient-to-tl from-black/70 via-black/30 to-transparent">
           </div>
-        </figure>
-        <div class="card-body lg:w-1/2 bg-gradient-to-br from-gray-900 to-black text-neutral-300 p-4 sm:p-6">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-3 h-3 bg-info rounded-full animate-pulse"></div>
-            <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-info to-cyan-400 bg-clip-text text-transparent">
-              {dgettext("navigation", "Infrastructure Management On the Go")}
-            </h2>
-          </div>
-          <div class="space-y-3 sm:space-y-4">
-            <p class="text-base sm:text-lg leading-relaxed">
-              {dgettext(
-                "navigation",
-                "Run Ansible tasks and manage DevOps workflows from your mobile device"
-              )}
-            </p>
-            <p class="text-base sm:text-lg leading-relaxed">
-              {dgettext("navigation", "Stay connected to your infrastructure wherever you are")}
-            </p>
-          </div>
-          <div class="card-actions justify-start mt-4 sm:mt-6">
-            <.link
-              href="/apps"
-              class="btn btn-info btn-sm sm:btn-md lg:btn-wide hover:btn-info transition-all duration-300 shadow-lg hover:shadow-xl"
-            >
-              <.dm_mdi name="server" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-              <span class="text-xs sm:text-sm">
-                {dgettext("navigation", "Explore DevOps Tools")}
+          <div class="absolute bottom-6 right-6">
+            <div class="glass-card rounded-xl px-4 py-2 flex items-center gap-2">
+              <.dm_mdi name="shield-check" class="w-4 h-4 text-info" />
+              <span class="text-sm text-gray-200 font-medium">
+                {dgettext("common", "Enterprise Ready")}
               </span>
-            </.link>
+            </div>
           </div>
         </div>
       </div>
       
 <!-- Cross-Platform Section -->
-      <div class="card lg:card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
-        <figure class="lg:w-1/2 relative overflow-hidden max-h-96 lg:max-h-none">
-          <img
-            src="/images/people-in-skyscraper.jpg"
-            alt="Cross-Platform"
-            class="w-full h-full object-cover rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none transition-transform duration-500 group-hover:scale-110"
-          />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          </div>
-        </figure>
-        <div class="card-body lg:w-1/2 bg-gradient-to-br from-gray-900 to-black text-neutral-300 p-4 sm:p-6">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-3 h-3 bg-warning rounded-full animate-pulse"></div>
-            <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-warning to-orange-400 bg-clip-text text-transparent">
-              {dgettext("navigation", "Available Everywhere You Work")}
-            </h2>
-          </div>
-          <div class="space-y-3 sm:space-y-4">
-            <p class="text-base sm:text-lg leading-relaxed">
-              {dgettext("navigation", "iOS, Android, macOS, Windows, and Linux support")}
-            </p>
-            <p class="text-base sm:text-lg leading-relaxed">
-              {dgettext("navigation", "Consistent professional tools across all your devices")}
-            </p>
-          </div>
-          <div class="card-actions justify-end mt-4 sm:mt-6">
-            <.link
-              href="/apps"
-              class="btn btn-warning btn-sm sm:btn-md lg:btn-wide hover:btn-warning transition-all duration-300 shadow-lg hover:shadow-xl"
-            >
-              <.dm_mdi name="devices" class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
-              <span class="text-xs sm:text-sm">
-                {dgettext("navigation", "Download for Your Platform")}
-              </span>
-            </.link>
+      <div class="relative">
+        <div class="absolute inset-0 bg-gradient-to-r from-warning/5 via-transparent to-warning/5 rounded-3xl">
+        </div>
+        <div class="relative glass-card rounded-3xl p-8 sm:p-12 lg:p-16">
+          <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div class="space-y-6">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-warning/15 flex items-center justify-center">
+                  <.dm_mdi name="devices" class="w-6 h-6 text-warning glow-warning" />
+                </div>
+                <span class="text-sm font-semibold text-warning uppercase tracking-widest">
+                  {dgettext("common", "Cross-Platform")}
+                </span>
+              </div>
+              <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                {dgettext("navigation", "Available Everywhere You Work")}
+              </h2>
+              <p class="text-lg text-gray-400 leading-relaxed">
+                {dgettext("navigation", "Consistent professional tools across all your devices")}
+              </p>
+            </div>
+            <div class="grid grid-cols-3 sm:grid-cols-5 gap-4">
+              <div class="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-white/10 transition-colors duration-300 platform-badge">
+                <.dm_mdi name="apple" class="w-8 h-8 text-gray-200" />
+                <span class="text-xs text-gray-400 font-medium">iOS</span>
+              </div>
+              <div class="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-white/10 transition-colors duration-300 platform-badge">
+                <.dm_mdi name="android" class="w-8 h-8 text-success" />
+                <span class="text-xs text-gray-400 font-medium">Android</span>
+              </div>
+              <div class="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-white/10 transition-colors duration-300 platform-badge">
+                <.dm_mdi name="apple" class="w-8 h-8 text-gray-200" />
+                <span class="text-xs text-gray-400 font-medium">macOS</span>
+              </div>
+              <div class="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-white/10 transition-colors duration-300 platform-badge">
+                <.dm_mdi name="microsoft-windows" class="w-8 h-8 text-info" />
+                <span class="text-xs text-gray-400 font-medium">Windows</span>
+              </div>
+              <div class="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-white/10 transition-colors duration-300 platform-badge">
+                <.dm_mdi name="linux" class="w-8 h-8 text-warning" />
+                <span class="text-xs text-gray-400 font-medium">Linux</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       
 <!-- Target Audience Section -->
-      <div class="text-center py-12">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-12">
-          {dgettext("navigation", "Built for Technical Professionals")}
-        </h2>
+      <div class="text-center space-y-16">
+        <div>
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+            {dgettext("navigation", "Built for Technical Professionals")}
+          </h2>
+          <p class="text-lg text-gray-400 max-w-2xl mx-auto">
+            {dgettext("user", "Purpose-built tools that fit your mobile workflow")}
+          </p>
+        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- For Developers -->
-          <div class="text-center">
-            <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <.dm_mdi name="application" class="w-8 h-8 text-primary" />
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          <div class="glass-card gradient-border rounded-2xl p-8 text-center feature-card group">
+            <div class="w-16 h-16 rounded-2xl bg-primary/15 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+              <.dm_mdi name="code-braces" class="w-8 h-8 text-primary glow-primary" />
             </div>
-            <h3 class="text-xl font-bold text-primary mb-3">
+            <h3 class="text-xl font-bold text-white mb-3">
               {dgettext("navigation", "For Developers")}
             </h3>
-            <p class="text-gray-300 mb-4">
+            <p class="text-gray-400 mb-6">
               {dgettext("user", "Tools designed specifically for mobile development workflows")}
             </p>
-            <ul class="text-left text-gray-400 space-y-2">
-              <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
+            <ul class="text-left space-y-3">
+              <li class="flex items-center gap-3 text-gray-300 text-sm">
+                <.dm_mdi name="check-circle-outline" class="w-4 h-4 text-success shrink-0" />
                 {dgettext("user", "Network diagnostics during field work")}
               </li>
-              <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
+              <li class="flex items-center gap-3 text-gray-300 text-sm">
+                <.dm_mdi name="check-circle-outline" class="w-4 h-4 text-success shrink-0" />
                 {dgettext("user", "Domain research for development projects")}
               </li>
-              <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
+              <li class="flex items-center gap-3 text-gray-300 text-sm">
+                <.dm_mdi name="check-circle-outline" class="w-4 h-4 text-success shrink-0" />
                 {dgettext("user", "DNS troubleshooting on the go")}
               </li>
             </ul>
           </div>
-          
-<!-- For System Administrators -->
-          <div class="text-center">
-            <div class="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <.dm_mdi name="server" class="w-8 h-8 text-secondary" />
+
+          <div class="glass-card gradient-border rounded-2xl p-8 text-center feature-card group">
+            <div class="w-16 h-16 rounded-2xl bg-secondary/15 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+              <.dm_mdi name="server-network" class="w-8 h-8 text-secondary" />
             </div>
-            <h3 class="text-xl font-bold text-secondary mb-3">
+            <h3 class="text-xl font-bold text-white mb-3">
               {dgettext("navigation", "For System Administrators")}
             </h3>
-            <p class="text-gray-300 mb-4">
+            <p class="text-gray-400 mb-6">
               {dgettext("user", "Stay connected to your systems outside the office")}
             </p>
-            <ul class="text-left text-gray-400 space-y-2">
-              <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
+            <ul class="text-left space-y-3">
+              <li class="flex items-center gap-3 text-gray-300 text-sm">
+                <.dm_mdi name="check-circle-outline" class="w-4 h-4 text-success shrink-0" />
                 {dgettext("user", "Remote server management")}
               </li>
-              <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
+              <li class="flex items-center gap-3 text-gray-300 text-sm">
+                <.dm_mdi name="check-circle-outline" class="w-4 h-4 text-success shrink-0" />
                 {dgettext("user", "Network monitoring from mobile")}
               </li>
-              <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
+              <li class="flex items-center gap-3 text-gray-300 text-sm">
+                <.dm_mdi name="check-circle-outline" class="w-4 h-4 text-success shrink-0" />
                 {dgettext("user", "Emergency troubleshooting capabilities")}
               </li>
             </ul>
           </div>
-          
-<!-- For IT Professionals -->
-          <div class="text-center">
-            <div class="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <.dm_mdi name="shield" class="w-8 h-8 text-accent" />
+
+          <div class="glass-card gradient-border rounded-2xl p-8 text-center feature-card group">
+            <div class="w-16 h-16 rounded-2xl bg-accent/15 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+              <.dm_mdi name="shield-lock" class="w-8 h-8 text-accent" />
             </div>
-            <h3 class="text-xl font-bold text-accent mb-3">
+            <h3 class="text-xl font-bold text-white mb-3">
               {dgettext("navigation", "For IT Professionals")}
             </h3>
-            <p class="text-gray-300 mb-4">
+            <p class="text-gray-400 mb-6">
               {dgettext("user", "Enterprise-grade utilities optimized for mobile workflows")}
             </p>
-            <ul class="text-left text-gray-400 space-y-2">
-              <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
+            <ul class="text-left space-y-3">
+              <li class="flex items-center gap-3 text-gray-300 text-sm">
+                <.dm_mdi name="check-circle-outline" class="w-4 h-4 text-success shrink-0" />
                 {dgettext("user", "Cross-platform compatibility")}
               </li>
-              <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext(
-                  "user",
-                  "Secure data handling"
-                )}
+              <li class="flex items-center gap-3 text-gray-300 text-sm">
+                <.dm_mdi name="check-circle-outline" class="w-4 h-4 text-success shrink-0" />
+                {dgettext("user", "Secure data handling")}
               </li>
-              <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext(
-                  "user",
-                  "Offline capabilities"
-                )}
+              <li class="flex items-center gap-3 text-gray-300 text-sm">
+                <.dm_mdi name="check-circle-outline" class="w-4 h-4 text-success shrink-0" />
+                {dgettext("user", "Offline capabilities")}
               </li>
             </ul>
           </div>
@@ -237,32 +313,45 @@
       </div>
       
 <!-- Final CTA Section -->
-      <div class="text-center py-16 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-          {dgettext("navigation", "Ready to Boost Your Mobile Productivity?")}
-        </h2>
-        <p class="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-          {dgettext(
-            "user",
-            "Join thousands of professionals using GSMLG tools daily for network diagnostics, infrastructure management, and technical utilities"
-          )}
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <.link href="/apps" class="btn btn-primary btn-lg">
-            <.dm_mdi name="application" class="w-5 h-5 mr-2" /> {dgettext(
-              "navigation",
-              "Browse All Apps"
+      <div class="relative overflow-hidden rounded-3xl">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/20 via-secondary/10 to-primary/20">
+        </div>
+        <div class="absolute inset-0 glass-card"></div>
+        <div class="relative text-center py-16 sm:py-20 px-6 sm:px-12">
+          <div class="w-20 h-20 rounded-full bg-primary/15 flex items-center justify-center mx-auto mb-8">
+            <.dm_mdi name="rocket-launch" class="w-10 h-10 text-primary glow-primary" />
+          </div>
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+            {dgettext("navigation", "Ready to Boost Your Mobile Productivity?")}
+          </h2>
+          <p class="text-lg sm:text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+            {dgettext(
+              "user",
+              "Join thousands of professionals using GSMLG tools daily for network diagnostics, infrastructure management, and technical utilities"
             )}
-          </.link>
-          <.link
-            href="/apps"
-            class="btn btn-outline btn-lg border-white text-white hover:bg-white hover:text-black"
-          >
-            <.dm_mdi name="download" class="w-5 h-5 mr-2" /> {dgettext(
-              "navigation",
-              "Download for iOS/Android"
-            )}
-          </.link>
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <.dm_btn
+              variant="primary"
+              size="lg"
+              class="shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/40 hover:scale-105 transition-all duration-300"
+            >
+              <.link href="/apps" class="flex items-center gap-2">
+                <.dm_mdi name="application" class="w-5 h-5" />
+                {dgettext("navigation", "Browse All Apps")}
+              </.link>
+            </.dm_btn>
+            <.dm_btn
+              variant="outline"
+              size="lg"
+              class="border-white/30 text-white hover:bg-white hover:text-black transition-all duration-300"
+            >
+              <.link href="/apps" class="flex items-center gap-2">
+                <.dm_mdi name="download" class="w-5 h-5" />
+                {dgettext("navigation", "Download for iOS/Android")}
+              </.link>
+            </.dm_btn>
+          </div>
         </div>
       </div>
     </div>

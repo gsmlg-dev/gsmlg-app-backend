@@ -34,11 +34,10 @@
 }
 
 /* ============================================
- * Missing component styles
- * Classes used in templates but not provided by @duskmoon-dev/core
+ * Custom component styles not provided by @duskmoon-dev/core
  * ============================================ */
 
-/* Hero Component */
+/* Hero Component - used for page headers with background images */
 @layer components {
   .hero {
     display: grid;
@@ -63,17 +62,13 @@
   }
 }
 
-/* Stats Component */
+/* Stats Component - used on apps listing page */
 @layer components {
   .stats {
     display: inline-grid;
     grid-auto-flow: column;
     overflow-x: auto;
     border-radius: var(--radius-box, 1rem);
-  }
-
-  .stats-vertical {
-    grid-auto-flow: row;
   }
 
   .stat {
@@ -111,134 +106,19 @@
   }
 }
 
-/* Join Component */
+/* Badge extensions not in core */
 @layer components {
-  .join {
-    display: inline-flex;
-    align-items: stretch;
+  .badge-xs {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.375rem;
+    line-height: 1;
+    height: auto;
+    min-height: auto;
   }
 
-  .join > :where(*:not(:first-child)) {
-    margin-inline-start: -1px;
-  }
-
-  .join-item:first-child,
-  .join > :first-child .join-item {
-    border-start-end-radius: 0;
-    border-end-end-radius: 0;
-  }
-
-  .join-item:last-child,
-  .join > :last-child .join-item {
-    border-start-start-radius: 0;
-    border-end-start-radius: 0;
-  }
-
-  .join-item:not(:first-child):not(:last-child),
-  .join > :not(:first-child):not(:last-child) .join-item {
-    border-radius: 0;
-  }
-}
-
-/* Drawer (checkbox-toggle layout pattern) */
-@layer components {
-  .drawer-toggle {
-    position: absolute;
-    height: 0;
-    width: 0;
-    appearance: none;
-    opacity: 0;
-  }
-
-  .drawer-toggle ~ .drawer-side {
-    position: fixed;
-    inset: 0;
-    z-index: 999;
-    pointer-events: none;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    visibility: hidden;
-  }
-
-  .drawer-toggle ~ .drawer-side > * {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-  }
-
-  .drawer-toggle:checked ~ .drawer-side {
-    pointer-events: auto;
-    visibility: visible;
-  }
-
-  .drawer-toggle:checked ~ .drawer-side > * {
-    transform: translateX(0);
-  }
-
-  .drawer-overlay {
-    position: fixed;
-    inset: 0;
-    cursor: pointer;
-    background-color: rgba(0, 0, 0, 0);
-    transition: background-color 0.3s ease-in-out;
-  }
-
-  .drawer-toggle:checked ~ .drawer-side > .drawer-overlay {
-    background-color: rgba(0, 0, 0, 0.4);
-  }
-
-  .drawer-button {
-    /* marker class for drawer trigger */
-  }
-}
-
-/* Chat Bubble Component */
-@layer components {
-  .chat-bubble {
-    display: block;
-    padding: 0.5rem 1rem;
-    border-radius: 1rem;
-    max-width: 90%;
+  .badge-neutral {
     background-color: var(--color-surface-container);
     color: var(--color-on-surface);
-  }
-
-  .chat-bubble-primary {
-    background-color: var(--color-primary);
-    color: var(--color-primary-content);
-  }
-
-  .chat-bubble-secondary {
-    background-color: var(--color-secondary);
-    color: var(--color-secondary-content);
-  }
-}
-
-/* Loading Spinner */
-@layer components {
-  .loading-spinner {
-    display: inline-block;
-    width: 1.5rem;
-    height: 1.5rem;
-    border: 3px solid currentColor;
-    border-right-color: transparent;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-  }
-
-  .loading-xs {
-    width: 0.75rem;
-    height: 0.75rem;
-    border-width: 2px;
-  }
-
-  .loading-sm {
-    width: 1rem;
-    height: 1rem;
-    border-width: 2px;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
   }
 }
 
@@ -254,261 +134,217 @@
     padding: 0.375rem 0.75rem;
     font-size: 0.8125rem;
   }
-
-  .badge-neutral {
-    background-color: var(--color-surface-container);
-    color: var(--color-on-surface);
-  }
 }
 
-/* Responsive component variants (Tailwind v4 doesn't auto-generate these for @layer components) */
-@media (min-width: 1024px) {
-  .lg\:card-side {
-    flex-direction: row;
+/* CSS-only Tabs (for static pages without LiveSocket) */
+@layer components {
+  .css-tabs {
+    position: relative;
   }
 
-  .lg\:card-side > figure,
-  .lg\:card-side > .card-image {
-    width: 40%;
-    flex-shrink: 0;
-  }
-
-  .lg\:card-side > figure img,
-  .lg\:card-side > .card-image img {
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-/* Custom animations for home page */
-@keyframes fade-in-down {
-  from {
+  .css-tab-radio {
+    position: absolute;
     opacity: 0;
-    transform: translateY(-30px);
+    pointer-events: none;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .css-tab-labels {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
   }
+
+  .css-tab-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.625rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .css-tab-label:hover {
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .css-tab-panel {
+    display: none;
+  }
+
+  /* Show active tab panel and style active label */
+  #tab-all:checked ~ .css-tab-labels label[for="tab-all"],
+  #tab-ios:checked ~ .css-tab-labels label[for="tab-ios"],
+  #tab-android:checked ~ .css-tab-labels label[for="tab-android"],
+  #tab-desktop:checked ~ .css-tab-labels label[for="tab-desktop"] {
+    color: white;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  #tab-all:checked ~ #panel-all,
+  #tab-ios:checked ~ #panel-ios,
+  #tab-android:checked ~ #panel-android,
+  #tab-desktop:checked ~ #panel-desktop {
+    display: block;
+    animation: fade-in 0.3s ease-out;
+  }
+}
+
+/* Custom animations */
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.animate-fade-in-down {
-  animation: fade-in-down 1s ease-out;
+@keyframes fade-in-scale {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-.animate-fade-in-up {
-  animation: fade-in-up 1s ease-out;
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
 }
 
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
 }
 
-.animation-delay-200 {
-  animation-delay: 200ms;
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-60px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-.animation-delay-400 {
-  animation-delay: 400ms;
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(60px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-/* Smooth scroll behavior */
-html {
-  scroll-behavior: smooth;
+@keyframes bounce-chevron {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, 12px); }
 }
 
-/* Enhanced hover effects */
-.group:hover .group-hover\:scale-110 {
-  transform: scale(1.1);
+.animate-fade-in-down { animation: fade-in-down 0.8s ease-out both; }
+.animate-fade-in-up { animation: fade-in-up 0.8s ease-out both; }
+.animate-fade-in { animation: fade-in 0.8s ease-out both; }
+.animate-fade-in-scale { animation: fade-in-scale 0.6s ease-out both; }
+.animate-slide-in-left { animation: slide-in-left 0.8s ease-out both; }
+.animate-slide-in-right { animation: slide-in-right 0.8s ease-out both; }
+.animate-bounce-chevron { animation: bounce-chevron 2s ease-in-out infinite; }
+.animation-delay-100 { animation-delay: 100ms; }
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+.animation-delay-400 { animation-delay: 400ms; }
+.animation-delay-500 { animation-delay: 500ms; }
+.animation-delay-600 { animation-delay: 600ms; }
+.animation-delay-700 { animation-delay: 700ms; }
+.animation-delay-800 { animation-delay: 800ms; }
+
+html { scroll-behavior: smooth; }
+
+/* Shimmer text effect for hero headings */
+.text-shimmer {
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
 }
 
-/* Custom gradient text animations */
-@keyframes gradient-shift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+/* Glassmorphism card effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient-shift 3s ease infinite;
+/* Glow effect for icons and accents */
+.glow-success { filter: drop-shadow(0 0 8px oklch(0.72 0.19 163)); }
+.glow-info { filter: drop-shadow(0 0 8px oklch(0.72 0.15 231)); }
+.glow-warning { filter: drop-shadow(0 0 8px oklch(0.8 0.16 84)); }
+.glow-primary { filter: drop-shadow(0 0 8px oklch(0.6 0.22 264)); }
+
+/* Gradient border for feature cards */
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent, rgba(255,255,255,0.05));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  pointer-events: none;
 }
 
-/* Enhanced app card animations */
-.app-card-enter {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.app-card-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 300ms, transform 300ms;
-}
-
-/* Platform badge animations */
+/* Platform badge float animation */
 .platform-badge {
   animation: float 3s ease-in-out infinite;
 }
-
-.platform-badge:nth-child(2) {
-  animation-delay: 0.5s;
-}
-
-.platform-badge:nth-child(3) {
-  animation-delay: 1s;
-}
-
-.platform-badge:nth-child(4) {
-  animation-delay: 1.5s;
-}
-
-.platform-badge:nth-child(5) {
-  animation-delay: 2s;
-}
+.platform-badge:nth-child(2) { animation-delay: 0.5s; }
+.platform-badge:nth-child(3) { animation-delay: 1s; }
+.platform-badge:nth-child(4) { animation-delay: 1.5s; }
+.platform-badge:nth-child(5) { animation-delay: 2s; }
 
 @keyframes float {
-  0%, 100% { 
-    transform: translateY(0px); 
-  }
-  50% { 
-    transform: translateY(-8px); 
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
 }
 
-/* Enhanced hover effects for cards */
+/* Card hover lift effect */
 .card-hover-lift {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 .card-hover-lift:hover {
   transform: translateY(-8px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-/* Stats section animations */
-.stats {
-  animation: slideInUp 0.6s ease-out;
+/* Feature card hover with glow */
+.feature-card {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.feature-card:hover {
+  transform: translateY(-6px) scale(1.01);
 }
 
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Number counter styling */
+.stat-number {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 
-/* Tab hover effects */
-.tabs .tab {
-  transition: all 0.2s ease;
-}
-
-.tabs .tab:hover {
-  transform: translateY(-2px);
-}
-
-/* Enhanced button hover effects */
-.btn {
-  transition: all 0.2s ease;
-}
-
-.btn:hover {
-  transform: scale(1.05);
-}
-
-/* Dropdown menu animations */
-.dropdown-content {
-  animation: dropdownFadeIn 0.2s ease-out;
-}
-
-@keyframes dropdownFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Hero section gradient animation */
-.hero {
-  background-size: 200% 200%;
-  animation: gradientShift 8s ease infinite;
-}
-
-@keyframes gradientShift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-/* Enhanced chip hover effects */
-.chip {
-  transition: all 0.2s ease;
-}
-
-.chip:hover {
-  transform: scale(1.1);
-  z-index: 10;
-}
-
-/* Loading states for future use */
-.loading-skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-/* Responsive adjustments */
 @media (max-width: 768px) {
-  .platform-badge {
-    animation: none;
-  }
-  
-  .card-hover-lift:hover {
-    transform: translateY(-4px);
-  }
+  .platform-badge { animation: none; }
+  .card-hover-lift:hover { transform: translateY(-4px); }
+  .feature-card:hover { transform: translateY(-3px) scale(1); }
 }
-
-

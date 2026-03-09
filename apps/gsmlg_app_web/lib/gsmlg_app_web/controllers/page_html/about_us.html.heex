@@ -24,8 +24,7 @@
     class="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black py-8 sm:py-12"
   >
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 space-y-12 sm:space-y-16">
-      
-<!-- Our Story Section -->
+      <!-- Our Story Section -->
       <div class="text-center">
         <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
           {dgettext("navigation", "Our Story")}
@@ -37,12 +36,12 @@
           )}
         </p>
 
-        <div class="card lg:card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
+        <.dm_card class="card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
           <figure class="lg:w-1/2 relative overflow-hidden max-h-96 lg:max-h-none">
             <img
               src="/images/people-in-skyscraper.jpg"
               alt="Hong Kong Skyline"
-              class="w-full h-full object-cover rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none transition-transform duration-500 group-hover:scale-110"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             </div>
@@ -75,7 +74,7 @@
               </p>
             </div>
           </div>
-        </div>
+        </.dm_card>
       </div>
       
 <!-- Our Mission Section -->
@@ -91,8 +90,7 @@
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <!-- Open Source Commitment -->
-          <div class="card bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+          <.dm_card class="bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <div class="card-body text-center">
               <div class="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <.dm_mdi name="source-merge" class="w-8 h-8 text-success" />
@@ -107,10 +105,9 @@
                 )}
               </p>
             </div>
-          </div>
-          
-<!-- Quality Focus -->
-          <div class="card bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+          </.dm_card>
+
+          <.dm_card class="bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <div class="card-body text-center">
               <div class="w-16 h-16 bg-warning/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <.dm_mdi name="star" class="w-8 h-8 text-warning" />
@@ -125,10 +122,9 @@
                 )}
               </p>
             </div>
-          </div>
-          
-<!-- Community Focus -->
-          <div class="card bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group">
+          </.dm_card>
+
+          <.dm_card class="bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <div class="card-body text-center">
               <div class="w-16 h-16 bg-info/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <.dm_mdi name="account-group" class="w-8 h-8 text-info" />
@@ -143,7 +139,7 @@
                 )}
               </p>
             </div>
-          </div>
+          </.dm_card>
         </div>
       </div>
       
@@ -154,8 +150,7 @@
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- Active -->
-          <div class="text-center">
+          <.dm_card class="bg-transparent shadow-none text-center">
             <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <.dm_mdi name="run" class="w-8 h-8 text-primary" />
             </div>
@@ -186,10 +181,9 @@
                 )}
               </li>
             </ul>
-          </div>
-          
-<!-- Optimistic -->
-          <div class="text-center">
+          </.dm_card>
+
+          <.dm_card class="bg-transparent shadow-none text-center">
             <div class="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <.dm_mdi name="lightbulb" class="w-8 h-8 text-secondary" />
             </div>
@@ -204,8 +198,10 @@
             </p>
             <ul class="text-left text-gray-400 space-y-2">
               <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
-                {dgettext("common", "Solution-oriented mindset")}
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext(
+                  "common",
+                  "Solution-oriented mindset"
+                )}
               </li>
               <li class="flex items-center">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext(
@@ -220,10 +216,9 @@
                 )}
               </li>
             </ul>
-          </div>
-          
-<!-- Passionate -->
-          <div class="text-center">
+          </.dm_card>
+
+          <.dm_card class="bg-transparent shadow-none text-center">
             <div class="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <.dm_mdi name="heart" class="w-8 h-8 text-accent" />
             </div>
@@ -236,8 +231,10 @@
             </p>
             <ul class="text-left text-gray-400 space-y-2">
               <li class="flex items-center">
-                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" />
-                {dgettext("common", "Deep technical expertise")}
+                <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext(
+                  "common",
+                  "Deep technical expertise"
+                )}
               </li>
               <li class="flex items-center">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext(
@@ -252,17 +249,17 @@
                 )}
               </li>
             </ul>
-          </div>
+          </.dm_card>
         </div>
       </div>
       
 <!-- Technology Stack Section -->
-      <div class="card lg:card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
+      <.dm_card class="card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
         <figure class="lg:w-1/2 relative overflow-hidden max-h-96 lg:max-h-none">
           <img
             src="/images/space-earth-light.jpg"
             alt="Technology"
-            class="w-full h-full object-cover rounded-t-lg lg:rounded-l-lg lg:rounded-tr-none transition-transform duration-500 group-hover:scale-110"
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
           <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           </div>
@@ -282,11 +279,11 @@
               )}
             </p>
             <div class="flex flex-wrap gap-2">
-              <span class="badge badge-primary">{dgettext("common", "Elixir")}</span>
-              <span class="badge badge-secondary">{dgettext("common", "Phoenix")}</span>
-              <span class="badge badge-accent">{dgettext("common", "LiveView")}</span>
-              <span class="badge badge-info">{dgettext("common", "PostgreSQL")}</span>
-              <span class="badge badge-success">{dgettext("common", "Docker")}</span>
+              <.dm_badge variant="primary">{dgettext("common", "Elixir")}</.dm_badge>
+              <.dm_badge variant="secondary">{dgettext("common", "Phoenix")}</.dm_badge>
+              <.dm_badge variant="tertiary">{dgettext("common", "LiveView")}</.dm_badge>
+              <.dm_badge variant="info">{dgettext("common", "PostgreSQL")}</.dm_badge>
+              <.dm_badge variant="success">{dgettext("common", "Docker")}</.dm_badge>
             </div>
             <p class="text-base sm:text-lg leading-relaxed">
               {dgettext(
@@ -296,7 +293,7 @@
             </p>
           </div>
         </div>
-      </div>
+      </.dm_card>
       
 <!-- Contact & Community Section -->
       <div class="text-center py-16 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl">
@@ -310,22 +307,26 @@
           )}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <.link href="/apps" class="btn btn-primary btn-lg">
-            <.dm_mdi name="application" class="w-5 h-5 mr-2" /> {dgettext(
-              "navigation",
-              "Explore Our Projects"
-            )}
-          </.link>
-          <.link
-            href="https://github.com/gsmlg"
-            target="_blank"
-            class="btn btn-outline btn-lg border-white text-white hover:bg-white hover:text-black"
+          <.dm_btn variant="primary" size="lg">
+            <.link href="/apps" class="flex items-center gap-2">
+              <.dm_mdi name="application" class="w-5 h-5" /> {dgettext(
+                "navigation",
+                "Explore Our Projects"
+              )}
+            </.link>
+          </.dm_btn>
+          <.dm_btn
+            variant="outline"
+            size="lg"
+            class="border-white text-white hover:bg-white hover:text-black"
           >
-            <.dm_mdi name="github" class="w-5 h-5 mr-2" /> {dgettext(
-              "navigation",
-              "Follow on GitHub"
-            )}
-          </.link>
+            <.link href="https://github.com/gsmlg" target="_blank" class="flex items-center gap-2">
+              <.dm_mdi name="github" class="w-5 h-5" /> {dgettext(
+                "navigation",
+                "Follow on GitHub"
+              )}
+            </.link>
+          </.dm_btn>
         </div>
         <div class="mt-8 flex items-center justify-center gap-2 text-gray-400">
           <.dm_mdi name="email" class="w-4 h-4" />

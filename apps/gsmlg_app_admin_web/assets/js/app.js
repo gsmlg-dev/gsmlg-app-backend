@@ -3,8 +3,12 @@ import "../vendor/js/phoenix_html.js"
 import { Socket } from "../vendor/js/phoenix.js"
 import { LiveSocket } from "../vendor/js/phoenix_live_view.js"
 
-// Import and register el-markdown custom element
+// Import and register duskmoon custom elements
+import "@duskmoon-dev/elements/register"
 import "@duskmoon-dev/el-markdown/register"
+
+// Import duskmoon LiveView hooks
+import * as DuskmoonHooks from "phoenix_duskmoon/hooks"
 
 // Custom web component for collapsible thinking box
 // Maintains collapse state across LiveView updates
@@ -282,7 +286,7 @@ Hooks.ModalAutoOpen = {
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   params: { _csrf_token: csrfToken },
-  hooks: Hooks
+  hooks: { ...DuskmoonHooks, ...Hooks }
 })
 
 liveSocket.connect()

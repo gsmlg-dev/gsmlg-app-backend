@@ -23,6 +23,7 @@ mix format                   # Format all code including HEEx
 mix test                     # Run all tests
 mix test apps/gsmlg_app_admin/test/path_test.exs:25  # Single test line
 mix lint                     # Credo + Dialyzer across all apps
+mix compile --warnings-as-errors  # CI enforces this — fix all warnings
 ```
 
 ## Technology Stack
