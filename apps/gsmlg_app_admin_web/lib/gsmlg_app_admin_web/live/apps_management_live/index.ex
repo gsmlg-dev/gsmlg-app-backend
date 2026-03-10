@@ -4,8 +4,6 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Index do
 
   Provides functionality for:
   - Listing all apps with active/deleted filter
-  - Creating new apps
-  - Editing existing apps
   - Soft deleting and restoring apps
   - Manual reordering via position input
   """
@@ -13,7 +11,6 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Index do
   use GsmlgAppAdminWeb, :live_view
 
   alias GsmlgAppAdmin.Apps
-  alias GsmlgAppAdmin.Apps.App
 
   @impl true
   def mount(_params, _session, socket) do
@@ -28,34 +25,8 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Index do
   end
 
   @impl true
-  def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
-  end
-
-  defp apply_action(socket, :index, _params) do
-    socket
-    |> assign(:page_title, "Apps Management")
-    |> assign(:app, nil)
-  end
-
-  defp apply_action(socket, :new, _params) do
-    socket
-    |> assign(:page_title, "New App")
-    |> assign(:app, %App{})
-  end
-
-  defp apply_action(socket, :edit, %{"id" => id}) do
-    app = Apps.get_app_with_store_links!(id)
-
-    socket
-    |> assign(:page_title, "Edit App")
-    |> assign(:app, app)
-  end
-
-  @impl true
-  def handle_info({GsmlgAppAdminWeb.AppsManagementLive.Form, {:saved, _app}}, socket) do
-    {:ok, apps} = Apps.list_apps_with_store_links(socket.assigns.show_deleted)
-    {:noreply, assign(socket, :apps, apps)}
+  def handle_params(_params, _url, socket) do
+    {:noreply, assign(socket, :page_title, "Apps Management")}
   end
 
   @impl true
@@ -140,7 +111,7 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Index do
             />
             <span class="label-text text-sm">Show deleted</span>
           </label>
-          <.link patch={~p"/apps/new"} class="btn btn-primary">
+          <.link navigate={~p"/apps/new"} class="btn btn-primary">
             <.dm_mdi name="plus" class="w-4 h-4 mr-2" /> Add App
           </.link>
         </div>
@@ -159,7 +130,7 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Index do
                 <% end %>
               </p>
               <%= unless @show_deleted do %>
-                <.link patch={~p"/apps/new"} class="btn btn-primary">
+                <.link navigate={~p"/apps/new"} class="btn btn-primary">
                   Add Your First App
                 </.link>
               <% end %>
@@ -225,7 +196,7 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Index do
                         onchange="this.dispatchEvent(new Event('blur', {bubbles: true})); this.setAttribute('phx-value-order', this.value)"
                       />
                     </div>
-                    <.link patch={~p"/apps/#{app.id}/edit"} class="btn btn-ghost btn-sm">
+                    <.link navigate={~p"/apps/#{app.id}/edit"} class="btn btn-ghost btn-sm">
                       <.dm_mdi name="pencil" class="w-4 h-4" />
                     </.link>
                     <%= if app.is_active do %>
@@ -254,20 +225,6 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Index do
         <% end %>
       </div>
     </div>
-
-    <.dm_modal :if={@live_action in [:new, :edit]} id="app-modal">
-      <:title>{@page_title}</:title>
-      <:body>
-        <.live_component
-          module={GsmlgAppAdminWeb.AppsManagementLive.Form}
-          id={@app.id || :new}
-          title={@page_title}
-          action={@live_action}
-          app={@app}
-          patch={~p"/apps"}
-        />
-      </:body>
-    </.dm_modal>
     """
   end
 

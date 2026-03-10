@@ -71,8 +71,8 @@ defmodule GsmlgAppAdminWeb.Router do
 
       # Apps management routes
       live "/apps", AppsManagementLive.Index, :index
-      live "/apps/new", AppsManagementLive.Index, :new
-      live "/apps/:id/edit", AppsManagementLive.Index, :edit
+      live "/apps/new", AppsManagementLive.Form, :new
+      live "/apps/:id/edit", AppsManagementLive.Form, :edit
 
       # Provider Settings routes (must be before /chat/:id to avoid matching "settings" as an ID)
       live "/chat/settings", ProviderSettingsLive.Index, :index
