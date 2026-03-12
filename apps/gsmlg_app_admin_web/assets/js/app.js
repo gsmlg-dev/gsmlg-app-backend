@@ -297,3 +297,37 @@ liveSocket.connect()
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket
 
+// Theme switcher - uses event delegation so it works regardless of DOM timing
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme)
+  const btn = document.getElementById("theme-switcher")
+  if (!btn) return
+  const lightIcon = btn.querySelector(".theme-icon-light")
+  const darkIcon = btn.querySelector(".theme-icon-dark")
+  if (theme === "moonlight") {
+    lightIcon?.classList.add("hidden")
+    darkIcon?.classList.remove("hidden")
+  } else {
+    lightIcon?.classList.remove("hidden")
+    darkIcon?.classList.add("hidden")
+  }
+}
+
+// Apply saved theme immediately
+applyTheme(localStorage.getItem("theme") || "sunshine")
+
+// Use event delegation - works even if button is added later
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("#theme-switcher")
+  if (!btn) return
+  const current = localStorage.getItem("theme") || "sunshine"
+  const next = current === "sunshine" ? "moonlight" : "sunshine"
+  localStorage.setItem("theme", next)
+  applyTheme(next)
+})
+
+// Re-sync icon state after LiveView navigations
+document.addEventListener("phx:page-loading-stop", () => {
+  applyTheme(localStorage.getItem("theme") || "sunshine")
+})
+

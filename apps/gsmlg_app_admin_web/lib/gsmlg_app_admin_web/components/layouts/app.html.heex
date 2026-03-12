@@ -5,6 +5,10 @@
     </.link>
   </:logo>
   <:user_profile>
+    <button id="theme-switcher" class="btn btn-ghost btn-sm self-center">
+      <.dm_mdi name="weather-sunny" class="w-5 h-5 theme-icon-light" />
+      <.dm_mdi name="weather-night" class="w-5 h-5 theme-icon-dark hidden" />
+    </button>
     <%= if @current_user do %>
       <.dm_dropdown position="bottom">
         <:trigger class="btn btn-ghost self-center">
