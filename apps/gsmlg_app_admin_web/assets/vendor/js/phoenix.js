@@ -665,6 +665,11 @@ var LongPoll = class {
     this.ajax("GET", headers, null, () => this.ontimeout(), (resp) => {
       if (resp) {
         var { status, token, messages } = resp;
+        if (status === 410 && this.token !== null) {
+          this.onerror(410);
+          this.closeAndRetry(3410, "session_gone", false);
+          return;
+        }
         this.token = token;
       } else {
         status = 0;
@@ -1030,6 +1035,7 @@ var Socket = class {
     this.channels = [];
     this.sendBuffer = [];
     this.ref = 0;
+    this.fallbackRef = null;
     this.timeout = opts.timeout || DEFAULT_TIMEOUT;
     this.transport = opts.transport || global.WebSocket || LongPoll;
     this.primaryPassedHealthCheck = false;
@@ -1043,6 +1049,7 @@ var Socket = class {
     this.disconnecting = false;
     this.binaryType = opts.binaryType || "arraybuffer";
     this.connectClock = 1;
+    this.pageHidden = false;
     if (this.transport !== LongPoll) {
       this.encode = opts.encode || this.defaultEncoder;
       this.decode = opts.decode || this.defaultDecoder;
@@ -1062,6 +1069,16 @@ var Socket = class {
         if (awaitingConnectionOnPageShow === this.connectClock) {
           awaitingConnectionOnPageShow = null;
           this.connect();
+        }
+      });
+      phxWindow.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+          this.pageHidden = true;
+        } else {
+          this.pageHidden = false;
+          if (!this.isConnected() && !this.closeWasClean) {
+            this.teardown(() => this.connect());
+          }
         }
       });
     }
@@ -1094,6 +1111,11 @@ var Socket = class {
     this.heartbeatTimer = null;
     this.pendingHeartbeatRef = null;
     this.reconnectTimer = new Timer(() => {
+      if (this.pageHidden) {
+        this.log("Not reconnecting as page is hidden!");
+        this.teardown();
+        return;
+      }
       this.teardown(() => this.connect());
     }, this.reconnectAfterMs);
     this.authToken = opts.authToken;
@@ -1268,6 +1290,19 @@ var Socket = class {
   }
   /**
    * @private
+   *
+   * @param {Function}
+   */
+  transportName(transport) {
+    switch (transport) {
+      case LongPoll:
+        return "LongPoll";
+      default:
+        return transport.name;
+    }
+  }
+  /**
+   * @private
    */
   transportConnect() {
     this.connectClock++;
@@ -1295,14 +1330,15 @@ var Socket = class {
     let established = false;
     let primaryTransport = true;
     let openRef, errorRef;
+    let fallbackTransportName = this.transportName(fallbackTransport);
     let fallback = (reason) => {
-      this.log("transport", `falling back to ${fallbackTransport.name}...`, reason);
+      this.log("transport", `falling back to ${fallbackTransportName}...`, reason);
       this.off([openRef, errorRef]);
       primaryTransport = false;
       this.replaceTransport(fallbackTransport);
       this.transportConnect();
     };
-    if (this.getSession(`phx:fallback:${fallbackTransport.name}`)) {
+    if (this.getSession(`phx:fallback:${fallbackTransportName}`)) {
       return fallback("memorized");
     }
     this.fallbackTimer = setTimeout(fallback, fallbackThreshold);
@@ -1313,13 +1349,17 @@ var Socket = class {
         fallback(reason);
       }
     });
-    this.onOpen(() => {
+    if (this.fallbackRef) {
+      this.off([this.fallbackRef]);
+    }
+    this.fallbackRef = this.onOpen(() => {
       established = true;
       if (!primaryTransport) {
+        let fallbackTransportName2 = this.transportName(fallbackTransport);
         if (!this.primaryPassedHealthCheck) {
-          this.storeSession(`phx:fallback:${fallbackTransport.name}`, "true");
+          this.storeSession(`phx:fallback:${fallbackTransportName2}`, "true");
         }
-        return this.log("transport", `established ${fallbackTransport.name} fallback`);
+        return this.log("transport", `established ${fallbackTransportName2} fallback`);
       }
       clearTimeout(this.fallbackTimer);
       this.fallbackTimer = setTimeout(fallback, fallbackThreshold);
@@ -1337,7 +1377,7 @@ var Socket = class {
   }
   onConnOpen() {
     if (this.hasLogger())
-      this.log("transport", `${this.transport.name} connected to ${this.endPointURL()}`);
+      this.log("transport", `${this.transportName(this.transport)} connected to ${this.endPointURL()}`);
     this.closeWasClean = false;
     this.disconnecting = false;
     this.establishedConnections++;
@@ -1372,23 +1412,15 @@ var Socket = class {
     if (!this.conn) {
       return callback && callback();
     }
-    let connectClock = this.connectClock;
-    this.waitForBufferDone(() => {
-      if (connectClock !== this.connectClock) {
-        return;
+    const connToClose = this.conn;
+    this.waitForBufferDone(connToClose, () => {
+      if (code) {
+        connToClose.close(code, reason || "");
+      } else {
+        connToClose.close();
       }
-      if (this.conn) {
-        if (code) {
-          this.conn.close(code, reason || "");
-        } else {
-          this.conn.close();
-        }
-      }
-      this.waitForSocketClosed(() => {
-        if (connectClock !== this.connectClock) {
-          return;
-        }
-        if (this.conn) {
+      this.waitForSocketClosed(connToClose, () => {
+        if (this.conn === connToClose) {
           this.conn.onopen = function() {
           };
           this.conn.onerror = function() {
@@ -1403,25 +1435,28 @@ var Socket = class {
       });
     });
   }
-  waitForBufferDone(callback, tries = 1) {
-    if (tries === 5 || !this.conn || !this.conn.bufferedAmount) {
+  waitForBufferDone(conn, callback, tries = 1) {
+    if (tries === 5 || !conn.bufferedAmount) {
       callback();
       return;
     }
     setTimeout(() => {
-      this.waitForBufferDone(callback, tries + 1);
+      this.waitForBufferDone(conn, callback, tries + 1);
     }, 150 * tries);
   }
-  waitForSocketClosed(callback, tries = 1) {
-    if (tries === 5 || !this.conn || this.conn.readyState === SOCKET_STATES.closed) {
+  waitForSocketClosed(conn, callback, tries = 1) {
+    if (tries === 5 || conn.readyState === SOCKET_STATES.closed) {
       callback();
       return;
     }
     setTimeout(() => {
-      this.waitForSocketClosed(callback, tries + 1);
+      this.waitForSocketClosed(conn, callback, tries + 1);
     }, 150 * tries);
   }
   onConnClose(event) {
+    if (this.conn)
+      this.conn.onclose = () => {
+      };
     let closeCode = event && event.code;
     if (this.hasLogger())
       this.log("transport", "close", event);

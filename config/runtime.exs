@@ -68,3 +68,13 @@ if config_env() == :prod do
 
   config :ash_authentication, :jwt, signing_secret: jwt_signing_secret
 end
+
+# Configure Tailwind CSS binary path from environment variable
+if tailwind_bin = System.get_env("TAILWINDCSS_BIN") do
+  config :tailwind, path: tailwind_bin
+end
+
+# Configure Bun binary path from environment variable
+if bun_bin = System.get_env("BUN_BIN") do
+  config :bun, path: bun_bin
+end

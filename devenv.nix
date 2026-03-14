@@ -1,26 +1,34 @@
-{ pkgs, lib, config, inputs, ... }:
-
-let
-  pkgs-stable = import inputs.nixpkgs-stable { system = pkgs.stdenv.system; };
-in
 {
+  pkgs,
+  lib,
+  config,
+  inputs,
+  ...
+}: let
+  pkgs-stable = import inputs.nixpkgs-stable {system = pkgs.stdenv.system;};
+in {
   env.GREET = "GSMLG APP Backend";
+  env.MIX_BUN_PATH = lib.getExe pkgs-stable.bun;
+  env.MIX_TAILWIND_PATH = lib.getExe pkgs-stable.tailwindcss_4;
+  env.NODE_PATH = "${config.git.root}/deps";
 
-  packages = with pkgs-stable; [
-    git
-    figlet
-    lolcat
-    watchman
-    tailwindcss_4
-  ] ++ lib.optionals stdenv.isLinux [
-    inotify-tools
-  ];
+  packages = with pkgs-stable;
+    [
+      git
+      figlet
+      lolcat
+      watchman
+      tailwindcss_4
+      beam28Packages.elixir-ls
+    ]
+    ++ lib.optionals stdenv.isLinux [
+      inotify-tools
+    ];
 
   languages.elixir.enable = true;
-  languages.elixir.package = pkgs-stable.beam27Packages.elixir;
+  languages.elixir.package = pkgs-stable.beam28Packages.elixir;
 
   languages.javascript.enable = true;
-  languages.javascript.pnpm.enable = true;
   languages.javascript.bun.enable = true;
   languages.javascript.bun.package = pkgs-stable.bun;
 
@@ -39,10 +47,10 @@ in
     enable = true;
     package = pkgs-stable.postgresql_14;
     initialDatabases = [
-      { name = "gsmlg_app_admin_dev"; }
-      { name = "gsmlg_app_admin_test"; }
+      {name = "gsmlg_app_admin_dev";}
+      {name = "gsmlg_app_admin_test";}
     ];
-    listen_addresses = "";  # Unix socket only, no TCP — avoids port conflicts
+    listen_addresses = ""; # Unix socket only, no TCP — avoids port conflicts
     settings = {
       max_connections = 200;
       shared_buffers = "512MB";
@@ -55,6 +63,4 @@ in
       ALTER DATABASE gsmlg_app_admin_test OWNER TO gsmlg_app;
     '';
   };
-
 }
-
