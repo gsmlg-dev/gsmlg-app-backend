@@ -23,11 +23,29 @@ defmodule GsmlgAppAdminWeb.Router do
     plug(GsmlgAppAdminWeb.Plugs.RequireAuth)
   end
 
+  pipeline :api_gateway do
+    plug(:accepts, ["json"])
+    plug(GsmlgAppAdminWeb.Plugs.CORS)
+    plug(GsmlgAppAdminWeb.Plugs.ApiKeyAuth)
+  end
+
   # Public API routes (no authentication required)
   scope "/api", GsmlgAppAdminWeb.Api do
     pipe_through(:api)
 
     get "/apps", AppsController, :index
+  end
+
+  # AI Gateway API routes (API key authenticated)
+  scope "/api/v1", GsmlgAppAdminWeb.Api.V1 do
+    pipe_through(:api_gateway)
+
+    # OpenAI-compatible endpoints
+    post "/chat/completions", ChatCompletionsController, :create
+    get "/models", ModelsController, :index
+
+    # Anthropic-compatible endpoint
+    post "/messages", MessagesController, :create
   end
 
   # Public authentication routes

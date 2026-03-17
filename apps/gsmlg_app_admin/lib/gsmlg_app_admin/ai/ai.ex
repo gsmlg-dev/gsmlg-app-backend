@@ -11,9 +11,10 @@ defmodule GsmlgAppAdmin.AI do
 
   use Ash.Domain
 
-  alias GsmlgAppAdmin.AI.{Conversation, Message, Provider}
+  alias GsmlgAppAdmin.AI.{ApiKey, Conversation, Message, Provider}
 
   resources do
+    resource(ApiKey)
     resource(Conversation)
     resource(Message)
     resource(Provider)
@@ -190,5 +191,77 @@ defmodule GsmlgAppAdmin.AI do
     provider
     |> Ash.Changeset.for_update(:increment_usage, %{messages: messages, tokens: tokens})
     |> Ash.update()
+  end
+
+  # --- API Key Management ---
+
+  @doc """
+  Creates a new API key. Returns the record with `__raw_key__` set (shown once).
+  """
+  def create_api_key(attrs) do
+    ApiKey
+    |> Ash.Changeset.for_create(:create, attrs)
+    |> Ash.create()
+  end
+
+  @doc """
+  Lists all API keys for a user.
+  """
+  def list_api_keys_for_user(user_id) do
+    require Ash.Query
+
+    ApiKey
+    |> Ash.Query.filter(user_id == ^user_id)
+    |> Ash.Query.sort(created_at: :desc)
+    |> Ash.read()
+  end
+
+  @doc """
+  Lists all API keys.
+  """
+  def list_api_keys do
+    require Ash.Query
+
+    ApiKey
+    |> Ash.Query.sort(created_at: :desc)
+    |> Ash.read()
+  end
+
+  @doc """
+  Gets an API key by ID.
+  """
+  def get_api_key!(id) do
+    require Ash.Query
+
+    ApiKey
+    |> Ash.Query.filter(id == ^id)
+    |> Ash.read_one!()
+  end
+
+  @doc """
+  Revokes an API key.
+  """
+  def revoke_api_key(api_key) do
+    api_key
+    |> Ash.Changeset.for_update(:revoke, %{})
+    |> Ash.update()
+  end
+
+  @doc """
+  Updates an API key.
+  """
+  def update_api_key(api_key, attrs) do
+    api_key
+    |> Ash.Changeset.for_update(:update, attrs)
+    |> Ash.update()
+  end
+
+  @doc """
+  Deletes an API key.
+  """
+  def delete_api_key(api_key) do
+    api_key
+    |> Ash.Changeset.for_destroy(:destroy, %{})
+    |> Ash.destroy()
   end
 end
