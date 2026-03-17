@@ -8,6 +8,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
 
   alias GsmlgAppAdmin.AI
   alias GsmlgAppAdmin.AI.Client
+  alias GsmlgAppAdmin.AI.ToolExecutor
 
   require Logger
 
@@ -120,13 +121,20 @@ defmodule GsmlgAppAdmin.AI.Gateway do
 
   @doc """
   Runs a named agent with the tool execution loop.
+
+  The agent iterates: call LLM → if tool_calls in response, execute tools,
+  append results, call LLM again. Stops when LLM returns content without
+  tool_calls or max_iterations is reached.
   """
   def run_agent(api_key, agent, messages, opts \\ []) do
     model = Keyword.get(opts, :model, agent.model)
-    _max_iterations = Keyword.get(opts, :max_iterations, agent.max_iterations)
+    max_iterations = Keyword.get(opts, :max_iterations, agent.max_iterations)
 
     with {:ok, provider} <- resolve_provider(api_key, model),
          :ok <- check_scope(api_key, :agents) do
+      # Load agent's tools
+      {:ok, tools} = AI.list_tools_for_agent(agent.id)
+
       # Build agent request
       request = %{
         model: model,
@@ -142,20 +150,28 @@ defmodule GsmlgAppAdmin.AI.Gateway do
       all_messages = build_messages(request)
       call_opts = build_call_opts(request, opts)
 
-      # Simple non-streaming agent execution
-      case Client.chat_completion(provider, all_messages, call_opts) do
-        {:ok, response} ->
-          tokens = get_in(response, [:usage, "total_tokens"]) || 0
-          log_usage(api_key, provider, request, :agent, :success, tokens: tokens)
+      # Add tool definitions if agent has tools
+      call_opts =
+        if tools != [] do
+          tool_defs = Enum.map(tools, &tool_to_function_def/1)
+          Keyword.put(call_opts, :tools, tool_defs)
+        else
+          call_opts
+        end
+
+      # Run the agent loop
+      case agent_loop(provider, all_messages, call_opts, tools, max_iterations, 0) do
+        {:ok, content, iterations, total_tokens} ->
+          log_usage(api_key, provider, request, :agent, :success, tokens: total_tokens)
 
           {:ok,
            %{
              id: "agent_run_#{generate_id()}",
              agent: agent.slug,
              model: model,
-             content: response.content,
-             iterations: 1,
-             usage: response[:usage] || %{}
+             content: content,
+             iterations: iterations,
+             usage: %{"total_tokens" => total_tokens}
            }}
 
         {:error, reason} ->
@@ -163,6 +179,94 @@ defmodule GsmlgAppAdmin.AI.Gateway do
           {:error, reason}
       end
     end
+  end
+
+  defp agent_loop(_provider, _messages, _call_opts, _tools, max_iter, iteration)
+       when iteration >= max_iter do
+    {:error, "Agent reached maximum iterations (#{max_iter}) without a final response."}
+  end
+
+  defp agent_loop(provider, messages, call_opts, tools, max_iter, iteration) do
+    case Client.chat_completion(provider, messages, call_opts) do
+      {:ok, response} ->
+        tokens = get_in(response, [:usage, "total_tokens"]) || 0
+        tool_calls = response[:tool_calls] || []
+
+        if tool_calls == [] do
+          # No tool calls — final response
+          {:ok, response.content, iteration + 1, tokens}
+        else
+          # Execute each tool call and build tool result messages
+          tool_messages = execute_tool_calls(tool_calls, tools)
+
+          # Append assistant message (with tool_calls) and tool results
+          updated_messages =
+            messages ++
+              [%{role: "assistant", content: response.content, tool_calls: tool_calls}] ++
+              tool_messages
+
+          agent_loop(provider, updated_messages, call_opts, tools, max_iter, iteration + 1)
+        end
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  defp execute_tool_calls(tool_calls, tools) do
+    tools_by_name = Map.new(tools, fn t -> {t.name, t} end)
+
+    Enum.map(tool_calls, fn tc ->
+      tool_name = tc["function"]["name"] || tc[:function][:name]
+      arguments = tc["function"]["arguments"] || tc[:function][:arguments] || %{}
+      call_id = tc["id"] || tc[:id] || generate_id()
+
+      arguments =
+        case arguments do
+          args when is_binary(args) ->
+            case Jason.decode(args) do
+              {:ok, parsed} -> parsed
+              _ -> %{"raw" => args}
+            end
+
+          args when is_map(args) ->
+            args
+
+          _ ->
+            %{}
+        end
+
+      result =
+        case Map.get(tools_by_name, tool_name) do
+          nil ->
+            "Error: unknown tool '#{tool_name}'"
+
+          tool ->
+            case ToolExecutor.execute(tool, arguments) do
+              {:ok, :passthrough} ->
+                "Tool '#{tool_name}' is passthrough — result delegated to caller."
+
+              {:ok, result} ->
+                result
+
+              {:error, reason} ->
+                "Error executing tool '#{tool_name}': #{reason}"
+            end
+        end
+
+      %{role: "tool", tool_call_id: call_id, content: result}
+    end)
+  end
+
+  defp tool_to_function_def(tool) do
+    %{
+      type: "function",
+      function: %{
+        name: tool.name,
+        description: tool.description,
+        parameters: tool.parameters_schema || %{"type" => "object", "properties" => %{}}
+      }
+    }
   end
 
   @doc """

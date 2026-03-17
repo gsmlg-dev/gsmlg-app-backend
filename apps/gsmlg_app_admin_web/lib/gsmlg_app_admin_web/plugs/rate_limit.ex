@@ -77,7 +77,7 @@ defmodule GsmlgAppAdminWeb.Plugs.RateLimit do
   defp ensure_ets_table do
     if :ets.whereis(@ets_table) == :undefined do
       try do
-        :ets.new(@ets_table, [:named_table, :public, :bag])
+        :ets.new(@ets_table, [:named_table, :public, :duplicate_bag])
       rescue
         ArgumentError -> :ok
       end
