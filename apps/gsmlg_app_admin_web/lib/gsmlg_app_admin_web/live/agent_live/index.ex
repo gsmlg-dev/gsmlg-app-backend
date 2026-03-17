@@ -1,0 +1,110 @@
+defmodule GsmlgAppAdminWeb.AgentLive.Index do
+  use GsmlgAppAdminWeb, :live_view
+
+  alias GsmlgAppAdmin.AI
+
+  @impl true
+  def mount(_params, _session, socket) do
+    {:ok, agents} = AI.list_agents()
+    {:ok, assign(socket, agents: agents)}
+  end
+
+  @impl true
+  def handle_params(params, _url, socket) do
+    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  end
+
+  defp apply_action(socket, :new, _params) do
+    assign(socket, page_title: "New Agent", agent: nil)
+  end
+
+  defp apply_action(socket, :edit, %{"id" => id}) do
+    assign(socket, page_title: "Edit Agent", agent: AI.get_agent!(id))
+  end
+
+  defp apply_action(socket, :index, _params) do
+    assign(socket, page_title: "Agents", agent: nil)
+  end
+
+  @impl true
+  def handle_event("delete", %{"id" => id}, socket) do
+    agent = AI.get_agent!(id)
+
+    case AI.delete_agent(agent) do
+      :ok ->
+        {:ok, agents} = AI.list_agents()
+        {:noreply, assign(socket, agents: agents) |> put_flash(:info, "Agent deleted.")}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Failed to delete agent.")}
+    end
+  end
+
+  @impl true
+  def handle_info({GsmlgAppAdminWeb.AgentLive.FormComponent, {:saved, _}}, socket) do
+    {:ok, agents} = AI.list_agents()
+    {:noreply, assign(socket, agents: agents)}
+  end
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <div class="container mx-auto p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Agents</h1>
+        <.link patch={~p"/agents/new"} class="btn btn-primary">New Agent</.link>
+      </div>
+
+      <.dm_modal
+        :if={@live_action in [:new, :edit]}
+        id="agent-modal"
+        size="lg"
+      >
+        <:body>
+          <.live_component
+            module={GsmlgAppAdminWeb.AgentLive.FormComponent}
+            id={(@agent && @agent.id) || :new}
+            action={@live_action}
+            agent={@agent}
+            patch={~p"/agents"}
+          />
+        </:body>
+      </.dm_modal>
+
+      <div class="space-y-3">
+        <div :for={a <- @agents} id={"agent-#{a.id}"} class="card bg-base-100 shadow-sm p-4">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <h3 class="font-bold">{a.name}</h3>
+              <p class="text-sm opacity-70">
+                Slug: {a.slug} | Model: {a.model || "auto"} | Max iterations: {a.max_iterations}
+              </p>
+              <div class="flex gap-2 mt-1">
+                <span class={[
+                  "badge badge-sm",
+                  if(a.is_active, do: "badge-success", else: "badge-error")
+                ]}>
+                  {if a.is_active, do: "Active", else: "Inactive"}
+                </span>
+                <span class="badge badge-sm badge-outline">tool_choice: {a.tool_choice}</span>
+              </div>
+              <p :if={a.description} class="text-sm mt-1">{a.description}</p>
+            </div>
+            <div class="flex gap-2 ml-4">
+              <.link patch={~p"/agents/#{a.id}/edit"} class="btn btn-sm btn-ghost">Edit</.link>
+              <button
+                phx-click="delete"
+                phx-value-id={a.id}
+                data-confirm="Delete this agent?"
+                class="btn btn-sm btn-error"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+end

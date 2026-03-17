@@ -114,6 +114,33 @@ defmodule GsmlgAppAdminWeb.Router do
       # AI Chat routes
       live "/chat", ChatLive.Index, :index
       live "/chat/:id", ChatLive.Index, :conversation
+
+      # API Gateway management routes
+      live "/api-keys", ApiKeyLive.Index, :index
+      live "/api-keys/new", ApiKeyLive.Index, :new
+      live "/api-keys/:id/edit", ApiKeyLive.Index, :edit
+
+      live "/system-prompts", SystemPromptLive.Index, :index
+      live "/system-prompts/new", SystemPromptLive.Index, :new
+      live "/system-prompts/:id/edit", SystemPromptLive.Index, :edit
+
+      live "/memories", MemoryLive.Index, :index
+      live "/memories/new", MemoryLive.Index, :new
+      live "/memories/:id/edit", MemoryLive.Index, :edit
+
+      live "/tools", ToolLive.Index, :index
+      live "/tools/new", ToolLive.Index, :new
+      live "/tools/:id/edit", ToolLive.Index, :edit
+
+      live "/agents", AgentLive.Index, :index
+      live "/agents/new", AgentLive.Index, :new
+      live "/agents/:id/edit", AgentLive.Index, :edit
+
+      live "/mcp-servers", McpServerLive.Index, :index
+      live "/mcp-servers/new", McpServerLive.Index, :new
+      live "/mcp-servers/:id/edit", McpServerLive.Index, :edit
+
+      live "/api-usage", ApiUsageLive.Index, :index
     end
   end
 
