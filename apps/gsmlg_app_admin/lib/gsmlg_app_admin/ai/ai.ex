@@ -11,13 +11,24 @@ defmodule GsmlgAppAdmin.AI do
 
   use Ash.Domain
 
-  alias GsmlgAppAdmin.AI.{ApiKey, Conversation, Message, Provider}
+  alias GsmlgAppAdmin.AI.{
+    ApiKey,
+    ApiKeyTemplate,
+    Conversation,
+    Memory,
+    Message,
+    Provider,
+    SystemPromptTemplate
+  }
 
   resources do
     resource(ApiKey)
+    resource(ApiKeyTemplate)
     resource(Conversation)
+    resource(Memory)
     resource(Message)
     resource(Provider)
+    resource(SystemPromptTemplate)
   end
 
   @doc """
@@ -263,5 +274,125 @@ defmodule GsmlgAppAdmin.AI do
     api_key
     |> Ash.Changeset.for_destroy(:destroy, %{})
     |> Ash.destroy()
+  end
+
+  # --- System Prompt Templates ---
+
+  @doc """
+  Lists all system prompt templates.
+  """
+  def list_system_prompt_templates do
+    require Ash.Query
+
+    SystemPromptTemplate
+    |> Ash.Query.sort(priority: :desc)
+    |> Ash.read()
+  end
+
+  @doc """
+  Gets active default templates.
+  """
+  def list_default_templates do
+    SystemPromptTemplate.active_defaults()
+  end
+
+  @doc """
+  Creates a system prompt template.
+  """
+  def create_system_prompt_template(attrs) do
+    SystemPromptTemplate
+    |> Ash.Changeset.for_create(:create, attrs)
+    |> Ash.create()
+  end
+
+  @doc """
+  Updates a system prompt template.
+  """
+  def update_system_prompt_template(template, attrs) do
+    template
+    |> Ash.Changeset.for_update(:update, attrs)
+    |> Ash.update()
+  end
+
+  @doc """
+  Deletes a system prompt template.
+  """
+  def delete_system_prompt_template(template) do
+    template
+    |> Ash.Changeset.for_destroy(:destroy, %{})
+    |> Ash.destroy()
+  end
+
+  @doc """
+  Gets a system prompt template by ID.
+  """
+  def get_system_prompt_template!(id) do
+    require Ash.Query
+
+    SystemPromptTemplate
+    |> Ash.Query.filter(id == ^id)
+    |> Ash.read_one!()
+  end
+
+  # --- Memories ---
+
+  @doc """
+  Lists all memories.
+  """
+  def list_memories do
+    require Ash.Query
+
+    Memory
+    |> Ash.Query.sort(priority: :desc)
+    |> Ash.read()
+  end
+
+  @doc """
+  Fetches memories for a gateway request.
+  """
+  def get_memories_for_request(opts \\ []) do
+    Memory.for_request(
+      Keyword.get(opts, :user_id),
+      Keyword.get(opts, :api_key_id),
+      Keyword.get(opts, :agent_id)
+    )
+  end
+
+  @doc """
+  Creates a memory.
+  """
+  def create_memory(attrs) do
+    Memory
+    |> Ash.Changeset.for_create(:create, attrs)
+    |> Ash.create()
+  end
+
+  @doc """
+  Updates a memory.
+  """
+  def update_memory(memory, attrs) do
+    memory
+    |> Ash.Changeset.for_update(:update, attrs)
+    |> Ash.update()
+  end
+
+  @doc """
+  Deletes a memory.
+  """
+  def delete_memory(memory) do
+    memory
+    |> Ash.Changeset.for_destroy(:destroy, %{})
+    |> Ash.destroy()
+  end
+
+  @doc """
+  Gets a memory by ID.
+  """
+  def get_memory!(id) do
+    require Ash.Query
+
+    Memory
+    |> Ash.Query.filter(id == ^id)
+    |> Ash.read_one!()
   end
 end

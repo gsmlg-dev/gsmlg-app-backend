@@ -26,6 +26,8 @@ defmodule GsmlgAppAdmin.AI.Gateway do
   def chat(api_key, request, opts \\ []) do
     with {:ok, provider} <- resolve_provider(api_key, request.model),
          :ok <- check_scope(api_key, :chat_completions) do
+      # Inject system prompts and memories
+      request = inject_system_context(api_key, request)
       messages = build_messages(request)
       call_opts = build_call_opts(request, opts)
 
@@ -127,6 +129,91 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     Enum.find(providers, fn provider ->
       all_models = [provider.model | provider.available_models || []]
       model in all_models
+    end)
+  end
+
+  @doc false
+  def inject_system_context(api_key, request) do
+    # 1. Fetch default templates + key-specific templates
+    templates = fetch_templates(api_key)
+
+    # 2. Fetch memories (global + user + key scoped)
+    memories = fetch_memories(api_key)
+
+    # 3. Render templates with variables
+    memory_text = format_memories(memories)
+
+    variables = %{
+      "memory" => memory_text,
+      "date" => Date.utc_today() |> Date.to_iso8601(),
+      "datetime" => DateTime.utc_now() |> DateTime.to_iso8601()
+    }
+
+    rendered_templates =
+      templates
+      |> Enum.map(fn template -> render_template(template.content, variables) end)
+      |> Enum.join("\n\n")
+
+    # 4. Merge admin system prompt with caller's system prompt
+    admin_system =
+      case rendered_templates do
+        "" -> nil
+        text -> text
+      end
+
+    # If no template uses {{memory}} and we have memories, add them as separate context
+    admin_system =
+      if admin_system && String.contains?(rendered_templates, memory_text) do
+        admin_system
+      else
+        case {admin_system, memory_text} do
+          {nil, ""} -> nil
+          {nil, mem} -> "Context:\n#{mem}"
+          {sys, ""} -> sys
+          {sys, mem} -> "#{sys}\n\nContext:\n#{mem}"
+        end
+      end
+
+    # Prepend admin system to caller's system
+    combined_system =
+      case {admin_system, request[:system]} do
+        {nil, caller} -> caller
+        {admin, nil} -> admin
+        {admin, caller} -> "#{admin}\n\n#{caller}"
+      end
+
+    Map.put(request, :system, combined_system)
+  end
+
+  defp fetch_templates(_api_key) do
+    # Get default templates
+    case AI.list_default_templates() do
+      {:ok, templates} -> templates
+      _ -> []
+    end
+  end
+
+  defp fetch_memories(api_key) do
+    case AI.get_memories_for_request(
+           user_id: api_key.user_id,
+           api_key_id: api_key.id
+         ) do
+      {:ok, memories} -> memories
+      _ -> []
+    end
+  end
+
+  defp format_memories([]), do: ""
+
+  defp format_memories(memories) do
+    memories
+    |> Enum.map(fn m -> "- [#{m.category}] #{m.content}" end)
+    |> Enum.join("\n")
+  end
+
+  defp render_template(content, variables) do
+    Enum.reduce(variables, content, fn {key, value}, acc ->
+      String.replace(acc, "{{#{key}}}", value || "")
     end)
   end
 
