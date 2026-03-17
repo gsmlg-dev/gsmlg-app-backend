@@ -12,23 +12,35 @@ defmodule GsmlgAppAdmin.AI do
   use Ash.Domain
 
   alias GsmlgAppAdmin.AI.{
+    Agent,
+    AgentTemplate,
+    AgentTool,
     ApiKey,
     ApiKeyTemplate,
+    ApiUsageLog,
     Conversation,
+    McpServer,
     Memory,
     Message,
     Provider,
-    SystemPromptTemplate
+    SystemPromptTemplate,
+    Tool
   }
 
   resources do
+    resource(Agent)
+    resource(AgentTemplate)
+    resource(AgentTool)
     resource(ApiKey)
     resource(ApiKeyTemplate)
+    resource(ApiUsageLog)
     resource(Conversation)
+    resource(McpServer)
     resource(Memory)
     resource(Message)
     resource(Provider)
     resource(SystemPromptTemplate)
+    resource(Tool)
   end
 
   @doc """
@@ -394,5 +406,231 @@ defmodule GsmlgAppAdmin.AI do
     Memory
     |> Ash.Query.filter(id == ^id)
     |> Ash.read_one!()
+  end
+
+  # --- Agents ---
+
+  @doc """
+  Lists all active agents.
+  """
+  def list_active_agents do
+    Agent.active()
+  end
+
+  @doc """
+  Lists all agents.
+  """
+  def list_agents do
+    require Ash.Query
+
+    Agent
+    |> Ash.Query.sort(name: :asc)
+    |> Ash.read()
+  end
+
+  @doc """
+  Gets an agent by slug.
+  """
+  def get_agent_by_slug(slug) do
+    case Agent.by_slug(slug) do
+      {:ok, [agent]} -> {:ok, agent}
+      {:ok, []} -> {:error, :not_found}
+      error -> error
+    end
+  end
+
+  @doc """
+  Gets an agent by ID.
+  """
+  def get_agent!(id) do
+    require Ash.Query
+
+    Agent
+    |> Ash.Query.filter(id == ^id)
+    |> Ash.read_one!()
+  end
+
+  @doc """
+  Creates an agent.
+  """
+  def create_agent(attrs) do
+    Agent
+    |> Ash.Changeset.for_create(:create, attrs)
+    |> Ash.create()
+  end
+
+  @doc """
+  Updates an agent.
+  """
+  def update_agent(agent, attrs) do
+    agent
+    |> Ash.Changeset.for_update(:update, attrs)
+    |> Ash.update()
+  end
+
+  @doc """
+  Deletes an agent.
+  """
+  def delete_agent(agent) do
+    agent
+    |> Ash.Changeset.for_destroy(:destroy, %{})
+    |> Ash.destroy()
+  end
+
+  # --- Tools ---
+
+  @doc """
+  Lists all active tools.
+  """
+  def list_active_tools do
+    Tool.active()
+  end
+
+  @doc """
+  Lists all tools.
+  """
+  def list_tools do
+    require Ash.Query
+
+    Tool
+    |> Ash.Query.sort(name: :asc)
+    |> Ash.read()
+  end
+
+  @doc """
+  Lists tools for an agent via join table.
+  """
+  def list_tools_for_agent(agent_id) do
+    require Ash.Query
+
+    AgentTool
+    |> Ash.Query.filter(agent_id == ^agent_id)
+    |> Ash.Query.sort(position: :asc)
+    |> Ash.read()
+    |> case do
+      {:ok, agent_tools} ->
+        tool_ids = Enum.map(agent_tools, & &1.tool_id)
+
+        Tool
+        |> Ash.Query.filter(id in ^tool_ids and is_active == true)
+        |> Ash.read()
+
+      error ->
+        error
+    end
+  end
+
+  @doc """
+  Gets a tool by ID.
+  """
+  def get_tool!(id) do
+    require Ash.Query
+
+    Tool
+    |> Ash.Query.filter(id == ^id)
+    |> Ash.read_one!()
+  end
+
+  @doc """
+  Creates a tool.
+  """
+  def create_tool(attrs) do
+    Tool
+    |> Ash.Changeset.for_create(:create, attrs)
+    |> Ash.create()
+  end
+
+  @doc """
+  Updates a tool.
+  """
+  def update_tool(tool, attrs) do
+    tool
+    |> Ash.Changeset.for_update(:update, attrs)
+    |> Ash.update()
+  end
+
+  @doc """
+  Deletes a tool.
+  """
+  def delete_tool(tool) do
+    tool
+    |> Ash.Changeset.for_destroy(:destroy, %{})
+    |> Ash.destroy()
+  end
+
+  # --- MCP Servers ---
+
+  @doc """
+  Lists all MCP servers.
+  """
+  def list_mcp_servers do
+    require Ash.Query
+
+    McpServer
+    |> Ash.Query.sort(name: :asc)
+    |> Ash.read()
+  end
+
+  @doc """
+  Gets an MCP server by ID.
+  """
+  def get_mcp_server!(id) do
+    require Ash.Query
+
+    McpServer
+    |> Ash.Query.filter(id == ^id)
+    |> Ash.read_one!()
+  end
+
+  @doc """
+  Creates an MCP server.
+  """
+  def create_mcp_server(attrs) do
+    McpServer
+    |> Ash.Changeset.for_create(:create, attrs)
+    |> Ash.create()
+  end
+
+  @doc """
+  Updates an MCP server.
+  """
+  def update_mcp_server(server, attrs) do
+    server
+    |> Ash.Changeset.for_update(:update, attrs)
+    |> Ash.update()
+  end
+
+  @doc """
+  Deletes an MCP server.
+  """
+  def delete_mcp_server(server) do
+    server
+    |> Ash.Changeset.for_destroy(:destroy, %{})
+    |> Ash.destroy()
+  end
+
+  # --- API Usage Logs ---
+
+  @doc """
+  Logs an API usage entry.
+  """
+  def log_api_usage(attrs) do
+    ApiUsageLog
+    |> Ash.Changeset.for_create(:create, attrs)
+    |> Ash.create()
+  end
+
+  @doc """
+  Lists recent API usage logs.
+  """
+  def list_recent_usage_logs do
+    ApiUsageLog.recent()
+  end
+
+  @doc """
+  Lists usage logs for a specific API key.
+  """
+  def list_usage_logs_for_key(api_key_id) do
+    ApiUsageLog.for_api_key(api_key_id)
   end
 end

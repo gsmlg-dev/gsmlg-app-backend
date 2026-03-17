@@ -27,6 +27,7 @@ defmodule GsmlgAppAdminWeb.Router do
     plug(:accepts, ["json"])
     plug(GsmlgAppAdminWeb.Plugs.CORS)
     plug(GsmlgAppAdminWeb.Plugs.ApiKeyAuth)
+    plug(GsmlgAppAdminWeb.Plugs.RateLimit)
   end
 
   # Public API routes (no authentication required)
@@ -46,6 +47,18 @@ defmodule GsmlgAppAdminWeb.Router do
 
     # Anthropic-compatible endpoint
     post "/messages", MessagesController, :create
+
+    # Image generation
+    post "/images/generations", ImagesController, :create
+
+    # OCR
+    post "/ocr", OcrController, :create
+
+    # Agent endpoints
+    post "/agents/:agent_slug/chat", AgentController, :chat
+    get "/agents", AgentController, :index
+    get "/agents/:agent_slug", AgentController, :show
+    get "/agents/:agent_slug/tools", AgentController, :tools
   end
 
   # Public authentication routes
