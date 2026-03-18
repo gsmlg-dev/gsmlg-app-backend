@@ -1,4 +1,4 @@
-defmodule GsmlgAppAdminWeb.SystemPromptLive.FormComponent do
+defmodule GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.FormComponent do
   use GsmlgAppAdminWeb, :live_component
 
   alias GsmlgAppAdmin.AI

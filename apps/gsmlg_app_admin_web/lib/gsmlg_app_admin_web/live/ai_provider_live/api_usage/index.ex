@@ -1,5 +1,7 @@
-defmodule GsmlgAppAdminWeb.ApiUsageLive.Index do
+defmodule GsmlgAppAdminWeb.AiProviderLive.ApiUsage.Index do
   use GsmlgAppAdminWeb, :live_view
+
+  import GsmlgAppAdminWeb.AiProviderLive.Components
 
   alias GsmlgAppAdmin.AI
 
@@ -10,17 +12,18 @@ defmodule GsmlgAppAdminWeb.ApiUsageLive.Index do
   end
 
   @impl true
-  def handle_params(_params, _url, socket) do
-    {:noreply, socket}
+  def handle_params(_params, url, socket) do
+    {:noreply, assign(socket, :current_uri, URI.parse(url).path)}
   end
 
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="container mx-auto p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">API Usage Logs</h1>
-      </div>
+    <.ai_provider_layout current_path={@current_uri}>
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-2xl font-bold">API Usage Logs</h1>
+        </div>
 
       <div class="overflow-x-auto">
         <table class="table table-sm w-full">
@@ -63,10 +66,11 @@ defmodule GsmlgAppAdminWeb.ApiUsageLive.Index do
         </table>
       </div>
 
-      <div :if={@logs == []} class="text-center py-8 opacity-50">
-        No usage logs yet.
+        <div :if={@logs == []} class="text-center py-8 opacity-50">
+          No usage logs yet.
+        </div>
       </div>
-    </div>
+    </.ai_provider_layout>
     """
   end
 end

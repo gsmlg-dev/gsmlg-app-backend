@@ -1,4 +1,4 @@
-defmodule GsmlgAppAdminWeb.ProviderSettingsLive.FormComponent do
+defmodule GsmlgAppAdminWeb.AiProviderLive.ProviderSettings.FormComponent do
   @moduledoc """
   LiveComponent for creating and editing AI providers.
   """

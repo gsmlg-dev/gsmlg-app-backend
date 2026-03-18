@@ -1,5 +1,7 @@
-defmodule GsmlgAppAdminWeb.MemoryLive.Index do
+defmodule GsmlgAppAdminWeb.AiProviderLive.Memory.Index do
   use GsmlgAppAdminWeb, :live_view
+
+  import GsmlgAppAdminWeb.AiProviderLive.Components
 
   alias GsmlgAppAdmin.AI
 
@@ -10,7 +12,8 @@ defmodule GsmlgAppAdminWeb.MemoryLive.Index do
   end
 
   @impl true
-  def handle_params(params, _url, socket) do
+  def handle_params(params, url, socket) do
+    socket = assign(socket, :current_uri, URI.parse(url).path)
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
@@ -41,7 +44,7 @@ defmodule GsmlgAppAdminWeb.MemoryLive.Index do
   end
 
   @impl true
-  def handle_info({GsmlgAppAdminWeb.MemoryLive.FormComponent, {:saved, _}}, socket) do
+  def handle_info({GsmlgAppAdminWeb.AiProviderLive.Memory.FormComponent, {:saved, _}}, socket) do
     {:ok, memories} = AI.list_memories()
     {:noreply, assign(socket, memories: memories)}
   end
@@ -49,10 +52,11 @@ defmodule GsmlgAppAdminWeb.MemoryLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="container mx-auto p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Memories</h1>
-        <.link patch={~p"/memories/new"} class="btn btn-primary">New Memory</.link>
+    <.ai_provider_layout current_path={@current_uri}>
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-2xl font-bold">Memories</h1>
+        <.link patch={~p"/ai-provider/memories/new"} class="btn btn-primary">New Memory</.link>
       </div>
 
       <.dm_modal
@@ -62,11 +66,11 @@ defmodule GsmlgAppAdminWeb.MemoryLive.Index do
       >
         <:body>
           <.live_component
-            module={GsmlgAppAdminWeb.MemoryLive.FormComponent}
+            module={GsmlgAppAdminWeb.AiProviderLive.Memory.FormComponent}
             id={(@memory && @memory.id) || :new}
             action={@live_action}
             memory={@memory}
-            patch={~p"/memories"}
+            patch={~p"/ai-provider/memories"}
           />
         </:body>
       </.dm_modal>
@@ -83,7 +87,7 @@ defmodule GsmlgAppAdminWeb.MemoryLive.Index do
               <p class="text-sm">{m.content}</p>
             </div>
             <div class="flex gap-2 ml-4">
-              <.link patch={~p"/memories/#{m.id}/edit"} class="btn btn-sm btn-ghost">Edit</.link>
+              <.link patch={~p"/ai-provider/memories/#{m.id}/edit"} class="btn btn-sm btn-ghost">Edit</.link>
               <button
                 phx-click="delete"
                 phx-value-id={m.id}
@@ -95,8 +99,9 @@ defmodule GsmlgAppAdminWeb.MemoryLive.Index do
             </div>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </.ai_provider_layout>
     """
   end
 end

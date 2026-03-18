@@ -1,9 +1,11 @@
-defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Index do
+defmodule GsmlgAppAdminWeb.AiProviderLive.ProviderSettings.Index do
   @moduledoc """
   LiveView for listing and managing AI providers.
   """
 
   use GsmlgAppAdminWeb, :live_view
+
+  import GsmlgAppAdminWeb.AiProviderLive.Components
 
   alias GsmlgAppAdmin.AI
 
@@ -19,8 +21,8 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Index do
   end
 
   @impl true
-  def handle_params(_params, _url, socket) do
-    {:noreply, socket}
+  def handle_params(_params, url, socket) do
+    {:noreply, assign(socket, :current_uri, URI.parse(url).path)}
   end
 
   @impl true
@@ -62,26 +64,22 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="container mx-auto px-4 py-8">
-      <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-4">
-          <.link navigate={~p"/chat"} class="btn btn-ghost btn-sm">
-            <.dm_mdi name="arrow-left" class="w-4 h-4" /> Back to Chat
-          </.link>
+    <.ai_provider_layout current_path={@current_uri}>
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
           <h1 class="text-2xl font-bold">AI Provider Settings</h1>
+          <.link navigate={~p"/ai-provider/providers/new"} class="btn btn-primary">
+            <.dm_mdi name="plus" class="w-4 h-4 mr-2" /> Add Provider
+          </.link>
         </div>
-        <.link navigate={~p"/chat/settings/new"} class="btn btn-primary">
-          <.dm_mdi name="plus" class="w-4 h-4 mr-2" /> Add Provider
-        </.link>
-      </div>
 
-      <div class="grid gap-4">
+        <div class="grid gap-4">
         <%= if Enum.empty?(@providers) do %>
           <div class="card bg-base-200 p-8 text-center">
             <div class="flex flex-col items-center gap-4">
               <.dm_mdi name="chip" class="w-16 h-16 text-base-content/50" />
               <p class="text-lg">No AI providers configured yet.</p>
-              <.link navigate={~p"/chat/settings/new"} class="btn btn-primary">
+              <.link navigate={~p"/ai-provider/providers/new"} class="btn btn-primary">
                 Add Your First Provider
               </.link>
             </div>
@@ -94,7 +92,7 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Index do
                   <div class="flex-1">
                     <div class="flex items-center gap-3">
                       <.link
-                        navigate={~p"/chat/settings/#{provider.id}"}
+                        navigate={~p"/ai-provider/providers/#{provider.id}"}
                         class="text-lg font-semibold hover:text-primary"
                       >
                         {provider.name}
@@ -132,7 +130,7 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Index do
                       <% end %>
                     </button>
                     <.link
-                      navigate={~p"/chat/settings/#{provider.id}/edit"}
+                      navigate={~p"/ai-provider/providers/#{provider.id}/edit"}
                       class="btn btn-ghost btn-sm"
                     >
                       <.dm_mdi name="pencil" class="w-4 h-4" />
@@ -156,8 +154,9 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Index do
             </div>
           <% end %>
         <% end %>
+        </div>
       </div>
-    </div>
+    </.ai_provider_layout>
     """
   end
 end

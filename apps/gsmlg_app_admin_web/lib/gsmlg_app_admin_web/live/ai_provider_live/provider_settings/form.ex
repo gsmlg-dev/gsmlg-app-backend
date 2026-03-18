@@ -1,9 +1,11 @@
-defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
+defmodule GsmlgAppAdminWeb.AiProviderLive.ProviderSettings.Form do
   @moduledoc """
   LiveView for creating and editing AI providers.
   """
 
   use GsmlgAppAdminWeb, :live_view
+
+  import GsmlgAppAdminWeb.AiProviderLive.Components
 
   alias GsmlgAppAdmin.AI
   alias GsmlgAppAdmin.AI.Provider
@@ -51,8 +53,8 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
   end
 
   @impl true
-  def handle_params(_params, _url, socket) do
-    {:noreply, socket}
+  def handle_params(_params, url, socket) do
+    {:noreply, assign(socket, :current_uri, URI.parse(url).path)}
   end
 
   @impl true
@@ -145,7 +147,7 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
         {:noreply,
          socket
          |> put_flash(:info, "Provider created successfully")
-         |> push_navigate(to: ~p"/chat/settings")}
+         |> push_navigate(to: ~p"/ai-provider/providers")}
 
       {:error, form} ->
         {:noreply, assign(socket, :form, to_form(form))}
@@ -158,7 +160,7 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
         {:noreply,
          socket
          |> put_flash(:info, "Provider updated successfully")
-         |> push_navigate(to: ~p"/chat/settings")}
+         |> push_navigate(to: ~p"/ai-provider/providers")}
 
       {:error, form} ->
         {:noreply, assign(socket, :form, to_form(form))}
@@ -192,13 +194,11 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="container mx-auto px-4 py-8 max-w-2xl">
-      <div class="flex items-center gap-4 mb-6">
-        <.link navigate={~p"/chat/settings"} class="btn btn-ghost btn-sm">
-          <.dm_mdi name="arrow-left" class="w-4 h-4" /> Back to Settings
-        </.link>
-        <h1 class="text-2xl font-bold">{@page_title}</h1>
-      </div>
+    <.ai_provider_layout current_path={@current_uri}>
+      <div class="p-6 max-w-2xl">
+        <div class="flex items-center gap-4 mb-6">
+          <h1 class="text-2xl font-bold">{@page_title}</h1>
+        </div>
 
       <%= if @preset_options do %>
         <div class="card bg-base-100 shadow-md mb-6">
@@ -359,7 +359,7 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
               <p class="text-sm text-base-content/70 mb-2">
                 Manage models for this provider. Check models to make them available in conversations.
               </p>
-              
+
     <!-- Add new models (batch input supported) -->
               <div class="mb-3">
                 <textarea
@@ -449,7 +449,7 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
             </div>
 
             <div class="flex justify-end gap-3 pt-4">
-              <.link navigate={~p"/chat/settings"} class="btn btn-ghost">
+              <.link navigate={~p"/ai-provider/providers"} class="btn btn-ghost">
                 Cancel
               </.link>
               <button type="submit" class="btn btn-primary" phx-disable-with="Saving...">
@@ -459,8 +459,9 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Form do
             </div>
           </.form>
         </div>
+        </div>
       </div>
-    </div>
+    </.ai_provider_layout>
     """
   end
 end

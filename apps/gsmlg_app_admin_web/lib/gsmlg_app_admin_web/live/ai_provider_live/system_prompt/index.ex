@@ -1,5 +1,7 @@
-defmodule GsmlgAppAdminWeb.SystemPromptLive.Index do
+defmodule GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.Index do
   use GsmlgAppAdminWeb, :live_view
+
+  import GsmlgAppAdminWeb.AiProviderLive.Components
 
   alias GsmlgAppAdmin.AI
 
@@ -10,7 +12,8 @@ defmodule GsmlgAppAdminWeb.SystemPromptLive.Index do
   end
 
   @impl true
-  def handle_params(params, _url, socket) do
+  def handle_params(params, url, socket) do
+    socket = assign(socket, :current_uri, URI.parse(url).path)
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
@@ -41,7 +44,7 @@ defmodule GsmlgAppAdminWeb.SystemPromptLive.Index do
   end
 
   @impl true
-  def handle_info({GsmlgAppAdminWeb.SystemPromptLive.FormComponent, {:saved, _}}, socket) do
+  def handle_info({GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.FormComponent, {:saved, _}}, socket) do
     {:ok, templates} = AI.list_system_prompt_templates()
     {:noreply, assign(socket, templates: templates)}
   end
@@ -49,10 +52,11 @@ defmodule GsmlgAppAdminWeb.SystemPromptLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="container mx-auto p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">System Prompt Templates</h1>
-        <.link patch={~p"/system-prompts/new"} class="btn btn-primary">New Template</.link>
+    <.ai_provider_layout current_path={@current_uri}>
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-2xl font-bold">System Prompt Templates</h1>
+        <.link patch={~p"/ai-provider/system-prompts/new"} class="btn btn-primary">New Template</.link>
       </div>
 
       <.dm_modal
@@ -62,11 +66,11 @@ defmodule GsmlgAppAdminWeb.SystemPromptLive.Index do
       >
         <:body>
           <.live_component
-            module={GsmlgAppAdminWeb.SystemPromptLive.FormComponent}
+            module={GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.FormComponent}
             id={(@template && @template.id) || :new}
             action={@live_action}
             template={@template}
-            patch={~p"/system-prompts"}
+            patch={~p"/ai-provider/system-prompts"}
           />
         </:body>
       </.dm_modal>
@@ -89,7 +93,7 @@ defmodule GsmlgAppAdminWeb.SystemPromptLive.Index do
               <pre class="mt-2 text-sm bg-base-200 p-2 rounded max-h-32 overflow-auto whitespace-pre-wrap">{t.content}</pre>
             </div>
             <div class="flex gap-2">
-              <.link patch={~p"/system-prompts/#{t.id}/edit"} class="btn btn-sm btn-ghost">
+              <.link patch={~p"/ai-provider/system-prompts/#{t.id}/edit"} class="btn btn-sm btn-ghost">
                 Edit
               </.link>
               <button
@@ -103,8 +107,9 @@ defmodule GsmlgAppAdminWeb.SystemPromptLive.Index do
             </div>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </.ai_provider_layout>
     """
   end
 end

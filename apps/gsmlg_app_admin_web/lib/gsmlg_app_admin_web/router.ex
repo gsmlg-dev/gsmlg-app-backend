@@ -105,42 +105,41 @@ defmodule GsmlgAppAdminWeb.Router do
       live "/apps/new", AppsManagementLive.Form, :new
       live "/apps/:id/edit", AppsManagementLive.Form, :edit
 
-      # Provider Settings routes (must be before /chat/:id to avoid matching "settings" as an ID)
-      live "/chat/settings", ProviderSettingsLive.Index, :index
-      live "/chat/settings/new", ProviderSettingsLive.Form, :new
-      live "/chat/settings/:id", ProviderSettingsLive.Show, :show
-      live "/chat/settings/:id/edit", ProviderSettingsLive.Form, :edit
-
       # AI Chat routes
       live "/chat", ChatLive.Index, :index
       live "/chat/:id", ChatLive.Index, :conversation
 
-      # API Gateway management routes
-      live "/api-keys", ApiKeyLive.Index, :index
-      live "/api-keys/new", ApiKeyLive.Index, :new
-      live "/api-keys/:id/edit", ApiKeyLive.Index, :edit
+      # AI Provider module routes
+      live "/ai-provider/providers", AiProviderLive.ProviderSettings.Index, :index
+      live "/ai-provider/providers/new", AiProviderLive.ProviderSettings.Form, :new
+      live "/ai-provider/providers/:id", AiProviderLive.ProviderSettings.Show, :show
+      live "/ai-provider/providers/:id/edit", AiProviderLive.ProviderSettings.Form, :edit
 
-      live "/system-prompts", SystemPromptLive.Index, :index
-      live "/system-prompts/new", SystemPromptLive.Index, :new
-      live "/system-prompts/:id/edit", SystemPromptLive.Index, :edit
+      live "/ai-provider/api-keys", AiProviderLive.ApiKey.Index, :index
+      live "/ai-provider/api-keys/new", AiProviderLive.ApiKey.Index, :new
+      live "/ai-provider/api-keys/:id/edit", AiProviderLive.ApiKey.Index, :edit
 
-      live "/memories", MemoryLive.Index, :index
-      live "/memories/new", MemoryLive.Index, :new
-      live "/memories/:id/edit", MemoryLive.Index, :edit
+      live "/ai-provider/system-prompts", AiProviderLive.SystemPrompt.Index, :index
+      live "/ai-provider/system-prompts/new", AiProviderLive.SystemPrompt.Index, :new
+      live "/ai-provider/system-prompts/:id/edit", AiProviderLive.SystemPrompt.Index, :edit
 
-      live "/tools", ToolLive.Index, :index
-      live "/tools/new", ToolLive.Index, :new
-      live "/tools/:id/edit", ToolLive.Index, :edit
+      live "/ai-provider/memories", AiProviderLive.Memory.Index, :index
+      live "/ai-provider/memories/new", AiProviderLive.Memory.Index, :new
+      live "/ai-provider/memories/:id/edit", AiProviderLive.Memory.Index, :edit
 
-      live "/agents", AgentLive.Index, :index
-      live "/agents/new", AgentLive.Index, :new
-      live "/agents/:id/edit", AgentLive.Index, :edit
+      live "/ai-provider/tools", AiProviderLive.Tool.Index, :index
+      live "/ai-provider/tools/new", AiProviderLive.Tool.Index, :new
+      live "/ai-provider/tools/:id/edit", AiProviderLive.Tool.Index, :edit
 
-      live "/mcp-servers", McpServerLive.Index, :index
-      live "/mcp-servers/new", McpServerLive.Index, :new
-      live "/mcp-servers/:id/edit", McpServerLive.Index, :edit
+      live "/ai-provider/agents", AiProviderLive.Agent.Index, :index
+      live "/ai-provider/agents/new", AiProviderLive.Agent.Index, :new
+      live "/ai-provider/agents/:id/edit", AiProviderLive.Agent.Index, :edit
 
-      live "/api-usage", ApiUsageLive.Index, :index
+      live "/ai-provider/mcp-servers", AiProviderLive.McpServer.Index, :index
+      live "/ai-provider/mcp-servers/new", AiProviderLive.McpServer.Index, :new
+      live "/ai-provider/mcp-servers/:id/edit", AiProviderLive.McpServer.Index, :edit
+
+      live "/ai-provider/usage", AiProviderLive.ApiUsage.Index, :index
     end
   end
 

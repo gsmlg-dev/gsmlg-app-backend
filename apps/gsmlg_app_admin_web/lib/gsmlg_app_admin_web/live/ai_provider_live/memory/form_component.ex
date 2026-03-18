@@ -1,4 +1,4 @@
-defmodule GsmlgAppAdminWeb.MemoryLive.FormComponent do
+defmodule GsmlgAppAdminWeb.AiProviderLive.Memory.FormComponent do
   use GsmlgAppAdminWeb, :live_component
 
   alias GsmlgAppAdmin.AI

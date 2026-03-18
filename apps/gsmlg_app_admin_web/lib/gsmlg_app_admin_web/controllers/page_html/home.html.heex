@@ -1,31 +1,25 @@
-<%= if @current_user do %>
-  <div class="mb-4 p-4 bg-base-200 rounded-lg">
-    <h2 class="text-lg font-semibold mb-2">Admin Navigation</h2>
-    <div class="flex gap-2 flex-wrap">
-      <.link href="/users" class="btn btn-primary">
-        User Management
-      </.link>
-      <.link href="/apps" class="btn btn-primary">
-        Apps Management
-      </.link>
-      <.link href="/chat" class="btn btn-secondary">
-        AI Chat
-      </.link>
+<div class="container mx-auto px-4 w-full">
+  <%= if @current_user do %>
+    <div class="mb-4 p-4 bg-base-200 rounded-lg">
+      <h2 class="text-lg font-semibold mb-2">Admin Navigation</h2>
+      <div class="flex gap-2 flex-wrap">
+        <.link href="/users" class="btn btn-primary">
+          User Management
+        </.link>
+        <.link href="/apps" class="btn btn-primary">
+          Apps Management
+        </.link>
+        <.link href="/chat" class="btn btn-secondary">
+          AI Chat
+        </.link>
+        <.link href="/ai-provider/providers" class="btn btn-secondary">
+          AI Provider
+        </.link>
+      </div>
     </div>
-    <h2 class="text-lg font-semibold mb-2 mt-4">API Gateway</h2>
-    <div class="flex gap-2 flex-wrap">
-      <.link href="/api-keys" class="btn btn-outline btn-sm">API Keys</.link>
-      <.link href="/system-prompts" class="btn btn-outline btn-sm">System Prompts</.link>
-      <.link href="/memories" class="btn btn-outline btn-sm">Memories</.link>
-      <.link href="/tools" class="btn btn-outline btn-sm">Tools</.link>
-      <.link href="/agents" class="btn btn-outline btn-sm">Agents</.link>
-      <.link href="/mcp-servers" class="btn btn-outline btn-sm">MCP Servers</.link>
-      <.link href="/api-usage" class="btn btn-outline btn-sm">API Usage</.link>
-    </div>
-  </div>
-<% end %>
+  <% end %>
 
-<div class="flex flex-col items-center px-4 py-10 sm:px-6 sm:py-28 lg:px-8 xl:px-28 xl:py-32">
+  <div class="flex flex-col items-center px-4 py-10 sm:px-6 sm:py-28 lg:px-8 xl:px-28 xl:py-32">
   <div class="mx-auto max-w-xl lg:mx-0">
     <h1 class="text-4xl font-bold text-center">
       Best in the World!
@@ -42,5 +36,6 @@
         </p>
       </div>
     <% end %>
+    </div>
   </div>
 </div>

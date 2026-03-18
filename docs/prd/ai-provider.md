@@ -1086,22 +1086,21 @@ The Gateway never knows which external API format the request came from — it o
 
 ## 8. Admin UI (LiveView)
 
-All under existing `live_session :authenticated`:
+All under existing `live_session :authenticated`, grouped under the `/ai-provider` base URL and `AiProviderLive` module namespace:
 
 | Route | LiveView | Purpose |
 |---|---|---|
-| `/api-keys` | `ApiKeyLive.Index` | List, create (modal), edit, revoke |
-| `/api-keys/:id` | `ApiKeyLive.Show` | Detail + usage chart |
-| `/system-prompts` | `SystemPromptLive.Index` | CRUD with variable reference |
-| `/memories` | `MemoryLive.Index` | Filterable by scope/category |
-| `/tools` | `ToolLive.Index` | List, create, edit, test tools |
-| `/tools/:id` | `ToolLive.Show` | Tool detail + execution logs |
-| `/mcp-servers` | `McpServerLive.Index` | List, add, configure MCP servers |
-| `/mcp-servers/:id` | `McpServerLive.Show` | Server detail, health, synced tools |
-| `/agents` | `AgentLive.Index` | List, create, edit agents |
-| `/agents/:id` | `AgentLive.Show` | Agent detail + tool assignment + test chat |
-| `/agents/:id/edit` | `AgentLive.Form` | Agent configuration form |
-| `/api-usage` | `ApiUsageLive.Index` | Aggregated dashboard |
+| `/ai-provider/providers` | `AiProviderLive.ProviderSettings.Index` | List, create, edit providers |
+| `/ai-provider/providers/new` | `AiProviderLive.ProviderSettings.Form` | Create new provider |
+| `/ai-provider/providers/:id` | `AiProviderLive.ProviderSettings.Show` | Provider detail + usage stats |
+| `/ai-provider/providers/:id/edit` | `AiProviderLive.ProviderSettings.Form` | Edit existing provider |
+| `/ai-provider/api-keys` | `AiProviderLive.ApiKey.Index` | List, create (modal), edit, revoke |
+| `/ai-provider/system-prompts` | `AiProviderLive.SystemPrompt.Index` | CRUD with variable reference |
+| `/ai-provider/memories` | `AiProviderLive.Memory.Index` | Filterable by scope/category |
+| `/ai-provider/tools` | `AiProviderLive.Tool.Index` | List, create, edit, test tools |
+| `/ai-provider/mcp-servers` | `AiProviderLive.McpServer.Index` | List, add, configure MCP servers |
+| `/ai-provider/agents` | `AiProviderLive.Agent.Index` | List, create, edit agents |
+| `/ai-provider/usage` | `AiProviderLive.ApiUsage.Index` | Aggregated dashboard |
 
 Follows existing modal CRUD pattern (patch-based navigation, `dm_modal`).
 
@@ -1279,7 +1278,7 @@ config :gsmlg_app_admin, GsmlgAppAdmin.AI.Gateway,
 **Phase 6 — Tool Definitions**:
 
 - `AI.Tool` Ash resource + migration
-- Admin UI: ToolLive.Index + ToolLive.Show (CRUD + JSON Schema editor)
+- Admin UI: AiProviderLive.Tool.Index (CRUD + JSON Schema editor)
 - Tool execution engine: webhook executor, builtin handler registry
 - Tool test panel in admin UI (execute with sample args)
 - Webhook SSRF prevention (private IP blocking)
@@ -1294,7 +1293,7 @@ config :gsmlg_app_admin, GsmlgAppAdmin.AI.Gateway,
 - `tools/list` → auto-sync to `AI.Tool` records with `execution_type: :mcp`
 - `tools/call` → execute MCP tools during agent runs
 - `resources/list` → expose as template variables
-- Admin UI: McpServerLive (add server, view health, manage synced tools)
+- Admin UI: AiProviderLive.McpServer.Index (add server, view health, manage synced tools)
 - Connection health monitoring + auto-reconnect
 
 **Phase 8 — Agents**:
@@ -1304,7 +1303,7 @@ config :gsmlg_app_admin, GsmlgAppAdmin.AI.Gateway,
 - `Gateway.run_agent/4` with tool execution loop (including MCP tools)
 - `AgentController` with chat, index, show, tools endpoints
 - Agent streaming (tool_start/tool_end/content_delta/agent_end events)
-- Admin UI: AgentLive with tool picker (manual + MCP tools), template picker, test chat panel
+- Admin UI: AiProviderLive.Agent.Index with tool picker (manual + MCP tools), template picker, test chat panel
 
 **Phase 9 — Tool Use in Chat API**:
 
@@ -1345,7 +1344,7 @@ config :gsmlg_app_admin, GsmlgAppAdmin.AI.Gateway,
 | File | Purpose |
 |---|---|
 | `apps/gsmlg_app_admin/lib/gsmlg_app_admin/ai/ai.ex` | Register new resources (ApiKey, Tool, Agent, etc.), add domain functions |
-| `apps/gsmlg_app_admin_web/lib/gsmlg_app_admin_web/router.ex` | Add api_gateway pipeline, /api/v1 scope, LiveView routes for all features |
+| `apps/gsmlg_app_admin_web/lib/gsmlg_app_admin_web/router.ex` | Add api_gateway pipeline, /api/v1 scope, LiveView routes under /ai-provider |
 | `apps/gsmlg_app_admin/lib/gsmlg_app_admin/ai/client.ex` | Existing upstream chat client — Gateway delegates to this for chat + tool use |
 | `apps/gsmlg_app_admin/lib/gsmlg_app_admin/ai/gateway.ex` | New — core orchestration (chat, generate_image, extract_text, run_agent) |
 | `apps/gsmlg_app_admin/lib/gsmlg_app_admin/ai/tool_executor.ex` | New — tool execution engine (webhook, builtin, code handlers) |
@@ -1358,7 +1357,7 @@ config :gsmlg_app_admin, GsmlgAppAdmin.AI.Gateway,
 | `apps/gsmlg_app_admin/lib/gsmlg_app_admin/ai/mcp_client.ex` | New — MCP protocol client (stdio, SSE, Streamable HTTP transports) |
 | `apps/gsmlg_app_admin/lib/gsmlg_app_admin/ai/provider.ex` | Reference pattern for Ash resources; may need `provider_type` field |
 | `apps/gsmlg_app_admin/lib/gsmlg_app_admin/ai/provider_presets.ex` | Add image + OCR provider presets |
-| `apps/gsmlg_app_admin_web/lib/gsmlg_app_admin_web/live/provider_settings_live/index.ex` | Reference pattern for LiveView CRUD |
+| `apps/gsmlg_app_admin_web/lib/gsmlg_app_admin_web/live/ai_provider_live/` | All AI provider LiveViews under `AiProviderLive.*` namespace |
 
 ## 14. Dependencies
 

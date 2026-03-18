@@ -1,5 +1,7 @@
-defmodule GsmlgAppAdminWeb.AgentLive.Index do
+defmodule GsmlgAppAdminWeb.AiProviderLive.Agent.Index do
   use GsmlgAppAdminWeb, :live_view
+
+  import GsmlgAppAdminWeb.AiProviderLive.Components
 
   alias GsmlgAppAdmin.AI
 
@@ -10,7 +12,8 @@ defmodule GsmlgAppAdminWeb.AgentLive.Index do
   end
 
   @impl true
-  def handle_params(params, _url, socket) do
+  def handle_params(params, url, socket) do
+    socket = assign(socket, :current_uri, URI.parse(url).path)
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
@@ -41,7 +44,7 @@ defmodule GsmlgAppAdminWeb.AgentLive.Index do
   end
 
   @impl true
-  def handle_info({GsmlgAppAdminWeb.AgentLive.FormComponent, {:saved, _}}, socket) do
+  def handle_info({GsmlgAppAdminWeb.AiProviderLive.Agent.FormComponent, {:saved, _}}, socket) do
     {:ok, agents} = AI.list_agents()
     {:noreply, assign(socket, agents: agents)}
   end
@@ -49,10 +52,11 @@ defmodule GsmlgAppAdminWeb.AgentLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="container mx-auto p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Agents</h1>
-        <.link patch={~p"/agents/new"} class="btn btn-primary">New Agent</.link>
+    <.ai_provider_layout current_path={@current_uri}>
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-2xl font-bold">Agents</h1>
+        <.link patch={~p"/ai-provider/agents/new"} class="btn btn-primary">New Agent</.link>
       </div>
 
       <.dm_modal
@@ -62,11 +66,11 @@ defmodule GsmlgAppAdminWeb.AgentLive.Index do
       >
         <:body>
           <.live_component
-            module={GsmlgAppAdminWeb.AgentLive.FormComponent}
+            module={GsmlgAppAdminWeb.AiProviderLive.Agent.FormComponent}
             id={(@agent && @agent.id) || :new}
             action={@live_action}
             agent={@agent}
-            patch={~p"/agents"}
+            patch={~p"/ai-provider/agents"}
           />
         </:body>
       </.dm_modal>
@@ -91,7 +95,7 @@ defmodule GsmlgAppAdminWeb.AgentLive.Index do
               <p :if={a.description} class="text-sm mt-1">{a.description}</p>
             </div>
             <div class="flex gap-2 ml-4">
-              <.link patch={~p"/agents/#{a.id}/edit"} class="btn btn-sm btn-ghost">Edit</.link>
+              <.link patch={~p"/ai-provider/agents/#{a.id}/edit"} class="btn btn-sm btn-ghost">Edit</.link>
               <button
                 phx-click="delete"
                 phx-value-id={a.id}
@@ -103,8 +107,9 @@ defmodule GsmlgAppAdminWeb.AgentLive.Index do
             </div>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </.ai_provider_layout>
     """
   end
 end

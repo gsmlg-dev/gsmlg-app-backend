@@ -1,5 +1,7 @@
-defmodule GsmlgAppAdminWeb.ApiKeyLive.Index do
+defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.Index do
   use GsmlgAppAdminWeb, :live_view
+
+  import GsmlgAppAdminWeb.AiProviderLive.Components
 
   alias GsmlgAppAdmin.AI
 
@@ -15,7 +17,8 @@ defmodule GsmlgAppAdminWeb.ApiKeyLive.Index do
   end
 
   @impl true
-  def handle_params(params, _url, socket) do
+  def handle_params(params, url, socket) do
+    socket = assign(socket, :current_uri, URI.parse(url).path)
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
@@ -69,7 +72,7 @@ defmodule GsmlgAppAdminWeb.ApiKeyLive.Index do
   end
 
   @impl true
-  def handle_info({GsmlgAppAdminWeb.ApiKeyLive.FormComponent, {:saved, api_key}}, socket) do
+  def handle_info({GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent, {:saved, api_key}}, socket) do
     raw_key = Map.get(api_key, :__raw_key__)
     {:ok, api_keys} = AI.list_api_keys()
     {:noreply, assign(socket, api_keys: api_keys, raw_key: raw_key)}
@@ -78,10 +81,11 @@ defmodule GsmlgAppAdminWeb.ApiKeyLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="container mx-auto p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">API Keys</h1>
-        <.link patch={~p"/api-keys/new"} class="btn btn-primary">
+    <.ai_provider_layout current_path={@current_uri}>
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-2xl font-bold">API Keys</h1>
+        <.link patch={~p"/ai-provider/api-keys/new"} class="btn btn-primary">
           New API Key
         </.link>
       </div>
@@ -93,12 +97,12 @@ defmodule GsmlgAppAdminWeb.ApiKeyLive.Index do
       >
         <:body>
           <.live_component
-            module={GsmlgAppAdminWeb.ApiKeyLive.FormComponent}
+            module={GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent}
             id={(@api_key && @api_key.id) || :new}
             action={@live_action}
             api_key={@api_key}
             current_user={@current_user}
-            patch={~p"/api-keys"}
+            patch={~p"/ai-provider/api-keys"}
           />
         </:body>
       </.dm_modal>
@@ -144,7 +148,7 @@ defmodule GsmlgAppAdminWeb.ApiKeyLive.Index do
               <td>{key.total_tokens}</td>
               <td>{format_datetime(key.last_used_at)}</td>
               <td class="flex gap-2">
-                <.link patch={~p"/api-keys/#{key.id}/edit"} class="btn btn-sm btn-ghost">
+                <.link patch={~p"/ai-provider/api-keys/#{key.id}/edit"} class="btn btn-sm btn-ghost">
                   Edit
                 </.link>
                 <%= if key.is_active do %>
@@ -169,8 +173,9 @@ defmodule GsmlgAppAdminWeb.ApiKeyLive.Index do
             </tr>
           </tbody>
         </table>
+        </div>
       </div>
-    </div>
+    </.ai_provider_layout>
     """
   end
 

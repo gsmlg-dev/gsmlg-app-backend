@@ -1,5 +1,7 @@
-defmodule GsmlgAppAdminWeb.McpServerLive.Index do
+defmodule GsmlgAppAdminWeb.AiProviderLive.McpServer.Index do
   use GsmlgAppAdminWeb, :live_view
+
+  import GsmlgAppAdminWeb.AiProviderLive.Components
 
   alias GsmlgAppAdmin.AI
 
@@ -10,7 +12,8 @@ defmodule GsmlgAppAdminWeb.McpServerLive.Index do
   end
 
   @impl true
-  def handle_params(params, _url, socket) do
+  def handle_params(params, url, socket) do
+    socket = assign(socket, :current_uri, URI.parse(url).path)
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
@@ -41,7 +44,7 @@ defmodule GsmlgAppAdminWeb.McpServerLive.Index do
   end
 
   @impl true
-  def handle_info({GsmlgAppAdminWeb.McpServerLive.FormComponent, {:saved, _}}, socket) do
+  def handle_info({GsmlgAppAdminWeb.AiProviderLive.McpServer.FormComponent, {:saved, _}}, socket) do
     {:ok, servers} = AI.list_mcp_servers()
     {:noreply, assign(socket, servers: servers)}
   end
@@ -49,10 +52,11 @@ defmodule GsmlgAppAdminWeb.McpServerLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="container mx-auto p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">MCP Servers</h1>
-        <.link patch={~p"/mcp-servers/new"} class="btn btn-primary">New MCP Server</.link>
+    <.ai_provider_layout current_path={@current_uri}>
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-2xl font-bold">MCP Servers</h1>
+        <.link patch={~p"/ai-provider/mcp-servers/new"} class="btn btn-primary">New MCP Server</.link>
       </div>
 
       <.dm_modal
@@ -62,11 +66,11 @@ defmodule GsmlgAppAdminWeb.McpServerLive.Index do
       >
         <:body>
           <.live_component
-            module={GsmlgAppAdminWeb.McpServerLive.FormComponent}
+            module={GsmlgAppAdminWeb.AiProviderLive.McpServer.FormComponent}
             id={(@server && @server.id) || :new}
             action={@live_action}
             server={@server}
-            patch={~p"/mcp-servers"}
+            patch={~p"/ai-provider/mcp-servers"}
           />
         </:body>
       </.dm_modal>
@@ -96,7 +100,7 @@ defmodule GsmlgAppAdminWeb.McpServerLive.Index do
               <p :if={s.last_error} class="text-xs text-error mt-1">{s.last_error}</p>
             </div>
             <div class="flex gap-2 ml-4">
-              <.link patch={~p"/mcp-servers/#{s.id}/edit"} class="btn btn-sm btn-ghost">
+              <.link patch={~p"/ai-provider/mcp-servers/#{s.id}/edit"} class="btn btn-sm btn-ghost">
                 Edit
               </.link>
               <button
@@ -110,8 +114,9 @@ defmodule GsmlgAppAdminWeb.McpServerLive.Index do
             </div>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </.ai_provider_layout>
     """
   end
 end

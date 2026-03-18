@@ -1,9 +1,11 @@
-defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Show do
+defmodule GsmlgAppAdminWeb.AiProviderLive.ProviderSettings.Show do
   @moduledoc """
   LiveView for showing AI provider details and usage statistics.
   """
 
   use GsmlgAppAdminWeb, :live_view
+
+  import GsmlgAppAdminWeb.AiProviderLive.Components
 
   alias GsmlgAppAdmin.AI
 
@@ -19,8 +21,8 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Show do
   end
 
   @impl true
-  def handle_params(_params, _url, socket) do
-    {:noreply, socket}
+  def handle_params(_params, url, socket) do
+    {:noreply, assign(socket, :current_uri, URI.parse(url).path)}
   end
 
   @impl true
@@ -46,12 +48,10 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Show do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="container mx-auto px-4 py-8">
-      <div class="flex items-center gap-4 mb-6">
-        <.link navigate={~p"/chat/settings"} class="btn btn-ghost btn-sm">
-          <.dm_mdi name="arrow-left" class="w-4 h-4" /> Back to Settings
-        </.link>
-        <h1 class="text-2xl font-bold">{@provider.name}</h1>
+    <.ai_provider_layout current_path={@current_uri}>
+      <div class="p-6">
+        <div class="flex items-center gap-4 mb-6">
+          <h1 class="text-2xl font-bold">{@provider.name}</h1>
         <span class={"badge #{if @provider.is_active, do: "badge-success", else: "badge-neutral"}"}>
           {if @provider.is_active, do: "Active", else: "Inactive"}
         </span>
@@ -102,7 +102,7 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Show do
               <% end %>
             </div>
             <div class="card-actions justify-end mt-4">
-              <.link navigate={~p"/chat/settings/#{@provider.id}/edit"} class="btn btn-primary btn-sm">
+              <.link navigate={~p"/ai-provider/providers/#{@provider.id}/edit"} class="btn btn-primary btn-sm">
                 <.dm_mdi name="pencil" class="w-4 h-4 mr-1" /> Edit
               </.link>
             </div>
@@ -174,8 +174,9 @@ defmodule GsmlgAppAdminWeb.ProviderSettingsLive.Show do
             </div>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </.ai_provider_layout>
     """
   end
 end

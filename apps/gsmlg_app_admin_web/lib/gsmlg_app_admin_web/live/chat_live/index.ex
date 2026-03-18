@@ -699,7 +699,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
         
     <!-- Settings Link -->
         <div class="p-4 border-t border-base-300">
-          <.link navigate={~p"/chat/settings"} class="btn btn-ghost btn-block justify-start">
+          <.link navigate={~p"/ai-provider/providers"} class="btn btn-ghost btn-block justify-start">
             <.dm_mdi name="cog" class="w-5 h-5" /> Settings
           </.link>
         </div>
@@ -716,7 +716,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
               <p class="text-base-content/60 mb-6">
                 To start chatting, you need to configure at least one AI provider.
               </p>
-              <.link navigate={~p"/chat/settings"} class="btn btn-primary">
+              <.link navigate={~p"/ai-provider/providers"} class="btn btn-primary">
                 <.dm_mdi name="cog" class="w-5 h-5 mr-2" /> Configure Providers
               </.link>
             </div>

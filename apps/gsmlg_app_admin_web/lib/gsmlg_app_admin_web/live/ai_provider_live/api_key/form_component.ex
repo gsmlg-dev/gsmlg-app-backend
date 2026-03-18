@@ -1,4 +1,4 @@
-defmodule GsmlgAppAdminWeb.ApiKeyLive.FormComponent do
+defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
   use GsmlgAppAdminWeb, :live_component
 
   alias GsmlgAppAdmin.AI
