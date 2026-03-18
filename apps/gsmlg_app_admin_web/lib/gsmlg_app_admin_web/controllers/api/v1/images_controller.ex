@@ -17,6 +17,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ImagesController do
       conn
       |> put_status(403)
       |> json(%{error: %{message: "API key lacks 'images' scope.", type: "permission_error"}})
+      |> halt()
     else
       case Gateway.generate_image(api_key, params) do
         {:ok, result} ->

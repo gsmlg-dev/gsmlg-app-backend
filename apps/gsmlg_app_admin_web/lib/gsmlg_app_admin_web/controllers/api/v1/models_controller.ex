@@ -19,6 +19,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ModelsController do
       |> json(%{
         error: %{message: "API key lacks 'models_list' scope.", type: "permission_error"}
       })
+      |> halt()
     else
       case Gateway.list_models(api_key) do
         {:ok, models} ->

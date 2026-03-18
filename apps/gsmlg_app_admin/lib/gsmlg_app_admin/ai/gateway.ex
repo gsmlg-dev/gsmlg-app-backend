@@ -305,11 +305,21 @@ defmodule GsmlgAppAdmin.AI.Gateway do
         system_prompt =
           if custom_prompt, do: "#{system_prompt}\n\n#{custom_prompt}", else: system_prompt
 
-        _image = params["image"]
+        image = params["image"]
 
-        # Build a chat request with the image
+        # Build a chat request with the image as a content block
+        user_content =
+          if image do
+            [
+              %{type: "image_url", image_url: %{url: image}},
+              %{type: "text", text: "Please extract the text from this image."}
+            ]
+          else
+            "Please extract the text from this image."
+          end
+
         messages = [
-          %{role: :user, content: "Please extract the text from this image."}
+          %{role: :user, content: user_content}
         ]
 
         request = %{
@@ -480,15 +490,17 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     end
   end
 
-  defp log_usage(api_key, _provider, _request, _endpoint_type, _status, opts \\ []) do
-    # Increment aggregate counters on the API key
+  defp log_usage(api_key, _provider, _request, endpoint_type, status, opts \\ []) do
     tokens = Keyword.get(opts, :tokens, 0)
 
     Task.start(fn ->
       try do
         AI.ApiKey.increment_usage(api_key, 1, tokens)
       rescue
-        _ -> :ok
+        e ->
+          Logger.warning(
+            "Failed to log usage for key #{api_key.id} (#{endpoint_type}/#{status}): #{inspect(e)}"
+          )
       end
     end)
   end

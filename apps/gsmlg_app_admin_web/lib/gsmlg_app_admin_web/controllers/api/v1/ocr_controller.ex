@@ -17,6 +17,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.OcrController do
       conn
       |> put_status(403)
       |> json(%{error: %{message: "API key lacks 'ocr' scope.", type: "permission_error"}})
+      |> halt()
     else
       case Gateway.extract_text(api_key, params) do
         {:ok, result} ->

@@ -153,7 +153,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
             {combined, msgs}
 
           _ ->
-            {sys, msgs ++ [%{role: String.to_atom(msg["role"]), content: msg["content"]}]}
+            {sys, msgs ++ [%{role: safe_role(msg["role"]), content: msg["content"]}]}
         end
       end)
 
@@ -169,6 +169,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
       }
     }
   end
+
+  defp safe_role(role) when role in ~w(user assistant tool function),
+    do: String.to_existing_atom(role)
+
+  defp safe_role(_), do: :user
 
   defp format_openai_response(response, model) do
     %{

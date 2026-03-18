@@ -6,6 +6,8 @@ defmodule GsmlgAppAdminWeb.Plugs.RateLimit do
 
   import Plug.Conn
 
+  require Logger
+
   @behaviour Plug
 
   @ets_table :api_gateway_rate_limits
@@ -114,7 +116,7 @@ defmodule GsmlgAppAdminWeb.Plugs.RateLimit do
         {{:_, :day, :"$1"}, [{:<, :"$1", day_cutoff}], [true]}
       ])
     rescue
-      _ -> :ok
+      e -> Logger.warning("Rate limit cleanup failed: #{inspect(e)}")
     end
   end
 

@@ -21,6 +21,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
         type: "error",
         error: %{type: "permission_error", message: "API key lacks 'messages' scope."}
       })
+      |> halt()
     else
       normalized = normalize_anthropic_request(params)
 
@@ -72,7 +73,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
       }
     }
 
-    {:ok, conn} = send_sse(conn, "message_start", message_start)
+    conn =
+      case send_sse(conn, "message_start", message_start) do
+        {:ok, conn} -> conn
+        {:error, _} -> conn
+      end
 
     # Send content_block_start
     block_start = %{
@@ -81,7 +86,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
       content_block: %{type: "text", text: ""}
     }
 
-    {:ok, conn} = send_sse(conn, "content_block_start", block_start)
+    conn =
+      case send_sse(conn, "content_block_start", block_start) do
+        {:ok, conn} -> conn
+        {:error, _} -> conn
+      end
 
     callback = fn
       {:content, content} ->
@@ -123,8 +132,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
 
       {:stream_done, _result} ->
         # Send content_block_stop
-        {:ok, conn} =
-          send_sse(conn, "content_block_stop", %{type: "content_block_stop", index: 0})
+        conn =
+          case send_sse(conn, "content_block_stop", %{type: "content_block_stop", index: 0}) do
+            {:ok, conn} -> conn
+            {:error, _} -> conn
+          end
 
         # Send message_delta with stop_reason
         message_delta = %{
@@ -133,11 +145,17 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
           usage: %{output_tokens: 0}
         }
 
-        {:ok, conn} = send_sse(conn, "message_delta", message_delta)
+        conn =
+          case send_sse(conn, "message_delta", message_delta) do
+            {:ok, conn} -> conn
+            {:error, _} -> conn
+          end
 
         # Send message_stop
-        send_sse(conn, "message_stop", %{type: "message_stop"})
-        conn
+        case send_sse(conn, "message_stop", %{type: "message_stop"}) do
+          {:ok, conn} -> conn
+          {:error, _} -> conn
+        end
     after
       120_000 ->
         conn
@@ -162,7 +180,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
             _ -> ""
           end
 
-        %{role: String.to_atom(msg["role"]), content: content}
+        %{role: safe_role(msg["role"]), content: content}
       end)
 
     %{
@@ -178,10 +196,13 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
     }
   end
 
+  defp safe_role(role) when role in ~w(user assistant tool), do: String.to_existing_atom(role)
+  defp safe_role(_), do: :user
+
   defp extract_text_from_blocks(blocks) do
     blocks
     |> Enum.filter(fn block -> block["type"] == "text" end)
-    |> Enum.map_join("\n", fn block -> block["text"] end)
+    |> Enum.map_join("\n", fn block -> block["text"] || "" end)
   end
 
   defp format_anthropic_response(response, model) do

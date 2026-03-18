@@ -18,6 +18,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
       conn
       |> put_status(403)
       |> json(%{error: %{message: "API key lacks 'agents' scope.", type: "permission_error"}})
+      |> halt()
     else
       case AI.list_active_agents() do
         {:ok, agents} ->
@@ -49,6 +50,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
       conn
       |> put_status(403)
       |> json(%{error: %{message: "API key lacks 'agents' scope.", type: "permission_error"}})
+      |> halt()
     else
       case AI.get_agent_by_slug(slug) do
         {:ok, agent} ->
@@ -77,6 +79,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
       conn
       |> put_status(403)
       |> json(%{error: %{message: "API key lacks 'agents' scope.", type: "permission_error"}})
+      |> halt()
     else
       case AI.get_agent_by_slug(slug) do
         {:ok, agent} ->
@@ -112,13 +115,14 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
       conn
       |> put_status(403)
       |> json(%{error: %{message: "API key lacks 'agents' scope.", type: "permission_error"}})
+      |> halt()
     else
       case AI.get_agent_by_slug(slug) do
         {:ok, agent} ->
           messages =
             (params["messages"] || [])
             |> Enum.map(fn msg ->
-              %{role: String.to_atom(msg["role"]), content: msg["content"]}
+              %{role: safe_role(msg["role"]), content: msg["content"]}
             end)
 
           stream = params["stream"] == true
@@ -149,6 +153,9 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
       end
     end
   end
+
+  defp safe_role(role) when role in ~w(user assistant tool), do: String.to_existing_atom(role)
+  defp safe_role(_), do: :user
 
   defp get_client_ip(conn) do
     conn.remote_ip |> Tuple.to_list() |> Enum.join(".")
