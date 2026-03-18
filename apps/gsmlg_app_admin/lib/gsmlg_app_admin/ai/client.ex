@@ -220,6 +220,41 @@ defmodule GsmlgAppAdmin.AI.Client do
     {:error, "Invalid response body: #{inspect(body)}"}
   end
 
+  @doc """
+  Sends an image generation request to an OpenAI-compatible images endpoint.
+
+  ## Parameters
+    - provider: The AI provider configuration
+    - params: Map with prompt, model, n, size, quality, response_format, style
+
+  ## Returns
+    - {:ok, response_body} on success
+    - {:error, reason} on failure
+  """
+  def image_generation(provider, params) do
+    headers = build_headers(provider)
+    url = "#{provider.api_base_url}/images/generations"
+
+    body =
+      %{model: params["model"] || provider.model, prompt: params["prompt"]}
+      |> maybe_put(:n, params["n"])
+      |> maybe_put(:size, params["size"])
+      |> maybe_put(:quality, params["quality"])
+      |> maybe_put(:response_format, params["response_format"])
+      |> maybe_put(:style, params["style"])
+
+    case Req.post(url, headers: headers, json: body, receive_timeout: 120_000) do
+      {:ok, %Req.Response{status: 200, body: body}} ->
+        {:ok, body}
+
+      {:ok, %Req.Response{status: status, body: body}} ->
+        {:error, extract_error_message(body, status)}
+
+      {:error, error} ->
+        {:error, "Request failed: #{inspect(error)}"}
+    end
+  end
+
   defp maybe_put(map, _key, nil), do: map
   defp maybe_put(map, key, value), do: Map.put(map, key, value)
 end

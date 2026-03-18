@@ -149,6 +149,37 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
       assert body["error"]["type"] == "permission_error"
       assert body["error"]["message"] =~ "images"
     end
+
+    test "returns error when model is missing", %{conn: conn} do
+      {raw_key, _} = create_api_key([:images])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/images/generations", %{"prompt" => "a cat"})
+
+      assert conn.status == 500
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["message"] =~ "model"
+    end
+
+    test "returns provider error when model not found", %{conn: conn} do
+      {raw_key, _} = create_api_key([:images])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/images/generations", %{
+          "model" => "dall-e-3",
+          "prompt" => "a cat"
+        })
+
+      assert conn.status == 500
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["message"] =~ "provider" or body["error"]["message"] =~ "model"
+    end
   end
 
   # ── OcrController ─────────────────────────────────────────────────────────

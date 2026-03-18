@@ -271,11 +271,33 @@ defmodule GsmlgAppAdmin.AI.Gateway do
 
   @doc """
   Generates an image via the gateway.
+
+  Proxies the request to an upstream provider's OpenAI-compatible images endpoint.
+  The model in `params["model"]` is resolved against active providers.
   """
-  def generate_image(api_key, _params) do
+  def generate_image(api_key, params) do
     with :ok <- check_scope(api_key, :images) do
-      # Image generation is a stub — will be implemented with ImageClient
-      {:error, "Image generation not yet configured. Add image providers in admin settings."}
+      model = params["model"]
+
+      unless model do
+        {:error, "Missing required parameter 'model'. Specify an image generation model."}
+      else
+        case resolve_provider(api_key, model) do
+          {:ok, provider} ->
+            case Client.image_generation(provider, params) do
+              {:ok, response} ->
+                log_usage(api_key, provider, %{model: model}, :image, :success)
+                {:ok, response}
+
+              {:error, reason} ->
+                log_usage(api_key, provider, %{model: model}, :image, :error)
+                {:error, reason}
+            end
+
+          {:error, reason} ->
+            {:error, reason}
+        end
+      end
     end
   end
 

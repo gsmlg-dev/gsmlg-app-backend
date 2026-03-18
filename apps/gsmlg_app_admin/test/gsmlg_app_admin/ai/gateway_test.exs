@@ -69,6 +69,39 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
     end
   end
 
+  describe "generate_image/2" do
+    test "returns permission error when api_key lacks images scope" do
+      api_key = %{id: "test-key", user_id: nil, scopes: [:chat_completions]}
+
+      assert {:error, reason} =
+               Gateway.generate_image(api_key, %{"model" => "dall-e-3", "prompt" => "a cat"})
+
+      assert reason =~ "images"
+    end
+
+    test "returns error when model is missing" do
+      api_key = %{id: "test-key", user_id: nil, scopes: [:images]}
+
+      assert {:error, reason} = Gateway.generate_image(api_key, %{"prompt" => "a cat"})
+      assert reason =~ "model"
+    end
+
+    test "returns provider error when no matching provider exists" do
+      api_key = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:images],
+        allowed_providers: [],
+        allowed_models: []
+      }
+
+      assert {:error, reason} =
+               Gateway.generate_image(api_key, %{"model" => "dall-e-3", "prompt" => "a cat"})
+
+      assert reason =~ "provider" or reason =~ "model"
+    end
+  end
+
   describe "extract_text/2" do
     test "returns permission error when api_key lacks ocr scope" do
       api_key = %{id: "test-key", user_id: nil, scopes: [:chat_completions]}
