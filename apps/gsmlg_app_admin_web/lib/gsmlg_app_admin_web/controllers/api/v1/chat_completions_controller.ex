@@ -9,6 +9,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
   use GsmlgAppAdminWeb, :controller
 
   alias GsmlgAppAdmin.AI.Gateway
+  alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
   alias GsmlgAppAdminWeb.Plugs.ApiKeyAuth
 
   def create(conn, params) do
@@ -153,7 +154,8 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
             {combined, msgs}
 
           _ ->
-            {sys, msgs ++ [%{role: safe_role(msg["role"]), content: msg["content"]}]}
+            {sys,
+             msgs ++ [%{role: RequestHelpers.safe_role(msg["role"]), content: msg["content"]}]}
         end
       end)
 
@@ -169,11 +171,6 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
       }
     }
   end
-
-  defp safe_role(role) when role in ~w(user assistant tool function),
-    do: String.to_existing_atom(role)
-
-  defp safe_role(_), do: :user
 
   defp format_openai_response(response, model) do
     %{

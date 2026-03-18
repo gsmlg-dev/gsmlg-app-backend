@@ -39,11 +39,11 @@ defmodule GsmlgAppAdmin.AI.ToolExecutorTest do
       tool = %{
         execution_type: :builtin,
         timeout_ms: 100,
-        builtin_handler: "Process.sleep"
+        builtin_handler: "GsmlgAppAdmin.Test.SleepyHandler.sleep_forever"
       }
 
       assert {:error, msg} = ToolExecutor.execute(tool, %{}, [])
-      assert msg =~ "timed out" or msg =~ "error"
+      assert msg == "Tool execution timed out after 100ms"
     end
   end
 

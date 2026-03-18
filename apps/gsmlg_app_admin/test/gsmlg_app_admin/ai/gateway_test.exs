@@ -1,5 +1,5 @@
 defmodule GsmlgAppAdmin.AI.GatewayTest do
-  use ExUnit.Case, async: true
+  use GsmlgAppAdmin.DataCase, async: true
 
   alias GsmlgAppAdmin.AI.Gateway
 
@@ -34,10 +34,27 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
       result = Gateway.inject_system_context(api_key, request)
       assert result.system =~ "Custom system prompt"
     end
+
+    test "does not raise when user_id is non-nil but no DB records exist" do
+      api_key = %{id: "test-key", user_id: "nonexistent-user-id", scopes: [:chat_completions]}
+
+      request = %{
+        model: "gpt-4o",
+        system: "Base prompt",
+        messages: [],
+        stream: false,
+        params: %{}
+      }
+
+      # Should not raise — gracefully handles missing DB records
+      result = Gateway.inject_system_context(api_key, request)
+      assert is_map(result)
+      assert Map.has_key?(result, :system)
+    end
   end
 
   describe "list_models/1" do
-    test "returns error when no providers available" do
+    test "returns a tuple (not a crash) when no providers are in DB" do
       api_key = %{
         id: "test-key",
         user_id: nil,
@@ -46,8 +63,60 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
         allowed_models: []
       }
 
-      # Without DB, list_active_providers will fail
-      assert {:error, _} = Gateway.list_models(api_key)
+      result = Gateway.list_models(api_key)
+      # Must return a tagged tuple — not raise — even with empty DB
+      assert match?({:ok, _}, result) or match?({:error, _}, result)
+    end
+  end
+
+  describe "extract_text/2" do
+    test "returns permission error when api_key lacks ocr scope" do
+      api_key = %{id: "test-key", user_id: nil, scopes: [:chat_completions]}
+
+      assert {:error, reason} = Gateway.extract_text(api_key, %{"model" => "gpt-4o"})
+      assert reason =~ "ocr"
+    end
+
+    test "returns error when no model is specified" do
+      api_key = %{id: "test-key", user_id: nil, scopes: [:ocr]}
+
+      # No model param → no provider to call → error
+      assert match?({:error, _}, Gateway.extract_text(api_key, %{}))
+    end
+
+    test "does not crash with text-only content path (no image param)" do
+      # Scope passes, no image param → plain string user_content.
+      # With no valid provider in test DB, expect provider error, not content error.
+      api_key = %{id: "test-key", user_id: nil, scopes: [:ocr]}
+
+      result = Gateway.extract_text(api_key, %{"model" => "gpt-4o"})
+      assert match?({:error, _}, result)
+    end
+
+    test "does not crash with multipart content path (image param present)" do
+      # Scope passes, image param present → list [image_url, text] user_content.
+      # With no valid provider in test DB, expect provider error, not a
+      # content-building or nil-safety crash.
+      api_key = %{id: "test-key", user_id: nil, scopes: [:ocr]}
+
+      params = %{
+        "model" => "gpt-4o",
+        "image" => "data:image/png;base64,abc123"
+      }
+
+      result = Gateway.extract_text(api_key, params)
+      assert match?({:error, _}, result)
+    end
+
+    test "accepts all supported output_format values without raising" do
+      api_key = %{id: "test-key", user_id: nil, scopes: [:ocr]}
+
+      for fmt <- ["markdown", "json", "text"] do
+        result = Gateway.extract_text(api_key, %{"model" => "gpt-4o", "output_format" => fmt})
+
+        assert match?({:error, _}, result),
+               "Expected {:error, _} for format=#{fmt}, got: #{inspect(result)}"
+      end
     end
   end
 end

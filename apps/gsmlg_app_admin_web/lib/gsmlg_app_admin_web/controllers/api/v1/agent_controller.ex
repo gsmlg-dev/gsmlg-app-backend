@@ -9,6 +9,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
 
   alias GsmlgAppAdmin.AI
   alias GsmlgAppAdmin.AI.Gateway
+  alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
   alias GsmlgAppAdminWeb.Plugs.ApiKeyAuth
 
   def index(conn, _params) do
@@ -122,7 +123,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
           messages =
             (params["messages"] || [])
             |> Enum.map(fn msg ->
-              %{role: safe_role(msg["role"]), content: msg["content"]}
+              %{role: RequestHelpers.safe_role(msg["role"]), content: msg["content"]}
             end)
 
           stream = params["stream"] == true
@@ -153,9 +154,6 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
       end
     end
   end
-
-  defp safe_role(role) when role in ~w(user assistant tool), do: String.to_existing_atom(role)
-  defp safe_role(_), do: :user
 
   defp get_client_ip(conn) do
     conn.remote_ip |> Tuple.to_list() |> Enum.join(".")

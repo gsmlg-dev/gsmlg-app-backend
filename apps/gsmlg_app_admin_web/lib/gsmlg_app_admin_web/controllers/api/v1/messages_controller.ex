@@ -9,6 +9,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
   use GsmlgAppAdminWeb, :controller
 
   alias GsmlgAppAdmin.AI.Gateway
+  alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
   alias GsmlgAppAdminWeb.Plugs.ApiKeyAuth
 
   def create(conn, params) do
@@ -73,11 +74,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
       }
     }
 
-    conn =
-      case send_sse(conn, "message_start", message_start) do
-        {:ok, conn} -> conn
-        {:error, _} -> conn
-      end
+    conn = send_sse!(conn, "message_start", message_start)
 
     # Send content_block_start
     block_start = %{
@@ -86,11 +83,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
       content_block: %{type: "text", text: ""}
     }
 
-    conn =
-      case send_sse(conn, "content_block_start", block_start) do
-        {:ok, conn} -> conn
-        {:error, _} -> conn
-      end
+    conn = send_sse!(conn, "content_block_start", block_start)
 
     callback = fn
       {:content, content} ->
@@ -125,46 +118,33 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
   defp anthropic_stream_loop(conn, msg_id, model) do
     receive do
       {:sse_event, event_type, data} ->
-        case send_sse(conn, event_type, data) do
-          {:ok, conn} -> anthropic_stream_loop(conn, msg_id, model)
-          {:error, _} -> conn
-        end
+        conn
+        |> send_sse!(event_type, data)
+        |> anthropic_stream_loop(msg_id, model)
 
       {:stream_done, _result} ->
-        # Send content_block_stop
-        conn =
-          case send_sse(conn, "content_block_stop", %{type: "content_block_stop", index: 0}) do
-            {:ok, conn} -> conn
-            {:error, _} -> conn
-          end
-
-        # Send message_delta with stop_reason
-        message_delta = %{
+        conn
+        |> send_sse!("content_block_stop", %{type: "content_block_stop", index: 0})
+        |> send_sse!("message_delta", %{
           type: "message_delta",
           delta: %{stop_reason: "end_turn"},
           usage: %{output_tokens: 0}
-        }
-
-        conn =
-          case send_sse(conn, "message_delta", message_delta) do
-            {:ok, conn} -> conn
-            {:error, _} -> conn
-          end
-
-        # Send message_stop
-        case send_sse(conn, "message_stop", %{type: "message_stop"}) do
-          {:ok, conn} -> conn
-          {:error, _} -> conn
-        end
+        })
+        |> send_sse!("message_stop", %{type: "message_stop"})
     after
       120_000 ->
         conn
     end
   end
 
-  defp send_sse(conn, event_type, data) do
+  # Sends an SSE event chunk, returning the (possibly unchanged) conn on error.
+  defp send_sse!(conn, event_type, data) do
     chunk_data = "event: #{event_type}\ndata: #{Jason.encode!(data)}\n\n"
-    Plug.Conn.chunk(conn, chunk_data)
+
+    case Plug.Conn.chunk(conn, chunk_data) do
+      {:ok, conn} -> conn
+      {:error, _} -> conn
+    end
   end
 
   defp normalize_anthropic_request(params) do
@@ -180,7 +160,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
             _ -> ""
           end
 
-        %{role: safe_role(msg["role"]), content: content}
+        %{role: RequestHelpers.safe_role(msg["role"]), content: content}
       end)
 
     %{
@@ -195,9 +175,6 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
       }
     }
   end
-
-  defp safe_role(role) when role in ~w(user assistant tool), do: String.to_existing_atom(role)
-  defp safe_role(_), do: :user
 
   defp extract_text_from_blocks(blocks) do
     blocks

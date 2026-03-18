@@ -22,6 +22,17 @@ defmodule GsmlgAppAdminWeb.Plugs.ApiKeyAuthTest do
       api_key = %{scopes: nil}
       refute ApiKeyAuth.has_scope?(api_key, :chat_completions)
     end
+
+    test "returns false when scopes list is empty" do
+      api_key = %{scopes: []}
+      refute ApiKeyAuth.has_scope?(api_key, :chat_completions)
+    end
+
+    test "atom scope does not match string scope" do
+      # Scopes are stored as atoms; string keys should not grant access
+      api_key = %{scopes: [:chat_completions]}
+      refute ApiKeyAuth.has_scope?(api_key, "chat_completions")
+    end
   end
 
   describe "call/2 - key extraction" do

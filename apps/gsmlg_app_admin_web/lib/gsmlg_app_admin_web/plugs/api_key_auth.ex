@@ -58,8 +58,7 @@ defmodule GsmlgAppAdminWeb.Plugs.ApiKeyAuth do
 
     case GsmlgAppAdmin.AI.ApiKey
          |> Ash.Query.filter(key_prefix == ^prefix)
-         |> Ash.Query.load(:user)
-         |> Ash.read_one() do
+         |> Ash.read_one(authorize?: false) do
       {:ok, nil} -> {:error, "Invalid API key."}
       {:ok, api_key} -> {:ok, api_key}
       {:error, _} -> {:error, "Invalid API key."}
