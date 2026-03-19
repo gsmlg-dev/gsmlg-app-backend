@@ -3,6 +3,8 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
 
   alias GsmlgAppAdmin.AI
 
+  @all_scopes ~w(chat_completions messages images ocr agents models_list)
+
   @impl true
   def update(%{api_key: api_key, action: action} = assigns, socket) do
     form =
@@ -25,7 +27,8 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:form, form)}
+     |> assign(:form, form)
+     |> assign(:all_scopes, @all_scopes)}
   end
 
   @impl true
@@ -111,98 +114,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
     ~w(chat_completions messages images ocr agents models_list)
   end
 
-  @all_scopes ~w(chat_completions messages images ocr agents models_list)
-
-  @impl true
-  def render(assigns) do
-    assigns = assign(assigns, :all_scopes, @all_scopes)
-
-    ~H"""
-    <div>
-      <h2 class="text-xl font-bold mb-4">
-        {if @action == :new, do: "New API Key", else: "Edit API Key"}
-      </h2>
-
-      <.form
-        for={@form}
-        id="api-key-form"
-        phx-target={@myself}
-        phx-change="validate"
-        phx-submit="save"
-      >
-        <div class="space-y-4">
-          <div class="form-control">
-            <label class="label"><span class="label-text">Name</span></label>
-            <input
-              type="text"
-              name="form[name]"
-              value={@form[:name].value}
-              class="input input-bordered w-full"
-              required
-              placeholder="My API Key"
-            />
-          </div>
-
-          <div class="form-control">
-            <label class="label"><span class="label-text">Description</span></label>
-            <textarea
-              name="form[description]"
-              class="textarea textarea-bordered w-full"
-              placeholder="Optional description"
-            ><%= @form[:description].value %></textarea>
-          </div>
-
-          <div class="form-control">
-            <label class="label"><span class="label-text">Scopes</span></label>
-            <div class="flex flex-wrap gap-2">
-              <%= for scope <- @all_scopes do %>
-                <label class="label cursor-pointer gap-2">
-                  <input
-                    type="checkbox"
-                    name="form[scopes][]"
-                    value={scope}
-                    checked={scope in (@form[:scopes].value || [])}
-                    class="checkbox checkbox-sm"
-                  />
-                  <span class="label-text">{scope}</span>
-                </label>
-              <% end %>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div class="form-control">
-              <label class="label"><span class="label-text">Rate Limit (RPM)</span></label>
-              <input
-                type="number"
-                name="form[rate_limit_rpm]"
-                value={@form[:rate_limit_rpm].value}
-                class="input input-bordered w-full"
-                placeholder="Default: 60"
-              />
-            </div>
-
-            <div class="form-control">
-              <label class="label"><span class="label-text">Rate Limit (RPD)</span></label>
-              <input
-                type="number"
-                name="form[rate_limit_rpd]"
-                value={@form[:rate_limit_rpd].value}
-                class="input input-bordered w-full"
-                placeholder="Default: 1000"
-              />
-            </div>
-          </div>
-
-          <div class="flex justify-end gap-2 mt-6">
-            <.link patch={@patch} class="btn btn-ghost">Cancel</.link>
-            <button type="submit" class="btn btn-primary">
-              {if @action == :new, do: "Create Key", else: "Save Changes"}
-            </button>
-          </div>
-        </div>
-      </.form>
-    </div>
-    """
-  end
 end

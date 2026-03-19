@@ -140,6 +140,9 @@ defmodule GsmlgAppAdminWeb.Router do
       live "/ai-provider/mcp-servers/:id/edit", AiProviderLive.McpServer.Index, :edit
 
       live "/ai-provider/usage", AiProviderLive.ApiUsage.Index, :index
+
+      # User profile routes
+      live "/profile", UserProfileLive.Index, :index
     end
   end
 

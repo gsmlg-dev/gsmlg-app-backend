@@ -1,0 +1,87 @@
+<div>
+  <h2 class="text-xl font-bold mb-4">
+    {if @action == :new, do: "New Template", else: "Edit Template"}
+  </h2>
+
+  <.form
+    for={@form}
+    id="template-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save"
+  >
+    <div class="space-y-4">
+      <div class="form-control">
+        <label class="label"><span class="label-text">Name</span></label>
+        <input
+          type="text"
+          name="form[name]"
+          value={@form[:name].value}
+          class="input input-bordered w-full"
+          required
+        />
+      </div>
+
+      <%= if @action == :new do %>
+        <div class="form-control">
+          <label class="label"><span class="label-text">Slug</span></label>
+          <input
+            type="text"
+            name="form[slug]"
+            value={@form[:slug].value}
+            class="input input-bordered w-full"
+            required
+          />
+        </div>
+      <% end %>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text">Content</span></label>
+        <textarea name="form[content]" class="textarea textarea-bordered w-full h-40" required><%= @form[:content].value %></textarea>
+        <p class="text-xs opacity-70 mt-1">
+          Variables: {"{{memory}}"}, {"{{date}}"}, {"{{datetime}}"}
+        </p>
+      </div>
+
+      <div class="flex gap-4">
+        <label class="label cursor-pointer gap-2">
+          <input type="hidden" name="form[is_default]" value="false" />
+          <input
+            type="checkbox"
+            name="form[is_default]"
+            value="true"
+            checked={@form[:is_default].value == "true" or @form[:is_default].value == true}
+            class="checkbox"
+          />
+          <span class="label-text">Default (auto-inject)</span>
+        </label>
+        <label class="label cursor-pointer gap-2">
+          <input type="hidden" name="form[is_active]" value="false" />
+          <input
+            type="checkbox"
+            name="form[is_active]"
+            value="true"
+            checked={@form[:is_active].value != "false" and @form[:is_active].value != false}
+            class="checkbox"
+          />
+          <span class="label-text">Active</span>
+        </label>
+      </div>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text">Priority</span></label>
+        <input
+          type="number"
+          name="form[priority]"
+          value={@form[:priority].value}
+          class="input input-bordered w-24"
+        />
+      </div>
+
+      <div class="flex justify-end gap-2 mt-6">
+        <.link patch={@patch} class="btn btn-ghost">Cancel</.link>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </.form>
+</div>

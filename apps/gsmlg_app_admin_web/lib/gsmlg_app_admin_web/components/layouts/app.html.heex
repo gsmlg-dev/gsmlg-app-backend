@@ -1,9 +1,22 @@
 <.dm_simple_appbar class="appbar-primary sticky top-0 z-100">
   <:logo>
-    <.link href="/" class="text-xl font-bold hover:opacity-80">
-      GSMLG APP Admin
+    <.link href="/" class="flex items-center gap-2 text-xl font-bold hover:opacity-80 no-underline">
+      <.dm_mdi name="shield-crown" class="w-6 h-6" />
+      <span class="hidden sm:inline">GSMLG Admin</span>
     </.link>
   </:logo>
+  <:menu to={~p"/users"} active={String.starts_with?(assigns[:current_uri] || "", "/users")}>
+    <.dm_mdi name="account-group" class="w-4 h-4 mr-1 inline" /> Users
+  </:menu>
+  <:menu to={~p"/apps"} active={String.starts_with?(assigns[:current_uri] || "", "/apps")}>
+    <.dm_mdi name="apps" class="w-4 h-4 mr-1 inline" /> Apps
+  </:menu>
+  <:menu to={~p"/ai-provider/providers"} active={String.starts_with?(assigns[:current_uri] || "", "/ai-provider")}>
+    <.dm_mdi name="robot" class="w-4 h-4 mr-1 inline" /> AI
+  </:menu>
+  <:menu to={~p"/chat"} active={String.starts_with?(assigns[:current_uri] || "", "/chat")}>
+    <.dm_mdi name="chat" class="w-4 h-4 mr-1 inline" /> Chat
+  </:menu>
   <:user_profile>
     <button class="theme-switcher btn btn-ghost btn-sm self-center">
       <.dm_mdi name="weather-sunny" class="w-5 h-5 theme-icon-light" />
@@ -13,14 +26,29 @@
       <.dm_dropdown position="bottom">
         <:trigger class="btn btn-ghost self-center">
           <div class="flex justify-center items-center gap-2">
-            <.dm_mdi name="account-circle" class="w-5 h-5" />
-            {@current_user.email}
+            <.dm_avatar name={@current_user.display_name || to_string(@current_user.email)} size="xs" />
+            <span class="hidden lg:inline text-sm">{@current_user.email}</span>
+            <.dm_mdi name="chevron-down" class="w-4 h-4 opacity-60" />
           </div>
         </:trigger>
         <:content>
-          <.link href="/sign-out" class="popover-menu-item">
-            <.dm_mdi name="logout" class="w-4 h-4" /> Sign Out
+          <div class="px-4 py-3 border-b border-base-300/30">
+            <p class="text-sm font-semibold text-base-content">
+              {@current_user.display_name || @current_user.email}
+            </p>
+            <p class="text-xs text-base-content/50 mt-0.5">{@current_user.email}</p>
+            <span class="inline-block mt-1.5 text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-primary/15 text-primary">
+              {if @current_user.role, do: @current_user.role, else: "user"}
+            </span>
+          </div>
+          <.link navigate={~p"/profile"} class="popover-menu-item">
+            <.dm_mdi name="account-outline" class="w-4 h-4" /> My Profile
           </.link>
+          <div class="border-t border-base-300/30 mt-1 pt-1">
+            <.link href="/sign-out" class="popover-menu-item text-error">
+              <.dm_mdi name="logout" class="w-4 h-4" /> Sign Out
+            </.link>
+          </div>
         </:content>
       </.dm_dropdown>
     <% else %>

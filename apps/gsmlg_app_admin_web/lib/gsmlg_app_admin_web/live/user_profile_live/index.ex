@@ -1,4 +1,4 @@
-defmodule GsmlgAppAdminWeb.UserProfileLive do
+defmodule GsmlgAppAdminWeb.UserProfileLive.Index do
   use GsmlgAppAdminWeb, :live_view
 
   alias GsmlgAppAdmin.Accounts

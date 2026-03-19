@@ -1086,7 +1086,39 @@ The Gateway never knows which external API format the request came from — it o
 
 ## 8. Admin UI (LiveView)
 
-All under existing `live_session :authenticated`, grouped under the `/ai-provider` base URL and `AiProviderLive` module namespace:
+All under existing `live_session :authenticated`, grouped under the `/ai-provider` base URL and `AiProviderLive` module namespace.
+
+### 8.1 Navigation Structure
+
+The admin sidebar organizes AI Provider settings into **grouped sections**, each with a section header and its own set of menu items. Tools, MCP Servers, and Agents are in **separate sections** — not inlined on the same row:
+
+```
+AI Provider
+│
+│  AI Chat               → /chat  (no section header, top-level entry)
+│
+├─ GATEWAY
+│  ├── Providers         → /ai-provider/providers
+│  ├── API Keys          → /ai-provider/api-keys
+│  └── API Usage         → /ai-provider/usage
+│
+├─ PROMPTS & MEMORY
+│  ├── System Prompts    → /ai-provider/system-prompts
+│  └── Memories          → /ai-provider/memories
+│
+├─ TOOLS
+│  ├── Tools             → /ai-provider/tools
+│  └── MCP Servers       → /ai-provider/mcp-servers
+│
+└─ AGENTS
+   └── Agents            → /ai-provider/agents
+```
+
+The **AI Chat** link sits at the top of the sidebar without a section header, providing quick access to the chat interface. The chat page has its own inner sidebar (conversation list, provider selector) so it is not wrapped in `ai_provider_layout` — it just links bidirectionally (chat sidebar has a "Settings" link back to `/ai-provider/providers`).
+
+Section headers are rendered as small uppercase labels (`text-xs`, `uppercase`, `tracking-wider`) that visually separate each group. Each menu item is its own clickable row with an icon.
+
+### 8.2 Routes
 
 | Route | LiveView | Purpose |
 |---|---|---|
@@ -1098,8 +1130,11 @@ All under existing `live_session :authenticated`, grouped under the `/ai-provide
 | `/ai-provider/system-prompts` | `AiProviderLive.SystemPrompt.Index` | CRUD with variable reference |
 | `/ai-provider/memories` | `AiProviderLive.Memory.Index` | Filterable by scope/category |
 | `/ai-provider/tools` | `AiProviderLive.Tool.Index` | List, create, edit, test tools |
+| `/ai-provider/tools/:id` | `AiProviderLive.Tool.Show` | Tool detail + execution logs |
 | `/ai-provider/mcp-servers` | `AiProviderLive.McpServer.Index` | List, add, configure MCP servers |
+| `/ai-provider/mcp-servers/:id` | `AiProviderLive.McpServer.Show` | Server detail, health, synced tools |
 | `/ai-provider/agents` | `AiProviderLive.Agent.Index` | List, create, edit agents |
+| `/ai-provider/agents/:id` | `AiProviderLive.Agent.Show` | Agent detail + test chat |
 | `/ai-provider/usage` | `AiProviderLive.ApiUsage.Index` | Aggregated dashboard |
 
 Follows existing modal CRUD pattern (patch-based navigation, `dm_modal`).
