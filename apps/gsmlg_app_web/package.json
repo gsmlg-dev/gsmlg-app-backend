@@ -13,8 +13,10 @@
   "author": "Jonathan Gao",
   "license": "ISC",
   "dependencies": {
-    "@duskmoon-dev/core": "^1.11.0",
-    "@duskmoon-dev/elements": "^0.5.0"
+    "@duskmoon-dev/core": "^1.13.0",
+    "@duskmoon-dev/css-art": "^1.13.0",
+    "@duskmoon-dev/elements": "^0.10.0",
+    "@duskmoon-dev/art-elements": "^0.10.0"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16"

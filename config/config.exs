@@ -27,7 +27,6 @@ config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
 # Use system bun from Nix when available (avoids glibc issues with downloaded binary)
 config :bun,
   version: "1.2.13",
-  path: System.find_executable("bun"),
   gsmlg_app_web: [
     args:
       ~w(build assets/js/app.js --bundle --format=esm --target=browser --outdir=priv/static/assets --loader:.js=jsx --external:/fonts/* --external:/images/*),

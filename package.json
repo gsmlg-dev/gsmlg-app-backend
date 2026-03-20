@@ -4,8 +4,7 @@
   "private": true,
   "description": "GSMLG App Backend - Umbrella Project",
   "workspaces": [
-    "apps/gsmlg_app_web",
-    "apps/gsmlg_app_admin_web"
+    "apps/*"
   ],
   "scripts": {
     "setup": "bun run setup:web && bun run setup:admin",
