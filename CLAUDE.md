@@ -71,12 +71,18 @@ Router:  live "/things",         ThingLive.Index, :index
 - **Modal display**: `<.dm_modal :if={@live_action in [:new, :edit]}>`
 - **CRITICAL**: Links to modal routes MUST use `patch=` not `navigate=`. `navigate` remounts the LiveView and breaks the modal pattern.
 
-## UI Framework
+## UI Library
 
-This project uses two companion libraries for its UI layer:
+This project uses the DuskMoon UI system:
 
-- **`@duskmoon-dev/core`** — CSS framework, a Tailwind CSS v4 plugin providing Material Design 3 components (btn, card, badge, modal, tabs, dropdown, menu, navbar, drawer, etc.) with OKLCH color system and built-in themes (sunshine, moonlight). Repo: https://github.com/duskmoon-dev/duskmoonui
-- **`phoenix_duskmoon`** — Elixir/Phoenix component library providing LiveView function components (`.dm_modal`, `.dm_mdi`, `.dm_bsi`, etc.) and custom web elements (`<el-dm-markdown>`, `<thinking-box>`). Repo: https://github.com/duskmoon-dev/phoenix-duskmoon-ui
+- **`phoenix_duskmoon`** — Phoenix LiveView UI component library (primary web UI)
+- **`@duskmoon-dev/core`** — Core Tailwind CSS plugin and utilities
+- **`@duskmoon-dev/css-art`** — CSS art utilities
+- **`@duskmoon-dev/elements`** — Base web components
+- **`@duskmoon-dev/art-elements`** — Art/decorative web components
+
+Do NOT use DaisyUI or other CSS component libraries. Do NOT use `core_components.ex` — use `phoenix_duskmoon` components instead.
+Use `@duskmoon-dev/core/plugin` as the Tailwind CSS plugin.
 
 **CSS setup** (in each app's `assets/css/app.css`):
 ```css
@@ -92,9 +98,15 @@ This project uses two companion libraries for its UI layer:
 - CSS classes follow daisyui-like conventions (`btn-primary`, `badge-success`, `card`, `tabs-boxed`)
 - Custom web components: `<el-dm-markdown>` (markdown rendering), `<thinking-box>` (collapsible reasoning)
 
-**IMPORTANT — Upstream issue policy:** When encountering bugs or missing features in `@duskmoon-dev/core` or `phoenix_duskmoon`, file an issue on the corresponding GitHub repository with the label `internal request`:
-- CSS/theme issues → https://github.com/duskmoon-dev/duskmoonui/issues
-- Elixir component issues → https://github.com/duskmoon-dev/phoenix-duskmoon-ui/issues
+### Reporting issues or feature requests
+
+If you encounter missing features, bugs, or need functionality not yet available in any DuskMoon package, open a GitHub issue in the appropriate repository with the label `internal request`:
+
+- **`phoenix_duskmoon`** — https://github.com/gsmlg-dev/phoenix_duskmoon/issues
+- **`@duskmoon-dev/core`** — https://github.com/gsmlg-dev/duskmoon-dev/issues
+- **`@duskmoon-dev/css-art`** — https://github.com/gsmlg-dev/duskmoon-dev/issues
+- **`@duskmoon-dev/elements`** — https://github.com/gsmlg-dev/duskmoon-dev/issues
+- **`@duskmoon-dev/art-elements`** — https://github.com/gsmlg-dev/duskmoon-dev/issues
 
 Do NOT silently work around library bugs with local hacks. File the issue first, then add a temporary workaround in `app.css` with a comment referencing the issue URL.
 
