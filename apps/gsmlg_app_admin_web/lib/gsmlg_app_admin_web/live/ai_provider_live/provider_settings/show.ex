@@ -44,5 +44,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ProviderSettings.Show do
 
   defp format_number(nil), do: "0"
   defp format_number(num), do: Integer.to_string(num)
-
 end

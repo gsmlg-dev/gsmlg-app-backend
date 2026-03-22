@@ -48,5 +48,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Memory.Index do
     {:ok, memories} = AI.list_memories()
     {:noreply, assign(socket, memories: memories)}
   end
-
 end

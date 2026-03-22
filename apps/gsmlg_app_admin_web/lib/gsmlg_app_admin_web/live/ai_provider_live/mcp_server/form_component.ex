@@ -79,5 +79,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.McpServer.FormComponent do
   defp blank_to_nil(""), do: nil
   defp blank_to_nil(nil), do: nil
   defp blank_to_nil(val), do: val
-
 end

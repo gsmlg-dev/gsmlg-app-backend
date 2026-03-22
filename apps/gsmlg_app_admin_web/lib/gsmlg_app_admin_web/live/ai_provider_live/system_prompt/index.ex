@@ -44,9 +44,11 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.Index do
   end
 
   @impl true
-  def handle_info({GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.FormComponent, {:saved, _}}, socket) do
+  def handle_info(
+        {GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.FormComponent, {:saved, _}},
+        socket
+      ) do
     {:ok, templates} = AI.list_system_prompt_templates()
     {:noreply, assign(socket, templates: templates)}
   end
-
 end

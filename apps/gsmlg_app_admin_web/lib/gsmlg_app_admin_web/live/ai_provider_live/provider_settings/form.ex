@@ -190,5 +190,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ProviderSettings.Form do
       {:noreply, assign(socket, :new_model_input, "")}
     end
   end
-
 end

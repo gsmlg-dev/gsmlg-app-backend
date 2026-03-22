@@ -72,7 +72,10 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.Index do
   end
 
   @impl true
-  def handle_info({GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent, {:saved, api_key}}, socket) do
+  def handle_info(
+        {GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent, {:saved, api_key}},
+        socket
+      ) do
     raw_key = Map.get(api_key, :__raw_key__)
     {:ok, api_keys} = AI.list_api_keys()
     {:noreply, assign(socket, api_keys: api_keys, raw_key: raw_key)}

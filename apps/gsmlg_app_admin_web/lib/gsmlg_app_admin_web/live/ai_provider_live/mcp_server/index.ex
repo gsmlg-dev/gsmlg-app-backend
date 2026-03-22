@@ -48,5 +48,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.McpServer.Index do
     {:ok, servers} = AI.list_mcp_servers()
     {:noreply, assign(socket, servers: servers)}
   end
-
 end

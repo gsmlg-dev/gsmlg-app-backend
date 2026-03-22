@@ -2,57 +2,62 @@
   <div class="p-6">
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold">System Prompt Templates</h1>
-    <.link patch={~p"/ai-provider/system-prompts/new"} class="btn btn-primary">New Template</.link>
-  </div>
+      <.link patch={~p"/ai-provider/system-prompts/new"} class="btn btn-primary">
+        New Template
+      </.link>
+    </div>
 
-  <.dm_modal
-    :if={@live_action in [:new, :edit]}
-    id="template-modal"
-    size="lg"
-  >
-    <:body>
-      <.live_component
-        module={GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.FormComponent}
-        id={(@template && @template.id) || :new}
-        action={@live_action}
-        template={@template}
-        patch={~p"/ai-provider/system-prompts"}
-      />
-    </:body>
-  </.dm_modal>
+    <.dm_modal
+      :if={@live_action in [:new, :edit]}
+      id="template-modal"
+      size="lg"
+    >
+      <:body>
+        <.live_component
+          module={GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.FormComponent}
+          id={(@template && @template.id) || :new}
+          action={@live_action}
+          template={@template}
+          patch={~p"/ai-provider/system-prompts"}
+        />
+      </:body>
+    </.dm_modal>
 
-  <div class="space-y-4">
-    <div :for={t <- @templates} id={"template-#{t.id}"} class="card bg-base-100 shadow-sm p-4">
-      <div class="flex justify-between items-start">
-        <div>
-          <h3 class="font-bold">{t.name}</h3>
-          <p class="text-sm opacity-70">Slug: {t.slug} | Priority: {t.priority}</p>
-          <div class="flex gap-2 mt-1">
-            <span :if={t.is_default} class="badge badge-info badge-sm">Default</span>
-            <span class={[
-              "badge badge-sm",
-              if(t.is_active, do: "badge-success", else: "badge-error")
-            ]}>
-              {if t.is_active, do: "Active", else: "Inactive"}
-            </span>
+    <div class="space-y-4">
+      <div :for={t <- @templates} id={"template-#{t.id}"} class="card bg-base-100 shadow-sm p-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="font-bold">{t.name}</h3>
+            <p class="text-sm opacity-70">Slug: {t.slug} | Priority: {t.priority}</p>
+            <div class="flex gap-2 mt-1">
+              <span :if={t.is_default} class="badge badge-info badge-sm">Default</span>
+              <span class={[
+                "badge badge-sm",
+                if(t.is_active, do: "badge-success", else: "badge-error")
+              ]}>
+                {if t.is_active, do: "Active", else: "Inactive"}
+              </span>
+            </div>
+            <pre class="mt-2 text-sm bg-base-200 p-2 rounded max-h-32 overflow-auto whitespace-pre-wrap">{t.content}</pre>
           </div>
-          <pre class="mt-2 text-sm bg-base-200 p-2 rounded max-h-32 overflow-auto whitespace-pre-wrap">{t.content}</pre>
-        </div>
-        <div class="flex gap-2">
-          <.link patch={~p"/ai-provider/system-prompts/#{t.id}/edit"} class="btn btn-sm btn-ghost">
-            Edit
-          </.link>
-          <button
-            phx-click="delete"
-            phx-value-id={t.id}
-            data-confirm="Delete this template?"
-            class="btn btn-sm btn-error"
-          >
-            Delete
-          </button>
+          <div class="flex gap-2">
+            <.link
+              patch={~p"/ai-provider/system-prompts/#{t.id}/edit"}
+              class="btn btn-sm btn-ghost"
+            >
+              Edit
+            </.link>
+            <button
+              phx-click="delete"
+              phx-value-id={t.id}
+              data-confirm="Delete this template?"
+              class="btn btn-sm btn-error"
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </div>
-    </div>
     </div>
   </div>
 </.ai_provider_layout>

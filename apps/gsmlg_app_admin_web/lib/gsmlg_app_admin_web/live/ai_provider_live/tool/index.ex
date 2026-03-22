@@ -48,5 +48,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Tool.Index do
     {:ok, tools} = AI.list_tools()
     {:noreply, assign(socket, tools: tools)}
   end
-
 end

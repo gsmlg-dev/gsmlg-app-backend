@@ -8,86 +8,86 @@
     </div>
 
     <div class="grid gap-4">
-    <%= if Enum.empty?(@providers) do %>
-      <div class="card bg-base-200 p-8 text-center">
-        <div class="flex flex-col items-center gap-4">
-          <.dm_mdi name="chip" class="w-16 h-16 text-base-content/50" />
-          <p class="text-lg">No AI providers configured yet.</p>
-          <.link navigate={~p"/ai-provider/providers/new"} class="btn btn-primary">
-            Add Your First Provider
-          </.link>
+      <%= if Enum.empty?(@providers) do %>
+        <div class="card bg-base-200 p-8 text-center">
+          <div class="flex flex-col items-center gap-4">
+            <.dm_mdi name="chip" class="w-16 h-16 text-base-content/50" />
+            <p class="text-lg">No AI providers configured yet.</p>
+            <.link navigate={~p"/ai-provider/providers/new"} class="btn btn-primary">
+              Add Your First Provider
+            </.link>
+          </div>
         </div>
-      </div>
-    <% else %>
-      <%= for provider <- @providers do %>
-        <div class="card bg-base-100 shadow-md">
-          <div class="card-body">
-            <div class="flex items-start justify-between">
-              <div class="flex-1">
-                <div class="flex items-center gap-3">
-                  <.link
-                    navigate={~p"/ai-provider/providers/#{provider.id}"}
-                    class="text-lg font-semibold hover:text-primary"
-                  >
-                    {provider.name}
-                  </.link>
-                  <span class={"badge #{if provider.is_active, do: "badge-success", else: "badge-neutral"}"}>
-                    {if provider.is_active, do: "Active", else: "Inactive"}
-                  </span>
+      <% else %>
+        <%= for provider <- @providers do %>
+          <div class="card bg-base-100 shadow-md">
+            <div class="card-body">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-3">
+                    <.link
+                      navigate={~p"/ai-provider/providers/#{provider.id}"}
+                      class="text-lg font-semibold hover:text-primary"
+                    >
+                      {provider.name}
+                    </.link>
+                    <span class={"badge #{if provider.is_active, do: "badge-success", else: "badge-neutral"}"}>
+                      {if provider.is_active, do: "Active", else: "Inactive"}
+                    </span>
+                  </div>
+                  <p class="text-sm text-base-content/70 mt-1">
+                    <span class="font-mono">{provider.slug}</span> &bull;
+                    Model: {provider.model}
+                  </p>
+                  <p class="text-sm text-base-content/50 mt-2">
+                    API: {provider.api_base_url}
+                    <%= if provider.masked_api_key do %>
+                      &bull; Key: {provider.masked_api_key}
+                    <% end %>
+                  </p>
                 </div>
-                <p class="text-sm text-base-content/70 mt-1">
-                  <span class="font-mono">{provider.slug}</span> &bull;
-                  Model: {provider.model}
-                </p>
-                <p class="text-sm text-base-content/50 mt-2">
-                  API: {provider.api_base_url}
-                  <%= if provider.masked_api_key do %>
-                    &bull; Key: {provider.masked_api_key}
-                  <% end %>
-                </p>
-              </div>
-              <div class="flex items-center gap-2">
-                <button
-                  phx-click="toggle_active"
-                  phx-value-id={provider.id}
-                  class="btn btn-ghost btn-sm"
-                  title={if provider.is_active, do: "Deactivate", else: "Activate"}
-                  disabled={@loading}
-                >
-                  <%= if @loading do %>
-                    <span class="loading loading-spinner loading-xs"></span>
-                  <% else %>
-                    <.dm_mdi
-                      name={if provider.is_active, do: "pause", else: "play"}
-                      class="w-4 h-4"
-                    />
-                  <% end %>
-                </button>
-                <.link
-                  navigate={~p"/ai-provider/providers/#{provider.id}/edit"}
-                  class="btn btn-ghost btn-sm"
-                >
-                  <.dm_mdi name="pencil" class="w-4 h-4" />
-                </.link>
-                <button
-                  phx-click="delete"
-                  phx-value-id={provider.id}
-                  class="btn btn-ghost btn-sm text-error"
-                  data-confirm={"Are you sure you want to delete #{provider.name}?"}
-                  disabled={@loading}
-                >
-                  <%= if @loading do %>
-                    <span class="loading loading-spinner loading-xs"></span>
-                  <% else %>
-                    <.dm_mdi name="delete" class="w-4 h-4" />
-                  <% end %>
-                </button>
+                <div class="flex items-center gap-2">
+                  <button
+                    phx-click="toggle_active"
+                    phx-value-id={provider.id}
+                    class="btn btn-ghost btn-sm"
+                    title={if provider.is_active, do: "Deactivate", else: "Activate"}
+                    disabled={@loading}
+                  >
+                    <%= if @loading do %>
+                      <span class="loading loading-spinner loading-xs"></span>
+                    <% else %>
+                      <.dm_mdi
+                        name={if provider.is_active, do: "pause", else: "play"}
+                        class="w-4 h-4"
+                      />
+                    <% end %>
+                  </button>
+                  <.link
+                    navigate={~p"/ai-provider/providers/#{provider.id}/edit"}
+                    class="btn btn-ghost btn-sm"
+                  >
+                    <.dm_mdi name="pencil" class="w-4 h-4" />
+                  </.link>
+                  <button
+                    phx-click="delete"
+                    phx-value-id={provider.id}
+                    class="btn btn-ghost btn-sm text-error"
+                    data-confirm={"Are you sure you want to delete #{provider.name}?"}
+                    disabled={@loading}
+                  >
+                    <%= if @loading do %>
+                      <span class="loading loading-spinner loading-xs"></span>
+                    <% else %>
+                      <.dm_mdi name="delete" class="w-4 h-4" />
+                    <% end %>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        <% end %>
       <% end %>
-    <% end %>
     </div>
   </div>
 </.ai_provider_layout>

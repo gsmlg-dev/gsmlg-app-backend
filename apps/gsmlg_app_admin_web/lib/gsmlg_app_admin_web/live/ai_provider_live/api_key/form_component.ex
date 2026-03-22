@@ -113,5 +113,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
   defp default_scopes do
     ~w(chat_completions messages images ocr agents models_list)
   end
-
 end

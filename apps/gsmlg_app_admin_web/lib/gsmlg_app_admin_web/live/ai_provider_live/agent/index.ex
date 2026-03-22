@@ -48,5 +48,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Agent.Index do
     {:ok, agents} = AI.list_agents()
     {:noreply, assign(socket, agents: agents)}
   end
-
 end

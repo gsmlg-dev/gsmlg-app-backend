@@ -60,5 +60,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ProviderSettings.Index do
         {:noreply, put_flash(socket, :error, "Failed to update provider status")}
     end
   end
-
 end

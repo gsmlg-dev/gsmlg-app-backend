@@ -2,8 +2,10 @@
   <%= if @current_user do %>
     <%!-- Hero Welcome Banner --%>
     <div class="relative overflow-hidden bg-gradient-to-br from-primary/10 via-base-100 to-secondary/10">
-      <div class="absolute inset-0 opacity-[0.03]"
-           style="background-image: radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0); background-size: 32px 32px;">
+      <div
+        class="absolute inset-0 opacity-[0.03]"
+        style="background-image: radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0); background-size: 32px 32px;"
+      >
       </div>
       <div class="relative container mx-auto px-6 py-12 lg:py-16">
         <div class="flex items-end justify-between gap-8 flex-wrap">
@@ -30,7 +32,6 @@
     <%!-- Dashboard Cards Grid --%>
     <div class="container mx-auto px-6 py-10">
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-
         <%!-- User Management Card --%>
         <.link href="/users" class="group block">
           <div class="relative h-full rounded-2xl border border-base-300/50 bg-base-100 p-6
@@ -44,9 +45,12 @@
                           transition-colors duration-300">
                 <.dm_mdi name="account-group" class="w-6 h-6" />
               </div>
-              <.dm_mdi name="arrow-top-right" class="w-5 h-5 text-base-content/20
+              <.dm_mdi
+                name="arrow-top-right"
+                class="w-5 h-5 text-base-content/20
                         group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5
-                        transition-all duration-300" />
+                        transition-all duration-300"
+              />
             </div>
             <h3 class="text-xl font-bold text-base-content mb-2">
               User Management
@@ -76,9 +80,12 @@
                           transition-colors duration-300">
                 <.dm_mdi name="apps" class="w-6 h-6" />
               </div>
-              <.dm_mdi name="arrow-top-right" class="w-5 h-5 text-base-content/20
+              <.dm_mdi
+                name="arrow-top-right"
+                class="w-5 h-5 text-base-content/20
                         group-hover:text-secondary group-hover:translate-x-0.5 group-hover:-translate-y-0.5
-                        transition-all duration-300" />
+                        transition-all duration-300"
+              />
             </div>
             <h3 class="text-xl font-bold text-base-content mb-2">
               Apps Management
@@ -108,9 +115,12 @@
                           transition-colors duration-300">
                 <.dm_mdi name="robot" class="w-6 h-6" />
               </div>
-              <.dm_mdi name="arrow-top-right" class="w-5 h-5 text-base-content/20
+              <.dm_mdi
+                name="arrow-top-right"
+                class="w-5 h-5 text-base-content/20
                         group-hover:text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5
-                        transition-all duration-300" />
+                        transition-all duration-300"
+              />
             </div>
             <h3 class="text-xl font-bold text-base-content mb-2">
               AI Providers
@@ -126,7 +136,6 @@
             </div>
           </div>
         </.link>
-
       </div>
 
       <%!-- AI Provider Quick Links --%>
@@ -135,63 +144,104 @@
           AI Provider Settings
         </h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          <.link href="/ai-provider/api-keys"
-                 class="group flex items-center gap-2 px-4 py-3 rounded-xl
+          <.link
+            href="/ai-provider/api-keys"
+            class="group flex items-center gap-2 px-4 py-3 rounded-xl
                         bg-base-200/50 border border-transparent
                         hover:bg-base-200 hover:border-base-300/50
-                        transition-all duration-200">
-            <.dm_mdi name="key-variant" class="w-4 h-4 text-base-content/30 group-hover:text-primary transition-colors" />
-            <span class="text-sm text-base-content/60 group-hover:text-base-content transition-colors">API Keys</span>
+                        transition-all duration-200"
+          >
+            <.dm_mdi
+              name="key-variant"
+              class="w-4 h-4 text-base-content/30 group-hover:text-primary transition-colors"
+            />
+            <span class="text-sm text-base-content/60 group-hover:text-base-content transition-colors">
+              API Keys
+            </span>
           </.link>
 
-          <.link href="/ai-provider/system-prompts"
-                 class="group flex items-center gap-2 px-4 py-3 rounded-xl
+          <.link
+            href="/ai-provider/system-prompts"
+            class="group flex items-center gap-2 px-4 py-3 rounded-xl
                         bg-base-200/50 border border-transparent
                         hover:bg-base-200 hover:border-base-300/50
-                        transition-all duration-200">
-            <.dm_mdi name="text-box-outline" class="w-4 h-4 text-base-content/30 group-hover:text-primary transition-colors" />
-            <span class="text-sm text-base-content/60 group-hover:text-base-content transition-colors">Prompts</span>
+                        transition-all duration-200"
+          >
+            <.dm_mdi
+              name="text-box-outline"
+              class="w-4 h-4 text-base-content/30 group-hover:text-primary transition-colors"
+            />
+            <span class="text-sm text-base-content/60 group-hover:text-base-content transition-colors">
+              Prompts
+            </span>
           </.link>
 
-          <.link href="/ai-provider/memories"
-                 class="group flex items-center gap-2 px-4 py-3 rounded-xl
+          <.link
+            href="/ai-provider/memories"
+            class="group flex items-center gap-2 px-4 py-3 rounded-xl
                         bg-base-200/50 border border-transparent
                         hover:bg-base-200 hover:border-base-300/50
-                        transition-all duration-200">
-            <.dm_mdi name="brain" class="w-4 h-4 text-base-content/30 group-hover:text-primary transition-colors" />
-            <span class="text-sm text-base-content/60 group-hover:text-base-content transition-colors">Memories</span>
+                        transition-all duration-200"
+          >
+            <.dm_mdi
+              name="brain"
+              class="w-4 h-4 text-base-content/30 group-hover:text-primary transition-colors"
+            />
+            <span class="text-sm text-base-content/60 group-hover:text-base-content transition-colors">
+              Memories
+            </span>
           </.link>
 
-          <.link href="/ai-provider/tools"
-                 class="group flex items-center gap-2 px-4 py-3 rounded-xl
+          <.link
+            href="/ai-provider/tools"
+            class="group flex items-center gap-2 px-4 py-3 rounded-xl
                         bg-base-200/50 border border-transparent
                         hover:bg-base-200 hover:border-base-300/50
-                        transition-all duration-200">
-            <.dm_mdi name="wrench" class="w-4 h-4 text-base-content/30 group-hover:text-primary transition-colors" />
-            <span class="text-sm text-base-content/60 group-hover:text-base-content transition-colors">Tools</span>
+                        transition-all duration-200"
+          >
+            <.dm_mdi
+              name="wrench"
+              class="w-4 h-4 text-base-content/30 group-hover:text-primary transition-colors"
+            />
+            <span class="text-sm text-base-content/60 group-hover:text-base-content transition-colors">
+              Tools
+            </span>
           </.link>
 
-          <.link href="/ai-provider/agents"
-                 class="group flex items-center gap-2 px-4 py-3 rounded-xl
+          <.link
+            href="/ai-provider/agents"
+            class="group flex items-center gap-2 px-4 py-3 rounded-xl
                         bg-base-200/50 border border-transparent
                         hover:bg-base-200 hover:border-base-300/50
-                        transition-all duration-200">
-            <.dm_mdi name="robot-outline" class="w-4 h-4 text-base-content/30 group-hover:text-primary transition-colors" />
-            <span class="text-sm text-base-content/60 group-hover:text-base-content transition-colors">Agents</span>
+                        transition-all duration-200"
+          >
+            <.dm_mdi
+              name="robot-outline"
+              class="w-4 h-4 text-base-content/30 group-hover:text-primary transition-colors"
+            />
+            <span class="text-sm text-base-content/60 group-hover:text-base-content transition-colors">
+              Agents
+            </span>
           </.link>
 
-          <.link href="/ai-provider/usage"
-                 class="group flex items-center gap-2 px-4 py-3 rounded-xl
+          <.link
+            href="/ai-provider/usage"
+            class="group flex items-center gap-2 px-4 py-3 rounded-xl
                         bg-base-200/50 border border-transparent
                         hover:bg-base-200 hover:border-base-300/50
-                        transition-all duration-200">
-            <.dm_mdi name="chart-bar" class="w-4 h-4 text-base-content/30 group-hover:text-primary transition-colors" />
-            <span class="text-sm text-base-content/60 group-hover:text-base-content transition-colors">Usage</span>
+                        transition-all duration-200"
+          >
+            <.dm_mdi
+              name="chart-bar"
+              class="w-4 h-4 text-base-content/30 group-hover:text-primary transition-colors"
+            />
+            <span class="text-sm text-base-content/60 group-hover:text-base-content transition-colors">
+              Usage
+            </span>
           </.link>
         </div>
       </div>
     </div>
-
   <% else %>
     <%!-- Unauthenticated State --%>
     <div class="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] px-6">
@@ -208,8 +258,7 @@
             Sign in to access the administration panel and manage platform resources.
           </p>
           <.link href="/sign-in" class="btn btn-primary btn-lg gap-2">
-            <.dm_mdi name="login" class="w-5 h-5" />
-            Sign In
+            <.dm_mdi name="login" class="w-5 h-5" /> Sign In
           </.link>
         </div>
       </div>

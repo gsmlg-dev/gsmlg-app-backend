@@ -614,5 +614,4 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
         if provider.model && provider.model != "", do: [provider.model], else: []
     end
   end
-
 end

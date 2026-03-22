@@ -65,5 +65,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.FormComponent do
         {:noreply, put_flash(socket, :error, "Failed to save template.")}
     end
   end
-
 end

@@ -66,5 +66,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ProviderSettings.FormComponent do
   end
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
-
 end

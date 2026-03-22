@@ -15,5 +15,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiUsage.Index do
   def handle_params(_params, url, socket) do
     {:noreply, assign(socket, :current_uri, URI.parse(url).path)}
   end
-
 end
