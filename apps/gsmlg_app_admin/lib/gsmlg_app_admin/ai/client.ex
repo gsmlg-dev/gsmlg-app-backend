@@ -1,223 +1,59 @@
 defmodule GsmlgAppAdmin.AI.Client do
   @moduledoc """
-  AI client module for interacting with OpenAI-compatible APIs using Instructor.
+  AI client module using ReqLLM for standardized LLM API access.
 
-  Supports multiple providers:
-  - DeepSeek
-  - Zhipu AI (ChatGLM)
-  - Moonshot AI (Kimi)
-  - OpenAI
+  Supports multiple providers via ReqLLM's unified interface.
   """
 
   @doc """
   Sends a chat completion request to the specified provider.
 
   ## Parameters
-    - provider: The AI provider configuration
+    - provider: The AI provider configuration (Ash resource with api_base_url, api_key, model, etc.)
     - messages: List of message maps with :role and :content
-    - opts: Optional parameters (temperature, max_tokens, stream, etc.)
+    - opts: Optional parameters (temperature, max_tokens, model override, tools, etc.)
 
   ## Returns
-    - {:ok, response} on success
+    - {:ok, response_map} on success (with :content, :model, :usage, :tool_calls keys)
     - {:error, reason} on failure
   """
   def chat_completion(provider, messages, opts \\ []) do
-    stream? = Keyword.get(opts, :stream, false)
+    model_spec = build_model_spec(provider, opts)
+    req_opts = build_req_opts(provider, opts)
 
-    params = build_params(provider, messages, opts)
-    headers = build_headers(provider)
+    case ReqLLM.generate_text(model_spec, format_messages(messages), req_opts) do
+      {:ok, response} ->
+        {:ok, normalize_response(response, provider, opts)}
 
-    url = "#{provider.api_base_url}/chat/completions"
-
-    if stream? do
-      stream_chat_completion(url, headers, params)
-    else
-      request_chat_completion(url, headers, params)
-    end
-  end
-
-  @doc """
-  Streams a chat completion response from the provider.
-  """
-  def stream_chat_completion(url, headers, params) do
-    params = Map.put(params, :stream, true)
-
-    case Req.post(url,
-           headers: headers,
-           json: params,
-           into: :self,
-           receive_timeout: 60_000
-         ) do
-      {:ok, %Req.Response{status: 200}} ->
-        {:ok, :streaming}
-
-      {:ok, %Req.Response{status: status, body: body}} ->
-        {:error, "HTTP #{status}: #{inspect(body)}"}
-
-      {:error, error} ->
-        {:error, "Request failed: #{inspect(error)}"}
-    end
-  end
-
-  @doc """
-  Makes a non-streaming chat completion request.
-  """
-  def request_chat_completion(url, headers, params) do
-    case Req.post(url,
-           headers: headers,
-           json: params,
-           receive_timeout: 60_000
-         ) do
-      {:ok, %Req.Response{status: 200, body: body}} ->
-        parse_response(body)
-
-      {:ok, %Req.Response{status: status, body: body}} ->
-        {:error, "HTTP #{status}: #{inspect(body)}"}
-
-      {:error, error} ->
-        {:error, "Request failed: #{inspect(error)}"}
+      {:error, reason} ->
+        {:error, format_error(reason)}
     end
   end
 
   @doc """
   Streams chat completion with a callback function for each chunk.
 
-  The callback receives each delta content as it arrives.
+  The callback receives `{:content, text}` or `{:thinking, text}` tuples.
   """
   def stream_with_callback(provider, messages, callback, opts \\ []) do
-    params = build_params(provider, messages, opts) |> Map.put(:stream, true)
-    headers = build_headers(provider)
-    url = "#{provider.api_base_url}/chat/completions"
+    model_spec = build_model_spec(provider, opts)
+    req_opts = build_req_opts(provider, opts)
 
-    result =
-      Req.post(url,
-        headers: headers,
-        json: params,
-        receive_timeout: 60_000,
-        into: fn {:data, data}, {req, resp} ->
-          # Parse SSE format: "data: {...}\n\n"
-          data
-          |> String.split("\n\n", trim: true)
-          |> Enum.each(fn line ->
-            case String.trim_leading(line, "data: ") do
-              "[DONE]" ->
-                :ok
+    case ReqLLM.stream_text(model_spec, format_messages(messages), req_opts) do
+      {:ok, stream_response} ->
+        ReqLLM.StreamResponse.process_stream(stream_response,
+          on_result: fn text -> callback.({:content, text}) end,
+          on_thinking: fn text -> callback.({:thinking, text}) end
+        )
 
-              json_str ->
-                case Jason.decode(json_str) do
-                  {:ok, chunk} ->
-                    delta = get_in(chunk, ["choices", Access.at(0), "delta"]) || %{}
-
-                    # Handle reasoning_content separately (for models like Zhipu GLM)
-                    if reasoning = delta["reasoning_content"] do
-                      callback.({:thinking, reasoning})
-                    end
-
-                    # Handle regular content
-                    if content = delta["content"] do
-                      callback.({:content, content})
-                    end
-
-                  {:error, _} ->
-                    :ok
-                end
-            end
-          end)
-
-          {:cont, {req, resp}}
-        end
-      )
-
-    # Handle the response properly
-    case result do
-      {:ok, %Req.Response{status: 200}} ->
         {:ok, :streaming_complete}
 
-      {:ok, %Req.Response{status: status, body: body}} ->
-        error_msg = extract_error_message(body, status)
-        {:error, error_msg}
-
-      {:error, exception} ->
-        {:error, "Request failed: #{inspect(exception)}"}
+      {:error, reason} ->
+        {:error, format_error(reason)}
     end
-  end
-
-  defp extract_error_message(body, status) when is_map(body) do
-    # Try to extract error message from API response
-    case get_in(body, ["error", "message"]) do
-      nil ->
-        case body["message"] do
-          nil -> "HTTP #{status}: #{inspect(body)}"
-          msg -> "HTTP #{status}: #{msg}"
-        end
-
-      msg ->
-        "HTTP #{status}: #{msg}"
-    end
-  end
-
-  defp extract_error_message(body, status) when is_binary(body) and body != "" do
-    case Jason.decode(body) do
-      {:ok, decoded} -> extract_error_message(decoded, status)
-      {:error, _} -> "HTTP #{status}: #{body}"
-    end
-  end
-
-  defp extract_error_message(_body, status) do
-    "HTTP #{status}: Unknown error"
-  end
-
-  # Private functions
-
-  defp build_params(provider, messages, opts) do
-    base_params = provider.default_params || %{}
-
-    params = %{
-      model: Keyword.get(opts, :model, provider.model),
-      messages: format_messages(messages)
-    }
-
-    # Merge provider defaults with custom opts
-    params
-    |> Map.merge(base_params)
-    |> maybe_put(:temperature, Keyword.get(opts, :temperature))
-    |> maybe_put(:max_tokens, Keyword.get(opts, :max_tokens))
-    |> maybe_put(:top_p, Keyword.get(opts, :top_p))
-  end
-
-  defp build_headers(provider) do
-    [
-      {"Content-Type", "application/json"},
-      {"Authorization", "Bearer #{provider.api_key}"}
-    ]
-  end
-
-  defp format_messages(messages) do
-    Enum.map(messages, fn msg ->
-      %{
-        "role" => to_string(msg.role || msg["role"]),
-        "content" => msg.content || msg["content"]
-      }
-    end)
-  end
-
-  defp parse_response(body) when is_map(body) do
-    case get_in(body, ["choices", Access.at(0), "message", "content"]) do
-      nil ->
-        {:error, "Invalid response format: #{inspect(body)}"}
-
-      content ->
-        {:ok,
-         %{
-           content: content,
-           model: body["model"],
-           usage: body["usage"]
-         }}
-    end
-  end
-
-  defp parse_response(body) do
-    {:error, "Invalid response body: #{inspect(body)}"}
+  rescue
+    e ->
+      {:error, "Streaming failed: #{Exception.message(e)}"}
   end
 
   @doc """
@@ -232,7 +68,11 @@ defmodule GsmlgAppAdmin.AI.Client do
     - {:error, reason} on failure
   """
   def image_generation(provider, params) do
-    headers = build_headers(provider)
+    headers = [
+      {"Content-Type", "application/json"},
+      {"Authorization", "Bearer #{provider.api_key}"}
+    ]
+
     url = "#{provider.api_base_url}/images/generations"
 
     body =
@@ -255,6 +95,118 @@ defmodule GsmlgAppAdmin.AI.Client do
     end
   end
 
+  # -- Private: Model Spec --
+
+  defp build_model_spec(provider, opts) do
+    model = Keyword.get(opts, :model, provider.model)
+
+    %{
+      provider: map_provider(provider.slug),
+      id: model,
+      base_url: provider.api_base_url
+    }
+  end
+
+  # Map our provider slugs to ReqLLM provider atoms.
+  defp map_provider("anthropic"), do: :anthropic
+  defp map_provider("google"), do: :google
+  defp map_provider("groq"), do: :groq
+  defp map_provider("xai"), do: :xai
+  defp map_provider("amazon_bedrock"), do: :amazon_bedrock
+  defp map_provider("azure"), do: :azure
+  defp map_provider("cerebras"), do: :cerebras
+  defp map_provider("openrouter"), do: :openrouter
+  defp map_provider(_), do: :openai
+
+  # -- Private: Messages --
+
+  defp format_messages(messages) do
+    Enum.map(messages, fn msg ->
+      %{
+        "role" => to_string(msg.role || msg["role"]),
+        "content" => msg.content || msg["content"]
+      }
+    end)
+  end
+
+  # -- Private: Options --
+
+  defp build_req_opts(provider, opts) do
+    base_params = provider.default_params || %{}
+
+    []
+    |> Keyword.put(:api_key, provider.api_key)
+    |> maybe_put_opt(:temperature, Keyword.get(opts, :temperature) || base_params["temperature"])
+    |> maybe_put_opt(:max_tokens, Keyword.get(opts, :max_tokens) || base_params["max_tokens"])
+    |> maybe_put_opt(:top_p, Keyword.get(opts, :top_p) || base_params["top_p"])
+    |> maybe_put_opt(:tools, Keyword.get(opts, :tools))
+    |> maybe_put_opt(:tool_choice, Keyword.get(opts, :tool_choice))
+  end
+
+  # -- Private: Response Normalization --
+
+  defp normalize_response(response, provider, opts) do
+    text = ReqLLM.Response.text(response)
+    usage = ReqLLM.Response.usage(response)
+    tool_calls = ReqLLM.Response.tool_calls(response) || []
+
+    %{
+      content: text,
+      model: Keyword.get(opts, :model, provider.model),
+      usage: normalize_usage(usage),
+      tool_calls: tool_calls
+    }
+  end
+
+  defp normalize_usage(nil), do: %{}
+
+  defp normalize_usage(usage) when is_map(usage) do
+    %{
+      "prompt_tokens" =>
+        usage[:input_tokens] || usage["input_tokens"] || usage[:prompt_tokens] ||
+          usage["prompt_tokens"] || 0,
+      "completion_tokens" =>
+        usage[:output_tokens] || usage["output_tokens"] || usage[:completion_tokens] ||
+          usage["completion_tokens"] || 0,
+      "total_tokens" => usage[:total_tokens] || usage["total_tokens"] || 0
+    }
+  end
+
+  defp normalize_usage(_), do: %{}
+
+  # -- Private: Error Formatting --
+
+  defp format_error(%{message: message}), do: message
+  defp format_error(reason) when is_binary(reason), do: reason
+  defp format_error(reason), do: inspect(reason)
+
+  # -- Private: Image Generation Helpers --
+
+  defp extract_error_message(body, status) when is_map(body) do
+    case get_in(body, ["error", "message"]) do
+      nil ->
+        case body["message"] do
+          nil -> "HTTP #{status}: #{inspect(body)}"
+          msg -> "HTTP #{status}: #{msg}"
+        end
+
+      msg ->
+        "HTTP #{status}: #{msg}"
+    end
+  end
+
+  defp extract_error_message(body, status) when is_binary(body) and body != "" do
+    case Jason.decode(body) do
+      {:ok, decoded} -> extract_error_message(decoded, status)
+      {:error, _} -> "HTTP #{status}: #{body}"
+    end
+  end
+
+  defp extract_error_message(_body, status), do: "HTTP #{status}: Unknown error"
+
   defp maybe_put(map, _key, nil), do: map
   defp maybe_put(map, key, value), do: Map.put(map, key, value)
+
+  defp maybe_put_opt(opts, _key, nil), do: opts
+  defp maybe_put_opt(opts, key, value), do: Keyword.put(opts, key, value)
 end

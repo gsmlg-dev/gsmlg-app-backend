@@ -42,11 +42,11 @@ defmodule GsmlgAppAdmin.MixProject do
       {:jason, "~> 1.2"},
       {:swoosh, "~> 1.3"},
       {:finch, "~> 0.18"},
+      {:req_llm, "~> 1.7"},
       {:picosat_elixir, "~> 0.2"},
       {:ash, "~> 3.0"},
       {:ash_authentication, "~> 4.0"},
       {:ash_postgres, "~> 2.0"},
-      {:instructor, "~> 0.1.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
