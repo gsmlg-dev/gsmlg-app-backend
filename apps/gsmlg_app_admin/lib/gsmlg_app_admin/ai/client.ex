@@ -140,6 +140,7 @@ defmodule GsmlgAppAdmin.AI.Client do
 
     []
     |> Keyword.put(:api_key, provider.api_key)
+    |> Keyword.put(:base_url, provider.api_base_url)
     |> maybe_put_opt(:temperature, Keyword.get(opts, :temperature) || base_params["temperature"])
     |> maybe_put_opt(:max_tokens, Keyword.get(opts, :max_tokens) || base_params["max_tokens"])
     |> maybe_put_opt(:top_p, Keyword.get(opts, :top_p) || base_params["top_p"])
