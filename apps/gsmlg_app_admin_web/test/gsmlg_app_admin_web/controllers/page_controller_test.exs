@@ -42,6 +42,6 @@ defmodule GsmlgAppAdminWeb.PageControllerTest do
     # Access home page as authenticated user
     conn = get(recycle(conn), ~p"/")
 
-    assert html_response(conn, 200) =~ "Best in the World!"
+    assert html_response(conn, 200) =~ "Welcome back"
   end
 end

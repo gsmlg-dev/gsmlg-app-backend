@@ -74,7 +74,7 @@ defmodule GsmlgAppAdminWeb.Router do
     )
 
     sign_out_route(AuthController)
-    auth_routes_for(GsmlgAppAdmin.Accounts.User, to: AuthController)
+    auth_routes(AuthController, GsmlgAppAdmin.Accounts.User)
     reset_route(otp_app: :gsmlg_app_admin)
   end
 
