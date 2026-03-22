@@ -2,7 +2,7 @@ defmodule GsmlgAppAdmin.AI.ProviderPresets do
   @moduledoc """
   Predefined provider configurations for common LLM providers.
 
-  Supports providers from req_llm and other popular OpenAI-compatible APIs.
+  Supports providers via ReqLLM's unified interface and other OpenAI-compatible APIs.
   """
 
   @presets [
