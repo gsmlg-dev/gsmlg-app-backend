@@ -41,12 +41,16 @@ defmodule GsmlgAppAdmin.AI.Client do
 
     case ReqLLM.stream_text(model_spec, format_messages(messages), req_opts) do
       {:ok, stream_response} ->
-        ReqLLM.StreamResponse.process_stream(stream_response,
-          on_result: fn text -> callback.({:content, text}) end,
-          on_thinking: fn text -> callback.({:thinking, text}) end
-        )
+        case ReqLLM.StreamResponse.process_stream(stream_response,
+               on_result: fn text -> callback.({:content, text}) end,
+               on_thinking: fn text -> callback.({:thinking, text}) end
+             ) do
+          {:error, reason} ->
+            {:error, format_error(reason)}
 
-        {:ok, :streaming_complete}
+          _response ->
+            {:ok, :streaming_complete}
+        end
 
       {:error, reason} ->
         {:error, format_error(reason)}
