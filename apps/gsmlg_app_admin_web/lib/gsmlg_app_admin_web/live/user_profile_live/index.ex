@@ -2,33 +2,42 @@ defmodule GsmlgAppAdminWeb.UserProfileLive.Index do
   use GsmlgAppAdminWeb, :live_view
 
   alias GsmlgAppAdmin.Accounts
-  alias GsmlgAppAdmin.Accounts.User
 
   @impl true
-  def mount(_params, %{"user_token" => user_token}, socket) do
+  def mount(_params, _session, socket) do
+    current_user = socket.assigns.current_user
+
+    form =
+      current_user
+      |> AshPhoenix.Form.for_update(:update, as: "user")
+      |> to_form()
+
     {:ok,
      socket
-     |> assign(:current_user, get_current_user(user_token))
      |> assign(:page_title, "My Profile")
-     |> assign(:form, to_form(Accounts.change_user(%User{})))
+     |> assign(:form, form)
      |> assign(:password_form, to_form(%{}))}
   end
 
   @impl true
   def handle_event("update_profile", %{"user" => user_params}, socket) do
-    current_user = socket.assigns.current_user
-
-    case Accounts.update_user(current_user, user_params) do
+    case AshPhoenix.Form.submit(socket.assigns.form.source, params: user_params) do
       {:ok, updated_user} ->
+        form =
+          updated_user
+          |> AshPhoenix.Form.for_update(:update, as: "user")
+          |> to_form()
+
         {:noreply,
          socket
          |> assign(:current_user, updated_user)
+         |> assign(:form, form)
          |> put_flash(:info, "Profile updated successfully")}
 
-      {:error, changeset} ->
+      {:error, form} ->
         {:noreply,
          socket
-         |> assign(:form, to_form(changeset))
+         |> assign(:form, to_form(form))
          |> put_flash(:error, "Failed to update profile")}
     end
   end
@@ -50,13 +59,6 @@ defmodule GsmlgAppAdminWeb.UserProfileLive.Index do
          |> assign(:password_form, to_form(%{errors: error_messages}))
          |> put_flash(:error, "Failed to change password")}
     end
-  end
-
-  defp get_current_user(user_token) do
-    # In a real implementation, you would decode the token and get the user
-    # For now, we'll return a placeholder or use AshAuthentication to get the current user
-    # This would typically be handled by authentication middleware
-    Accounts.get_user!(user_token)
   end
 
   defp validate_and_change_password(user, %{
