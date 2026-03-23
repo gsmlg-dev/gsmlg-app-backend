@@ -26,7 +26,7 @@ config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
 # Configure bun (the version is required)
 # Use system bun from Nix when available (avoids glibc issues with downloaded binary)
 config :bun,
-  version: "1.2.13",
+  version: "1.3.3",
   gsmlg_app_web: [
     args:
       ~w(build assets/js/app.js --bundle --format=esm --target=browser --outdir=priv/static/assets --loader:.js=jsx --external:/fonts/* --external:/images/*),
@@ -40,7 +40,7 @@ config :bun,
 
 # Configure tailwind (the version is required)
 config :tailwind,
-  version: "4.1.11",
+  version: "4.1.18",
   gsmlg_app_web: [
     args: ~w(
       --input=assets/css/app.css

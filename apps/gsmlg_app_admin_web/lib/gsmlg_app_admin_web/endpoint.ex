@@ -52,4 +52,24 @@ defmodule GsmlgAppAdminWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
   plug GsmlgAppAdminWeb.Router
+
+  @doc """
+  Wraps the default call/2 to catch stale CSRF tokens and redirect to sign-in.
+
+  When a LiveView sign-in form submits via `phx-trigger-action` after the
+  session has expired or the server restarted, the CSRF token in the form
+  no longer matches the session. Instead of showing an error page, redirect
+  back to sign-in so the user gets a fresh form.
+  """
+  @impl true
+  def call(conn, opts) do
+    super(conn, opts)
+  rescue
+    Plug.CSRFProtection.InvalidCSRFTokenError ->
+      conn
+      |> Plug.Conn.fetch_session()
+      |> Plug.Conn.put_session(:phoenix_flash, %{"error" => "Session expired, please try again."})
+      |> Phoenix.Controller.redirect(to: "/sign-in")
+      |> Plug.Conn.halt()
+  end
 end

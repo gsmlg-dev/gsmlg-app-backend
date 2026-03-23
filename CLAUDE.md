@@ -24,7 +24,12 @@ mix test                     # Run all tests
 mix test apps/gsmlg_app_admin/test/path_test.exs:25  # Single test line
 mix lint                     # Credo + Dialyzer across all apps
 mix compile --warnings-as-errors  # CI enforces this — fix all warnings
+mix format --check-formatted     # CI enforces this — run mix format before pushing
+mix credo --strict               # CI enforces this — fix all Credo warnings
+mix dialyzer --halt-exit-status  # CI enforces this — fix all Dialyzer warnings
 ```
+
+CI runs four parallel checks on every push: compile (warnings-as-errors), format, credo --strict, and dialyzer.
 
 ## Technology Stack
 
@@ -158,3 +163,7 @@ docker build --target public -t gsmlg-app-backend:1.0.0-public . # Public only (
 
 **Public routes** (`apps/gsmlg_app_web/lib/gsmlg_app_web/router.ex`):
 - No authentication. Static pages, `/apps`, `/lookup/*` WHOIS API
+
+## Feature Specs
+
+Feature planning documents live in `specs/` with numbered directories (e.g., `specs/001-ai-provider-settings/`). Each contains `spec.md`, `plan.md`, `tasks.md`, `data-model.md`, `research.md`, and `checklists/`. These are design artifacts, not runtime code.
