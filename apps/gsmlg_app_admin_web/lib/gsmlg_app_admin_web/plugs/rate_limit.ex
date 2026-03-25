@@ -19,8 +19,6 @@ defmodule GsmlgAppAdminWeb.Plugs.RateLimit do
 
   @impl true
   def call(conn, _opts) do
-    ensure_ets_table()
-
     api_key = conn.assigns[:api_key]
 
     if api_key do
@@ -81,24 +79,6 @@ defmodule GsmlgAppAdminWeb.Plugs.RateLimit do
     |> put_resp_content_type("application/json")
     |> send_resp(429, Jason.encode!(body))
     |> halt()
-  end
-
-  defp ensure_ets_table do
-    case :ets.whereis(@ets_table) do
-      :undefined ->
-        try do
-          :ets.new(@ets_table, [:named_table, :public, :duplicate_bag])
-        rescue
-          # Another process created the table between whereis and new — verify it exists
-          e in [ArgumentError] ->
-            if :ets.whereis(@ets_table) == :undefined do
-              reraise e, __STACKTRACE__
-            end
-        end
-
-      _ref ->
-        :ok
-    end
   end
 
   defp count_requests(key_id, window, now, window_seconds) do

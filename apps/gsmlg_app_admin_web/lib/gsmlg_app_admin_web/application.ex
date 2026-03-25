@@ -7,6 +7,9 @@ defmodule GsmlgAppAdminWeb.Application do
 
   @impl true
   def start(_type, _args) do
+    # Create rate limiter ETS table at startup (owned by application process)
+    :ets.new(:api_gateway_rate_limits, [:named_table, :public, :duplicate_bag])
+
     children = [
       GsmlgAppAdminWeb.Telemetry,
       # ETS-based session store - must start before Endpoint
