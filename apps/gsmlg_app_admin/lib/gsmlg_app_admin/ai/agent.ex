@@ -32,6 +32,10 @@ defmodule GsmlgAppAdmin.AI.Agent do
       description("Agent description")
     end
 
+    attribute :system_prompt, :string do
+      description("Agent-specific system prompt injected into every request")
+    end
+
     attribute :model, :string do
       description("Default model (overridable per request)")
     end
@@ -75,6 +79,7 @@ defmodule GsmlgAppAdmin.AI.Agent do
         :name,
         :slug,
         :description,
+        :system_prompt,
         :model,
         :provider_id,
         :max_iterations,
@@ -90,6 +95,7 @@ defmodule GsmlgAppAdmin.AI.Agent do
       accept([
         :name,
         :description,
+        :system_prompt,
         :model,
         :provider_id,
         :max_iterations,

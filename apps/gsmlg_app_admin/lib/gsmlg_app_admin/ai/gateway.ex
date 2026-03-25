@@ -135,10 +135,10 @@ defmodule GsmlgAppAdmin.AI.Gateway do
       # Load agent's tools
       {:ok, tools} = AI.list_tools_for_agent(agent.id)
 
-      # Build agent request
+      # Build agent request with agent's own system prompt
       request = %{
         model: model,
-        system: nil,
+        system: agent[:system_prompt],
         messages: messages,
         stream: false,
         params: agent.model_params || %{}
