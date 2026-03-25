@@ -28,7 +28,7 @@ defmodule GsmlgAppAdminWeb.Plugs.SessionUserTest do
     test "assigns nil for non-string session value", %{conn: conn} do
       conn =
         conn
-        |> init_test_session(%{"user" => 12345})
+        |> init_test_session(%{"user" => 12_345})
         |> SessionUser.call([])
 
       assert conn.assigns.current_user == nil

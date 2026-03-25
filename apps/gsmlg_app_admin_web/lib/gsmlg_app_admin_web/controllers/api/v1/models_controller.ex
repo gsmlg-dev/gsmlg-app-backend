@@ -19,9 +19,12 @@ defmodule GsmlgAppAdminWeb.Api.V1.ModelsController do
           json(conn, %{object: "list", data: models})
 
         {:error, reason} ->
+          require Logger
+          Logger.error("Models list error: #{inspect(reason)}")
+
           conn
           |> put_status(500)
-          |> json(%{error: %{message: to_string(reason), type: "server_error"}})
+          |> json(%{error: %{message: "An internal error occurred.", type: "server_error"}})
       end
     else
       conn
