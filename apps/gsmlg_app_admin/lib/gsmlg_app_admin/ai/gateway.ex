@@ -75,7 +75,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
   def resolve_provider(api_key, model) do
     require Ash.Query
 
-    allowed_models = Map.get(api_key, :allowed_models, [])
+    allowed_models = Map.get(api_key, :allowed_models, []) || []
 
     if allowed_models != [] and model not in allowed_models do
       {:error, "API key does not have access to model '#{model}'."}
