@@ -2,8 +2,17 @@ defmodule GsmlgAppAdmin.AI.SystemPromptTemplate do
   @moduledoc """
   Admin-defined reusable prompt blocks with variable interpolation.
 
-  Supports `{{memory}}`, `{{user.display_name}}`, `{{date}}` variables.
+  Supported variables:
+  - `{{memory}}` — injects all applicable memories for the request
+  - `{{date}}` — current UTC date (ISO 8601)
+  - `{{datetime}}` — current UTC datetime (ISO 8601)
+  - `{{user.display_name}}` — user's display name (falls back to username)
+  - `{{user.email}}` — user's email address
+  - `{{user.username}}` — user's username
+
   Templates marked as `is_default` are auto-injected into all gateway requests.
+  Key-specific templates can be linked via `ApiKeyTemplate` and are injected
+  after default templates for requests using that key.
   """
 
   use Ash.Resource,
