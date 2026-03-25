@@ -142,7 +142,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
       {:ok, agent} ->
         messages =
           Enum.map(raw_messages, fn msg ->
-            %{role: RequestHelpers.safe_role(msg["role"]), content: msg["content"]}
+            %{role: RequestHelpers.safe_role(msg["role"]), content: msg["content"] || ""}
           end)
 
         stream = params["stream"] == true

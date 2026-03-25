@@ -538,4 +538,58 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
       assert conn.status == 200
     end
   end
+
+  # ── Nil content safety ─────────────────────────────────────────────────
+
+  describe "nil content safety" do
+    test "chat/completions does not crash when message content is nil", %{conn: conn} do
+      {raw_key, _} = create_api_key([:chat_completions])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/chat/completions", %{
+          "model" => "gpt-4o",
+          "messages" => [%{"role" => "user"}]
+        })
+
+      # Should not crash — may fail on provider resolution, not on nil content
+      refute conn.status == 500
+    end
+
+    test "chat/completions does not crash when system message content is nil", %{conn: conn} do
+      {raw_key, _} = create_api_key([:chat_completions])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/chat/completions", %{
+          "model" => "gpt-4o",
+          "messages" => [
+            %{"role" => "system"},
+            %{"role" => "user", "content" => "hi"}
+          ]
+        })
+
+      # Should not crash with ArgumentError on nil string concatenation
+      refute conn.status == 500
+    end
+
+    test "agent chat does not crash when message content is nil", %{conn: conn} do
+      {raw_key, _} = create_api_key([:agents])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/agents/some-agent/chat", %{
+          "messages" => [%{"role" => "user"}]
+        })
+
+      # Should return 404 (agent not found), not 500 (crash)
+      assert conn.status == 404
+    end
+  end
 end

@@ -195,13 +195,14 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
       Enum.reduce(messages, {nil, []}, fn msg, {sys, msgs} ->
         case msg["role"] do
           "system" ->
-            content = msg["content"]
+            content = msg["content"] || ""
             combined = if sys, do: sys <> "\n" <> content, else: content
             {combined, msgs}
 
           _ ->
             {sys,
-             msgs ++ [%{role: RequestHelpers.safe_role(msg["role"]), content: msg["content"]}]}
+             msgs ++
+               [%{role: RequestHelpers.safe_role(msg["role"]), content: msg["content"] || ""}]}
         end
       end)
 
