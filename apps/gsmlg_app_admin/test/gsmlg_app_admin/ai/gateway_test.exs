@@ -696,6 +696,33 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
       result = Gateway.inject_system_context(different_api_key, request)
       refute is_binary(result.system) and result.system =~ "OTHER_KEY_SECRET"
     end
+
+    test "injects agent-scoped memory when agent_id is provided" do
+      agent_id = Ash.UUID.generate()
+
+      {:ok, _memory} =
+        GsmlgAppAdmin.AI.Memory
+        |> Ash.Changeset.for_create(:create, %{
+          content: "AGENT_SCOPED_MEMORY",
+          category: :instruction,
+          scope: :agent,
+          agent_id: agent_id,
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{id: Ash.UUID.generate(), user_id: nil, scopes: [:agents]}
+
+      request = %{model: "gpt-4o", system: nil, messages: [], stream: false, params: %{}}
+
+      # Without agent_id: memory not injected
+      result_without = Gateway.inject_system_context(api_key, request)
+      refute is_binary(result_without.system) and result_without.system =~ "AGENT_SCOPED_MEMORY"
+
+      # With agent_id: memory injected
+      result_with = Gateway.inject_system_context(api_key, request, agent_id: agent_id)
+      assert result_with.system =~ "AGENT_SCOPED_MEMORY"
+    end
   end
 
   describe "check_scope (via chat/3)" do

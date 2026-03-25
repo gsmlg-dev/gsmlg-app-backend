@@ -169,8 +169,8 @@ defmodule GsmlgAppAdmin.AI.Gateway do
         params: agent.model_params || %{}
       }
 
-      # Inject agent system context
-      request = inject_system_context(api_key, request)
+      # Inject agent system context (including agent-scoped memories)
+      request = inject_system_context(api_key, request, agent_id: agent.id)
 
       all_messages = build_messages(request)
       call_opts = build_call_opts(request, opts)
@@ -451,12 +451,14 @@ defmodule GsmlgAppAdmin.AI.Gateway do
   end
 
   @doc false
-  def inject_system_context(api_key, request) do
+  def inject_system_context(api_key, request, opts \\ []) do
+    agent_id = Keyword.get(opts, :agent_id)
+
     # 1. Fetch default templates + key-specific templates
     templates = fetch_templates(api_key)
 
-    # 2. Fetch memories (global + user + key scoped)
-    memories = fetch_memories(api_key)
+    # 2. Fetch memories (global + user + key + agent scoped)
+    memories = fetch_memories(api_key, agent_id: agent_id)
 
     # 3. Render templates with variables
     memory_text = format_memories(memories)
@@ -523,11 +525,14 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     defaults ++ key_specific
   end
 
-  defp fetch_memories(api_key) do
-    case AI.get_memories_for_request(
-           user_id: api_key.user_id,
-           api_key_id: api_key.id
-         ) do
+  defp fetch_memories(api_key, opts) do
+    agent_id = Keyword.get(opts, :agent_id)
+
+    request_opts =
+      [user_id: api_key.user_id, api_key_id: api_key.id]
+      |> then(fn o -> if agent_id, do: Keyword.put(o, :agent_id, agent_id), else: o end)
+
+    case AI.get_memories_for_request(request_opts) do
       {:ok, memories} -> memories
       _ -> []
     end
