@@ -38,6 +38,16 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
       {:ok, response} ->
         json(conn, format_openai_response(response, request.model))
 
+      {:error, "No provider found" <> _ = reason} ->
+        conn
+        |> put_status(422)
+        |> json(%{error: %{message: reason, type: "invalid_request_error"}})
+
+      {:error, "API key does not have" <> _ = reason} ->
+        conn
+        |> put_status(403)
+        |> json(%{error: %{message: reason, type: "permission_error"}})
+
       {:error, reason} ->
         conn
         |> put_status(500)

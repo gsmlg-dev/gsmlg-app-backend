@@ -39,6 +39,22 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
       {:ok, response} ->
         json(conn, format_anthropic_response(response, request.model))
 
+      {:error, "No provider found" <> _ = reason} ->
+        conn
+        |> put_status(422)
+        |> json(%{
+          type: "error",
+          error: %{type: "invalid_request_error", message: reason}
+        })
+
+      {:error, "API key does not have" <> _ = reason} ->
+        conn
+        |> put_status(403)
+        |> json(%{
+          type: "error",
+          error: %{type: "permission_error", message: reason}
+        })
+
       {:error, reason} ->
         conn
         |> put_status(500)

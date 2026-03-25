@@ -73,6 +73,25 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
 
       refute conn.status == 403
     end
+
+    test "returns 422 when no provider found for model", %{conn: conn} do
+      {raw_key, _} = create_api_key([:chat_completions])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/chat/completions", %{
+          "model" => "nonexistent-model-xyz",
+          "messages" => [%{"role" => "user", "content" => "hi"}],
+          "stream" => false
+        })
+
+      assert conn.status == 422
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "invalid_request_error"
+      assert body["error"]["message"] =~ "provider"
+    end
   end
 
   # ── MessagesController ─────────────────────────────────────────────────────
@@ -107,6 +126,25 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
         })
 
       refute conn.status == 403
+    end
+
+    test "returns 422 when no provider found for model", %{conn: conn} do
+      {raw_key, _} = create_api_key([:messages])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/messages", %{
+          "model" => "nonexistent-model-xyz",
+          "messages" => [%{"role" => "user", "content" => "hi"}],
+          "stream" => false
+        })
+
+      assert conn.status == 422
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "invalid_request_error"
+      assert body["error"]["message"] =~ "provider"
     end
 
     test "does not crash when content block is missing 'text' key", %{conn: conn} do
