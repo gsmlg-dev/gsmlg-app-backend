@@ -77,7 +77,9 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.McpServer.FormComponent do
         {:noreply,
          socket |> put_flash(:info, "MCP server saved.") |> push_patch(to: socket.assigns.patch)}
 
-      {:error, _} ->
+      {:error, error} ->
+        require Logger
+        Logger.error("Failed to save MCP server: #{inspect(error)}")
         {:noreply, put_flash(socket, :error, "Failed to save MCP server.")}
     end
   end

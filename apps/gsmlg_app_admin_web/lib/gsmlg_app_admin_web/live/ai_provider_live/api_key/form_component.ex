@@ -81,7 +81,9 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
          |> put_flash(:info, "API key created successfully.")
          |> push_patch(to: socket.assigns.patch)}
 
-      {:error, _} ->
+      {:error, error} ->
+        require Logger
+        Logger.error("Failed to create API key: #{inspect(error)}")
         {:noreply, put_flash(socket, :error, "Failed to create API key.")}
     end
   end
@@ -111,7 +113,9 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
          |> put_flash(:info, "API key updated.")
          |> push_patch(to: socket.assigns.patch)}
 
-      {:error, _} ->
+      {:error, error} ->
+        require Logger
+        Logger.error("Failed to update API key: #{inspect(error)}")
         {:noreply, put_flash(socket, :error, "Failed to update API key.")}
     end
   end

@@ -67,7 +67,9 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.FormComponent do
         {:noreply,
          socket |> put_flash(:info, "Template saved.") |> push_patch(to: socket.assigns.patch)}
 
-      {:error, _} ->
+      {:error, error} ->
+        require Logger
+        Logger.error("Failed to save template: #{inspect(error)}")
         {:noreply, put_flash(socket, :error, "Failed to save template.")}
     end
   end
