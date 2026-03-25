@@ -200,9 +200,19 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
             {combined, msgs}
 
           _ ->
-            {sys,
-             msgs ++
-               [%{role: RequestHelpers.safe_role(msg["role"]), content: msg["content"] || ""}]}
+            normalized = %{
+              role: RequestHelpers.safe_role(msg["role"]),
+              content: msg["content"] || ""
+            }
+
+            # Preserve tool-related fields for multi-turn tool use
+            normalized =
+              normalized
+              |> maybe_put_field(:tool_call_id, msg["tool_call_id"])
+              |> maybe_put_field(:tool_calls, msg["tool_calls"])
+              |> maybe_put_field(:name, msg["name"])
+
+            {sys, msgs ++ [normalized]}
         end
       end)
 
@@ -257,6 +267,9 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
       usage: response[:usage] || %{prompt_tokens: 0, completion_tokens: 0, total_tokens: 0}
     }
   end
+
+  defp maybe_put_field(map, _key, nil), do: map
+  defp maybe_put_field(map, key, value), do: Map.put(map, key, value)
 
   defp generate_id do
     :crypto.strong_rand_bytes(12) |> Base.url_encode64(padding: false)

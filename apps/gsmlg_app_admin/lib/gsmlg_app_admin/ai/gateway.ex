@@ -482,7 +482,13 @@ defmodule GsmlgAppAdmin.AI.Gateway do
 
     user_messages =
       Enum.map(request.messages, fn msg ->
-        %{role: to_string(msg.role), content: msg.content}
+        base = %{role: to_string(msg.role), content: msg.content}
+
+        # Preserve tool-related fields for multi-turn tool use
+        base
+        |> maybe_put_if_present(msg, :tool_call_id)
+        |> maybe_put_if_present(msg, :tool_calls)
+        |> maybe_put_if_present(msg, :name)
       end)
 
     system_messages ++ user_messages
@@ -502,6 +508,13 @@ defmodule GsmlgAppAdmin.AI.Gateway do
 
   defp maybe_put_opt(opts, _key, nil), do: opts
   defp maybe_put_opt(opts, key, value), do: Keyword.put(opts, key, value)
+
+  defp maybe_put_if_present(map, source, key) do
+    case Map.get(source, key) do
+      nil -> map
+      value -> Map.put(map, key, value)
+    end
+  end
 
   defp check_scope(api_key, scope) do
     if scope in (api_key.scopes || []) do
