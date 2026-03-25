@@ -33,13 +33,18 @@ defmodule GsmlgAppAdminWeb.Api.V1.ImagesController do
     end
   end
 
-  defp classify_error(reason) when is_binary(reason) do
+  defp classify_error(reason) do
+    reason_str = to_string(reason)
+
     cond do
-      String.contains?(reason, "Missing required parameter") -> {400, "invalid_request_error"}
-      String.contains?(reason, "No provider found") -> {422, "invalid_request_error"}
-      true -> {500, "server_error"}
+      String.contains?(reason_str, "Missing required parameter") ->
+        {400, "invalid_request_error"}
+
+      String.contains?(reason_str, "No provider found") ->
+        {422, "invalid_request_error"}
+
+      true ->
+        {500, "server_error"}
     end
   end
-
-  defp classify_error(_reason), do: {500, "server_error"}
 end
