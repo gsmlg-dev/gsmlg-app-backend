@@ -973,6 +973,33 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
       assert "test-model-beta" in model_ids
     end
 
+    test "{{datetime}} variable is replaced with ISO 8601 datetime string" do
+      {:ok, _template} =
+        GsmlgAppAdmin.AI.SystemPromptTemplate
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Datetime Template #{System.unique_integer([:positive])}",
+          slug: "datetime-template-#{System.unique_integer([:positive])}",
+          content: "Current datetime: {{datetime}}. Today: {{date}}.",
+          is_default: true,
+          is_active: true,
+          priority: 1
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{id: Ash.UUID.generate(), user_id: nil, scopes: [:chat_completions]}
+      request = %{model: "gpt-4o", system: nil, messages: [], stream: false, params: %{}}
+
+      result = Gateway.inject_system_context(api_key, request)
+
+      # {{datetime}} should be replaced with ISO 8601 datetime (contains T separator)
+      assert result.system =~ ~r/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
+      # {{date}} should be replaced with today's date
+      assert result.system =~ Date.utc_today() |> Date.to_iso8601()
+      # No unreplaced variables remain
+      refute result.system =~ "{{datetime}}"
+      refute result.system =~ "{{date}}"
+    end
+
     test "filters models by allowed_models restriction" do
       {:ok, _provider} =
         GsmlgAppAdmin.AI.Provider
