@@ -17,6 +17,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
             "name" => "",
             "description" => "",
             "scopes" => default_scopes(),
+            "expires_at" => "",
             "allowed_models" => "",
             "allowed_providers" => []
           }
@@ -29,6 +30,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
             "scopes" => Enum.map(api_key.scopes || [], &to_string/1),
             "rate_limit_rpm" => api_key.rate_limit_rpm,
             "rate_limit_rpd" => api_key.rate_limit_rpd,
+            "expires_at" => format_datetime_local(api_key.expires_at),
             "allowed_models" => Enum.join(api_key.allowed_models || [], ", "),
             "allowed_providers" => Enum.map(api_key.allowed_providers || [], &to_string/1)
           }
@@ -62,6 +64,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
       name: params["name"],
       description: params["description"],
       scopes: scopes,
+      expires_at: parse_datetime(params["expires_at"]),
       rate_limit_rpm: parse_int(params["rate_limit_rpm"]),
       rate_limit_rpd: parse_int(params["rate_limit_rpd"]),
       allowed_models: parse_comma_list(params["allowed_models"]),
@@ -92,6 +95,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
       name: params["name"],
       description: params["description"],
       scopes: scopes,
+      expires_at: parse_datetime(params["expires_at"]),
       rate_limit_rpm: parse_int(params["rate_limit_rpm"]),
       rate_limit_rpd: parse_int(params["rate_limit_rpd"]),
       allowed_models: parse_comma_list(params["allowed_models"]),
@@ -125,6 +129,22 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
   end
 
   defp parse_int(val) when is_integer(val), do: val
+
+  defp parse_datetime(nil), do: nil
+  defp parse_datetime(""), do: nil
+
+  defp parse_datetime(str) when is_binary(str) do
+    case DateTime.from_iso8601(str <> ":00Z") do
+      {:ok, dt, _} -> dt
+      _ -> nil
+    end
+  end
+
+  defp format_datetime_local(nil), do: ""
+
+  defp format_datetime_local(dt) do
+    Calendar.strftime(dt, "%Y-%m-%dT%H:%M")
+  end
 
   defp parse_comma_list(nil), do: []
   defp parse_comma_list(""), do: []
