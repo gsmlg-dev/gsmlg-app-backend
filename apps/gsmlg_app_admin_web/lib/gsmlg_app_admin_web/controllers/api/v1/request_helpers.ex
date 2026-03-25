@@ -71,4 +71,18 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpers do
   def generate_id do
     :crypto.strong_rand_bytes(12) |> Base.url_encode64(padding: false)
   end
+
+  @doc """
+  Clamps a float parameter to a range, returning nil for invalid values.
+  """
+  def clamp_float(nil, _min, _max), do: nil
+  def clamp_float(val, min, max) when is_number(val), do: val |> max(min) |> min(max)
+  def clamp_float(_val, _min, _max), do: nil
+
+  @doc """
+  Clamps an integer parameter to a range, returning nil for invalid values.
+  """
+  def clamp_int(nil, _min, _max), do: nil
+  def clamp_int(val, min, max) when is_integer(val), do: val |> max(min) |> min(max)
+  def clamp_int(_val, _min, _max), do: nil
 end

@@ -76,6 +76,44 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpersTest do
     end
   end
 
+  describe "clamp_float/3" do
+    test "returns nil for nil input" do
+      assert RequestHelpers.clamp_float(nil, 0.0, 2.0) == nil
+    end
+
+    test "clamps value within range" do
+      assert RequestHelpers.clamp_float(1.5, 0.0, 2.0) == 1.5
+      assert RequestHelpers.clamp_float(-1.0, 0.0, 2.0) == 0.0
+      assert RequestHelpers.clamp_float(5.0, 0.0, 2.0) == 2.0
+    end
+
+    test "returns nil for non-numeric input" do
+      assert RequestHelpers.clamp_float("1.5", 0.0, 2.0) == nil
+      assert RequestHelpers.clamp_float(true, 0.0, 2.0) == nil
+    end
+
+    test "handles integer input as number" do
+      assert RequestHelpers.clamp_float(1, 0.0, 2.0) == 1
+    end
+  end
+
+  describe "clamp_int/3" do
+    test "returns nil for nil input" do
+      assert RequestHelpers.clamp_int(nil, 1, 100_000) == nil
+    end
+
+    test "clamps value within range" do
+      assert RequestHelpers.clamp_int(500, 1, 100_000) == 500
+      assert RequestHelpers.clamp_int(0, 1, 100_000) == 1
+      assert RequestHelpers.clamp_int(999_999, 1, 100_000) == 100_000
+    end
+
+    test "returns nil for non-integer input" do
+      assert RequestHelpers.clamp_int(1.5, 1, 100_000) == nil
+      assert RequestHelpers.clamp_int("500", 1, 100_000) == nil
+    end
+  end
+
   describe "error_body/3" do
     test "returns OpenAI error format" do
       body = RequestHelpers.error_body(:openai, "auth_error", "Invalid key")
