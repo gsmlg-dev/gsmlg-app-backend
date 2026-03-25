@@ -39,7 +39,7 @@ defmodule GsmlgAppAdmin.AI.ToolExecutorTest do
       tool = %{
         execution_type: :builtin,
         timeout_ms: 100,
-        builtin_handler: "GsmlgAppAdmin.Test.SleepyHandler.sleep_forever"
+        builtin_handler: "GsmlgAppAdmin.AI.Builtins.TestSleepyHandler.sleep_forever"
       }
 
       assert {:error, msg} = ToolExecutor.execute(tool, %{}, [])
@@ -52,6 +52,12 @@ defmodule GsmlgAppAdmin.AI.ToolExecutorTest do
       tool = %{execution_type: :builtin, timeout_ms: 5000, builtin_handler: "no_dots"}
       assert {:error, msg} = ToolExecutor.execute(tool, %{})
       assert msg =~ "Invalid builtin handler"
+    end
+
+    test "blocks modules outside the allowed namespace" do
+      tool = %{execution_type: :builtin, timeout_ms: 5000, builtin_handler: "System.cmd"}
+      assert {:error, msg} = ToolExecutor.execute(tool, %{})
+      assert msg =~ "not in the allowed namespace"
     end
   end
 

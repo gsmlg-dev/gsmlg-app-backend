@@ -23,7 +23,7 @@ defmodule GsmlgAppAdmin.AI.Message do
 
     attribute :role, :atom do
       allow_nil?(false)
-      constraints(one_of: [:user, :assistant, :system])
+      constraints(one_of: [:user, :assistant, :system, :tool, :function])
       description("The role of the message sender")
     end
 

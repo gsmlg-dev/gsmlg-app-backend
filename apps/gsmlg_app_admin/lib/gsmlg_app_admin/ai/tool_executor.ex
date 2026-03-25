@@ -145,13 +145,21 @@ defmodule GsmlgAppAdmin.AI.ToolExecutor do
 
   defp interpolate_secrets(value), do: value
 
+  # Only modules under this namespace are allowed for builtin tool execution
+  @allowed_builtin_namespace GsmlgAppAdmin.AI.Builtins
+
   defp resolve_builtin_handler(handler) when is_binary(handler) do
     case String.split(handler, ".") do
       parts when length(parts) >= 2 ->
         function = List.last(parts) |> String.to_existing_atom()
         module_parts = Enum.drop(parts, -1)
         module = Module.concat(module_parts)
-        {:ok, {module, function}}
+
+        if allowed_builtin_module?(module) do
+          {:ok, {module, function}}
+        else
+          {:error, "Builtin handler module #{inspect(module)} is not in the allowed namespace"}
+        end
 
       _ ->
         {:error, "Invalid builtin handler format: #{handler}"}
@@ -161,6 +169,12 @@ defmodule GsmlgAppAdmin.AI.ToolExecutor do
   end
 
   defp resolve_builtin_handler(_), do: {:error, "Invalid builtin handler"}
+
+  defp allowed_builtin_module?(module) do
+    module_str = Atom.to_string(module)
+    allowed_str = Atom.to_string(@allowed_builtin_namespace)
+    String.starts_with?(module_str, allowed_str)
+  end
 
   # -- SSRF Protection --
 

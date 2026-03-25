@@ -57,9 +57,9 @@ defmodule GsmlgAppAdmin.AI.MockClient do
        content: response,
        model: "mock-model-v1",
        usage: %{
-         "prompt_tokens" => 50,
-         "completion_tokens" => String.length(response),
-         "total_tokens" => 50 + String.length(response)
+         prompt_tokens: 50,
+         completion_tokens: String.length(response),
+         total_tokens: 50 + String.length(response)
        }
      }}
   end

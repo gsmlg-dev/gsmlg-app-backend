@@ -511,9 +511,26 @@ defmodule GsmlgAppAdmin.AI do
       {:ok, agent_tools} ->
         tool_ids = Enum.map(agent_tools, & &1.tool_id)
 
-        Tool
-        |> Ash.Query.filter(id in ^tool_ids and is_active == true)
-        |> Ash.read()
+        case Tool
+             |> Ash.Query.filter(id in ^tool_ids and is_active == true)
+             |> Ash.read() do
+          {:ok, tools} ->
+            # Preserve the position ordering from agent_tools
+            tools_by_id = Map.new(tools, fn t -> {t.id, t} end)
+
+            ordered =
+              Enum.flat_map(agent_tools, fn at ->
+                case Map.get(tools_by_id, at.tool_id) do
+                  nil -> []
+                  tool -> [tool]
+                end
+              end)
+
+            {:ok, ordered}
+
+          error ->
+            error
+        end
 
       error ->
         error
@@ -639,20 +656,33 @@ defmodule GsmlgAppAdmin.AI do
   Returns a map with total_requests, total_tokens, error_count, and endpoint breakdown.
   """
   def usage_summary(logs) do
-    %{
-      total_requests: length(logs),
-      total_tokens: Enum.reduce(logs, 0, fn log, acc -> acc + (log.total_tokens || 0) end),
-      total_prompt_tokens:
-        Enum.reduce(logs, 0, fn log, acc -> acc + (log.prompt_tokens || 0) end),
-      total_completion_tokens:
-        Enum.reduce(logs, 0, fn log, acc -> acc + (log.completion_tokens || 0) end),
-      error_count: Enum.count(logs, fn log -> log.status == :error end),
-      success_count: Enum.count(logs, fn log -> log.status == :success end),
-      by_endpoint: Enum.frequencies_by(logs, fn log -> log.endpoint_type end),
-      by_model:
-        logs
-        |> Enum.reject(fn log -> is_nil(log.model) end)
-        |> Enum.frequencies_by(fn log -> log.model end)
+    acc = %{
+      total_requests: 0,
+      total_tokens: 0,
+      total_prompt_tokens: 0,
+      total_completion_tokens: 0,
+      error_count: 0,
+      success_count: 0,
+      by_endpoint: %{},
+      by_model: %{}
     }
+
+    Enum.reduce(logs, acc, fn log, acc ->
+      %{
+        acc
+        | total_requests: acc.total_requests + 1,
+          total_tokens: acc.total_tokens + (log.total_tokens || 0),
+          total_prompt_tokens: acc.total_prompt_tokens + (log.prompt_tokens || 0),
+          total_completion_tokens: acc.total_completion_tokens + (log.completion_tokens || 0),
+          error_count: acc.error_count + if(log.status == :error, do: 1, else: 0),
+          success_count: acc.success_count + if(log.status == :success, do: 1, else: 0),
+          by_endpoint: Map.update(acc.by_endpoint, log.endpoint_type, 1, &(&1 + 1)),
+          by_model:
+            if(log.model,
+              do: Map.update(acc.by_model, log.model, 1, &(&1 + 1)),
+              else: acc.by_model
+            )
+      }
+    end)
   end
 end

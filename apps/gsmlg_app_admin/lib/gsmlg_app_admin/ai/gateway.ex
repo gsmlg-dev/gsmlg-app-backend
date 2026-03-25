@@ -51,7 +51,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
       else
         case Client.chat_completion(provider, messages, call_opts) do
           {:ok, response} ->
-            tokens = get_in(response, [:usage, "total_tokens"]) || 0
+            tokens = get_in(response, [:usage, :total_tokens]) || 0
 
             log_usage(api_key, provider, request, :chat, :success,
               tokens: tokens,
@@ -185,7 +185,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
              content: content,
              tool_calls_made: tool_calls_made,
              iterations: iterations,
-             usage: %{"total_tokens" => total_tokens}
+             usage: %{total_tokens: total_tokens}
            }}
 
         {:error, reason} ->
@@ -203,7 +203,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
   defp agent_loop(provider, messages, call_opts, tools, max_iter, iteration, tool_calls_acc) do
     case Client.chat_completion(provider, messages, call_opts) do
       {:ok, response} ->
-        tokens = get_in(response, [:usage, "total_tokens"]) || 0
+        tokens = get_in(response, [:usage, :total_tokens]) || 0
         tool_calls = response[:tool_calls] || []
 
         if tool_calls == [] do

@@ -175,14 +175,20 @@ defmodule GsmlgAppAdmin.AI.Client do
   defp normalize_usage(nil), do: %{}
 
   defp normalize_usage(usage) when is_map(usage) do
+    prompt =
+      usage[:input_tokens] || usage["input_tokens"] || usage[:prompt_tokens] ||
+        usage["prompt_tokens"] || 0
+
+    completion =
+      usage[:output_tokens] || usage["output_tokens"] || usage[:completion_tokens] ||
+        usage["completion_tokens"] || 0
+
+    total = usage[:total_tokens] || usage["total_tokens"] || prompt + completion
+
     %{
-      "prompt_tokens" =>
-        usage[:input_tokens] || usage["input_tokens"] || usage[:prompt_tokens] ||
-          usage["prompt_tokens"] || 0,
-      "completion_tokens" =>
-        usage[:output_tokens] || usage["output_tokens"] || usage[:completion_tokens] ||
-          usage["completion_tokens"] || 0,
-      "total_tokens" => usage[:total_tokens] || usage["total_tokens"] || 0
+      prompt_tokens: prompt,
+      completion_tokens: completion,
+      total_tokens: total
     }
   end
 

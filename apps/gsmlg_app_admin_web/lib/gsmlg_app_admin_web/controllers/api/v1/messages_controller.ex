@@ -300,8 +300,8 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
 
   defp format_anthropic_usage(usage) do
     %{
-      input_tokens: usage["prompt_tokens"] || usage[:prompt_tokens] || 0,
-      output_tokens: usage["completion_tokens"] || usage[:completion_tokens] || 0
+      input_tokens: usage[:prompt_tokens] || 0,
+      output_tokens: usage[:completion_tokens] || 0
     }
   end
 
