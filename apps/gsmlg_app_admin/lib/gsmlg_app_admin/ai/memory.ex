@@ -80,6 +80,30 @@ defmodule GsmlgAppAdmin.AI.Memory do
         :api_key_id,
         :agent_id
       ])
+
+      validate(fn changeset, _context ->
+        scope = Ash.Changeset.get_attribute(changeset, :scope)
+
+        case scope do
+          :user ->
+            if Ash.Changeset.get_attribute(changeset, :user_id),
+              do: :ok,
+              else: {:error, field: :user_id, message: "is required when scope is :user"}
+
+          :api_key ->
+            if Ash.Changeset.get_attribute(changeset, :api_key_id),
+              do: :ok,
+              else: {:error, field: :api_key_id, message: "is required when scope is :api_key"}
+
+          :agent ->
+            if Ash.Changeset.get_attribute(changeset, :agent_id),
+              do: :ok,
+              else: {:error, field: :agent_id, message: "is required when scope is :agent"}
+
+          _ ->
+            :ok
+        end
+      end)
     end
 
     update :update do
