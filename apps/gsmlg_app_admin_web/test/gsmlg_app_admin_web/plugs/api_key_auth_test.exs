@@ -72,6 +72,32 @@ defmodule GsmlgAppAdminWeb.Plugs.ApiKeyAuthTest do
       assert conn.halted
     end
   end
+
+  describe "call/2 - format-aware errors" do
+    test "returns OpenAI error format for /chat/completions path" do
+      conn =
+        conn(:post, "/api/v1/chat/completions")
+        |> ApiKeyAuth.call(ApiKeyAuth.init([]))
+
+      body = Jason.decode!(conn.resp_body)
+      # OpenAI format: %{error: %{message: ..., type: ...}}
+      assert body["error"]["type"] == "authentication_error"
+      assert body["error"]["message"] =~ "Missing API key"
+      refute Map.has_key?(body, "type")
+    end
+
+    test "returns Anthropic error format for /messages path" do
+      conn =
+        conn(:post, "/api/v1/messages")
+        |> ApiKeyAuth.call(ApiKeyAuth.init([]))
+
+      body = Jason.decode!(conn.resp_body)
+      # Anthropic format: %{type: "error", error: %{type: ..., message: ...}}
+      assert body["type"] == "error"
+      assert body["error"]["type"] == "authentication_error"
+      assert body["error"]["message"] =~ "Missing API key"
+    end
+  end
 end
 
 defmodule GsmlgAppAdminWeb.Plugs.ApiKeyAuthIntegrationTest do

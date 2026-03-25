@@ -134,7 +134,6 @@ defmodule GsmlgAppAdminWeb.Plugs.RateLimitTest do
       assert conn.halted
       body = Jason.decode!(conn.resp_body)
       assert body["error"]["message"] =~ "per day"
-      assert body["error"]["code"] == "rate_limit_exceeded"
     end
 
     test "429 response body has correct error structure", %{api_key: api_key} do
@@ -151,7 +150,6 @@ defmodule GsmlgAppAdminWeb.Plugs.RateLimitTest do
 
       body = Jason.decode!(conn.resp_body)
       assert body["error"]["type"] == "rate_limit_error"
-      assert body["error"]["code"] == "rate_limit_exceeded"
       assert body["error"]["message"] =~ "per minute"
     end
 
@@ -188,6 +186,47 @@ defmodule GsmlgAppAdminWeb.Plugs.RateLimitTest do
         |> RateLimit.call(RateLimit.init([]))
 
       refute conn2.halted
+    end
+
+    test "returns OpenAI error format for /chat/completions path", %{api_key: api_key} do
+      for _ <- 1..3 do
+        conn(:post, "/api/v1/chat/completions")
+        |> assign(:api_key, api_key)
+        |> RateLimit.call(RateLimit.init([]))
+      end
+
+      conn =
+        conn(:post, "/api/v1/chat/completions")
+        |> assign(:api_key, api_key)
+        |> RateLimit.call(RateLimit.init([]))
+
+      body = Jason.decode!(conn.resp_body)
+      # OpenAI format: no top-level "type" key
+      assert body["error"]["type"] == "rate_limit_error"
+      refute Map.has_key?(body, "type")
+    end
+
+    test "returns Anthropic error format for /messages path" do
+      key = %{
+        id: "anthropic-rate-key-#{System.unique_integer([:positive])}",
+        rate_limit_rpm: 1,
+        rate_limit_rpd: 100
+      }
+
+      conn(:post, "/api/v1/messages")
+      |> assign(:api_key, key)
+      |> RateLimit.call(RateLimit.init([]))
+
+      conn =
+        conn(:post, "/api/v1/messages")
+        |> assign(:api_key, key)
+        |> RateLimit.call(RateLimit.init([]))
+
+      assert conn.status == 429
+      body = Jason.decode!(conn.resp_body)
+      # Anthropic format: top-level "type" = "error"
+      assert body["type"] == "error"
+      assert body["error"]["type"] == "rate_limit_error"
     end
 
     test "uses system defaults when key has nil rate limits" do

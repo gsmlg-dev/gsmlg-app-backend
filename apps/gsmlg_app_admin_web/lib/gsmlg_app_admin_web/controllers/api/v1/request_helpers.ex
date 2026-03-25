@@ -31,4 +31,30 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpers do
     do: String.to_existing_atom(role)
 
   def safe_role(_), do: :user
+
+  @doc """
+  Detects whether a request targets an Anthropic-format endpoint based on the path.
+  Returns `:anthropic` for `/api/v1/messages`, `:openai` otherwise.
+  """
+  def api_format(%Plug.Conn{request_path: path}) do
+    if String.contains?(path, "/messages") do
+      :anthropic
+    else
+      :openai
+    end
+  end
+
+  @doc """
+  Builds a format-aware JSON error body.
+
+  Anthropic format wraps errors in `%{type: "error", error: %{type: ..., message: ...}}`.
+  OpenAI format uses `%{error: %{message: ..., type: ...}}`.
+  """
+  def error_body(:anthropic, type, message) do
+    %{type: "error", error: %{type: type, message: message}}
+  end
+
+  def error_body(:openai, type, message) do
+    %{error: %{message: message, type: type}}
+  end
 end

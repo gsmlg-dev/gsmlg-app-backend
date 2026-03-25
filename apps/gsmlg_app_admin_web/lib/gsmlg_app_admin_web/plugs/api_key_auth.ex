@@ -8,6 +8,7 @@ defmodule GsmlgAppAdminWeb.Plugs.ApiKeyAuth do
   import Plug.Conn
 
   alias GsmlgAppAdmin.AI.ApiKey
+  alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
 
   @behaviour Plug
 
@@ -26,12 +27,12 @@ defmodule GsmlgAppAdminWeb.Plugs.ApiKeyAuth do
       |> assign(:api_user, api_key.user_id)
     else
       {:error, reason} ->
+        format = RequestHelpers.api_format(conn)
+        body = RequestHelpers.error_body(format, "authentication_error", reason)
+
         conn
         |> put_resp_content_type("application/json")
-        |> send_resp(
-          401,
-          Jason.encode!(%{error: %{message: reason, type: "authentication_error"}})
-        )
+        |> send_resp(401, Jason.encode!(body))
         |> halt()
     end
   end

@@ -6,6 +6,8 @@ defmodule GsmlgAppAdminWeb.Plugs.RateLimit do
 
   import Plug.Conn
 
+  alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
+
   require Logger
 
   @behaviour Plug
@@ -71,19 +73,13 @@ defmodule GsmlgAppAdminWeb.Plugs.RateLimit do
   end
 
   defp rate_limit_response(conn, retry_after, message) do
+    format = RequestHelpers.api_format(conn)
+    body = RequestHelpers.error_body(format, "rate_limit_error", message)
+
     conn
     |> put_resp_header("retry-after", to_string(retry_after))
     |> put_resp_content_type("application/json")
-    |> send_resp(
-      429,
-      Jason.encode!(%{
-        error: %{
-          message: message,
-          type: "rate_limit_error",
-          code: "rate_limit_exceeded"
-        }
-      })
-    )
+    |> send_resp(429, Jason.encode!(body))
     |> halt()
   end
 
