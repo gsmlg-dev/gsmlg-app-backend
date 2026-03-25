@@ -139,5 +139,71 @@ defmodule GsmlgAppAdmin.AI.MemoryTest do
       {:ok, memories} = Memory.for_request(nil, nil, nil)
       refute Enum.any?(memories, &(&1.content == "Inactive global"))
     end
+
+    test "returns user-scoped memories when user_id provided" do
+      user_id = Ash.UUID.generate()
+
+      {:ok, _} =
+        Memory
+        |> Ash.Changeset.for_create(:create, %{
+          content: "User-specific info",
+          category: :preference,
+          scope: :user,
+          user_id: user_id,
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      {:ok, memories} = Memory.for_request(user_id, nil, nil)
+      assert Enum.any?(memories, &(&1.content == "User-specific info"))
+
+      # Does not appear for a different user_id
+      {:ok, other_memories} = Memory.for_request(Ash.UUID.generate(), nil, nil)
+      refute Enum.any?(other_memories, &(&1.content == "User-specific info"))
+    end
+
+    test "returns api_key-scoped memories when api_key_id provided" do
+      api_key_id = Ash.UUID.generate()
+
+      {:ok, _} =
+        Memory
+        |> Ash.Changeset.for_create(:create, %{
+          content: "Key-specific instruction",
+          category: :instruction,
+          scope: :api_key,
+          api_key_id: api_key_id,
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      {:ok, memories} = Memory.for_request(nil, api_key_id, nil)
+      assert Enum.any?(memories, &(&1.content == "Key-specific instruction"))
+
+      # Does not appear for a different api_key_id
+      {:ok, other_memories} = Memory.for_request(nil, Ash.UUID.generate(), nil)
+      refute Enum.any?(other_memories, &(&1.content == "Key-specific instruction"))
+    end
+
+    test "returns agent-scoped memories when agent_id provided" do
+      agent_id = Ash.UUID.generate()
+
+      {:ok, _} =
+        Memory
+        |> Ash.Changeset.for_create(:create, %{
+          content: "Agent context info",
+          category: :context,
+          scope: :agent,
+          agent_id: agent_id,
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      {:ok, memories} = Memory.for_request(nil, nil, agent_id)
+      assert Enum.any?(memories, &(&1.content == "Agent context info"))
+
+      # Does not appear without agent_id
+      {:ok, no_agent_memories} = Memory.for_request(nil, nil, nil)
+      refute Enum.any?(no_agent_memories, &(&1.content == "Agent context info"))
+    end
   end
 end
