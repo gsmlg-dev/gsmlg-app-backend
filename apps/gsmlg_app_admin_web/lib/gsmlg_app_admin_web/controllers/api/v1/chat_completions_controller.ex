@@ -191,7 +191,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
   defp normalize_openai_request(params) do
     messages = params["messages"] || []
 
-    {system, user_messages} =
+    {system, reversed_messages} =
       Enum.reduce(messages, {nil, []}, fn msg, {sys, msgs} ->
         case msg["role"] do
           "system" ->
@@ -212,9 +212,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
               |> maybe_put_field(:tool_calls, msg["tool_calls"])
               |> maybe_put_field(:name, msg["name"])
 
-            {sys, msgs ++ [normalized]}
+            {sys, [normalized | msgs]}
         end
       end)
+
+    user_messages = Enum.reverse(reversed_messages)
 
     request = %{
       model: params["model"],
@@ -271,7 +273,5 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
   defp maybe_put_field(map, _key, nil), do: map
   defp maybe_put_field(map, key, value), do: Map.put(map, key, value)
 
-  defp generate_id do
-    :crypto.strong_rand_bytes(12) |> Base.url_encode64(padding: false)
-  end
+  defp generate_id, do: RequestHelpers.generate_id()
 end

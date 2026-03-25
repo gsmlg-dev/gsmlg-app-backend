@@ -8,8 +8,8 @@ defmodule GsmlgAppAdmin.AI.ToolExecutor do
   require Logger
   import Bitwise
 
-  # Private/internal IP ranges to block for SSRF protection
-  @blocked_ip_ranges [
+  # Private/internal IPv4 ranges to block for SSRF protection
+  @blocked_ipv4_ranges [
     # Loopback
     {127, 0, 0, 0, 8},
     # Private Class A
@@ -20,7 +20,7 @@ defmodule GsmlgAppAdmin.AI.ToolExecutor do
     {192, 168, 0, 0, 16},
     # Link-local
     {169, 254, 0, 0, 16},
-    # IPv6 mapped IPv4 loopback
+    # Current network
     {0, 0, 0, 0, 8}
   ]
 
@@ -173,7 +173,7 @@ defmodule GsmlgAppAdmin.AI.ToolExecutor do
   defp allowed_builtin_module?(module) do
     module_str = Atom.to_string(module)
     allowed_str = Atom.to_string(@allowed_builtin_namespace)
-    String.starts_with?(module_str, allowed_str)
+    module_str == allowed_str or String.starts_with?(module_str, allowed_str <> ".")
   end
 
   # -- SSRF Protection --
@@ -207,24 +207,54 @@ defmodule GsmlgAppAdmin.AI.ToolExecutor do
   end
 
   defp dns_resolves_to_blocked?(host) do
-    case :inet.getaddr(String.to_charlist(host), :inet) do
-      {:ok, ip_tuple} -> ip_in_blocked_range?(ip_tuple)
-      {:error, _} -> false
-    end
+    charlist = String.to_charlist(host)
+
+    ipv4_blocked =
+      case :inet.getaddr(charlist, :inet) do
+        {:ok, ip_tuple} -> ip_in_blocked_range?(ip_tuple)
+        {:error, _} -> false
+      end
+
+    ipv6_blocked =
+      case :inet.getaddr(charlist, :inet6) do
+        {:ok, ip_tuple} -> ip_in_blocked_range?(ip_tuple)
+        {:error, _} -> false
+      end
+
+    ipv4_blocked or ipv6_blocked
   end
 
   defp ip_in_blocked_range?(ip_tuple) when tuple_size(ip_tuple) == 4 do
-    Enum.any?(@blocked_ip_ranges, fn {net_a, net_b, net_c, net_d, prefix_len} ->
-      ip_int = ip_to_integer(ip_tuple)
-      net_int = ip_to_integer({net_a, net_b, net_c, net_d})
+    Enum.any?(@blocked_ipv4_ranges, fn {net_a, net_b, net_c, net_d, prefix_len} ->
+      ip_int = ipv4_to_integer(ip_tuple)
+      net_int = ipv4_to_integer({net_a, net_b, net_c, net_d})
       mask = bsl(0xFFFFFFFF, 32 - prefix_len) &&& 0xFFFFFFFF
       (ip_int &&& mask) == (net_int &&& mask)
     end)
   end
 
+  # IPv6 blocking: loopback (::1), link-local (fe80::/10), unique-local (fc00::/7)
+  defp ip_in_blocked_range?({0, 0, 0, 0, 0, 0, 0, 1}), do: true
+  defp ip_in_blocked_range?({0, 0, 0, 0, 0, 0, 0, 0}), do: true
+
+  defp ip_in_blocked_range?(ip_tuple) when tuple_size(ip_tuple) == 8 do
+    first = elem(ip_tuple, 0)
+    # fe80::/10 link-local
+    # fc00::/7 unique-local
+    # ::ffff:0:0/96 IPv4-mapped — check the mapped IPv4 address
+    (first &&& 0xFFC0) == 0xFE80 or
+      (first &&& 0xFE00) == 0xFC00 or
+      (elem(ip_tuple, 0) == 0 and elem(ip_tuple, 1) == 0 and elem(ip_tuple, 2) == 0 and
+         elem(ip_tuple, 3) == 0 and elem(ip_tuple, 4) == 0 and elem(ip_tuple, 5) == 0xFFFF and
+         ip_in_blocked_range?(
+           {elem(ip_tuple, 6) >>> 8, elem(ip_tuple, 6) &&& 0xFF, elem(ip_tuple, 7) >>> 8,
+            elem(ip_tuple, 7) &&& 0xFF}
+         ))
+  end
+
   defp ip_in_blocked_range?(_), do: false
 
-  defp ip_to_integer({a, b, c, d}) do
+  defp ipv4_to_integer({a, b, c, d}) do
     bsl(a, 24) + bsl(b, 16) + bsl(c, 8) + d
   end
 

@@ -59,6 +59,20 @@ defmodule GsmlgAppAdmin.AI.ToolExecutorTest do
       assert {:error, msg} = ToolExecutor.execute(tool, %{})
       assert msg =~ "not in the allowed namespace"
     end
+
+    test "blocks modules with matching prefix but different namespace" do
+      # "GsmlgAppAdmin.AI.BuiltinsEvil" starts with "GsmlgAppAdmin.AI.Builtins"
+      # but must NOT be allowed — requires exact match or submodule (with dot separator)
+      # The atom doesn't exist so String.to_existing_atom catches it first,
+      # but the namespace check is defense-in-depth for if the atom did exist
+      tool = %{
+        execution_type: :builtin,
+        timeout_ms: 5000,
+        builtin_handler: "GsmlgAppAdmin.AI.BuiltinsEvil.dangerous"
+      }
+
+      assert {:error, _msg} = ToolExecutor.execute(tool, %{})
+    end
   end
 
   describe "execute/3 - webhook GET with nested arguments" do
@@ -127,6 +141,18 @@ defmodule GsmlgAppAdmin.AI.ToolExecutorTest do
 
     test "rejects nil" do
       assert {:error, _} = ToolExecutor.validate_webhook_url(nil)
+    end
+
+    test "blocks IPv6 loopback address" do
+      assert {:error, _} = ToolExecutor.validate_webhook_url("http://[::1]/internal")
+    end
+
+    test "blocks IPv6 link-local addresses" do
+      assert {:error, _} = ToolExecutor.validate_webhook_url("http://[fe80::1]/internal")
+    end
+
+    test "blocks IPv6 unique-local addresses" do
+      assert {:error, _} = ToolExecutor.validate_webhook_url("http://[fd00::1]/internal")
     end
   end
 end

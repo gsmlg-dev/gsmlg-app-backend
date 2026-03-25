@@ -12,7 +12,8 @@ defmodule GsmlgAppAdmin.Application do
       {Phoenix.PubSub, name: GsmlgAppAdmin.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: GsmlgAppAdmin.Finch},
-      {AshAuthentication.Supervisor, otp_app: :gsmlg_app_admin}
+      {AshAuthentication.Supervisor, otp_app: :gsmlg_app_admin},
+      {Task.Supervisor, name: GsmlgAppAdmin.TaskSupervisor}
     ]
 
     Supervisor.start_link(children, strategy: :one_for_one, name: GsmlgAppAdmin.Supervisor)

@@ -288,11 +288,20 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
   end
 
   defp parse_tool_input(tc) do
-    args = get_in(tc, ["function", "arguments"]) || get_in(tc, [:function, :arguments]) || "{}"
+    args = get_in(tc, ["function", "arguments"]) || get_in(tc, [:function, :arguments]) || %{}
 
-    case Jason.decode(args) do
-      {:ok, parsed} -> parsed
-      _ -> %{"raw" => args}
+    case args do
+      map when is_map(map) ->
+        map
+
+      str when is_binary(str) ->
+        case Jason.decode(str) do
+          {:ok, parsed} -> parsed
+          _ -> %{"raw" => str}
+        end
+
+      _ ->
+        %{}
     end
   end
 
@@ -305,7 +314,5 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
     }
   end
 
-  defp generate_id do
-    :crypto.strong_rand_bytes(12) |> Base.url_encode64(padding: false)
-  end
+  defp generate_id, do: RequestHelpers.generate_id()
 end

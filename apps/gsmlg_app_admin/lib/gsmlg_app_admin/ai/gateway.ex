@@ -208,7 +208,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
 
         if tool_calls == [] do
           # No tool calls — final response
-          {:ok, response.content, iteration + 1, tokens, tool_calls_acc}
+          {:ok, response[:content] || "", iteration + 1, tokens, tool_calls_acc}
         else
           # Execute each tool call with timing, build tool result messages
           {tool_messages, new_metadata} = execute_tool_calls_with_timing(tool_calls, tools)
@@ -571,7 +571,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     tokens = Keyword.get(opts, :tokens, 0)
     request_ip = Keyword.get(opts, :request_ip)
 
-    Task.start(fn ->
+    Task.Supervisor.start_child(GsmlgAppAdmin.TaskSupervisor, fn ->
       try do
         AI.ApiKey.increment_usage(api_key, 1, tokens)
 

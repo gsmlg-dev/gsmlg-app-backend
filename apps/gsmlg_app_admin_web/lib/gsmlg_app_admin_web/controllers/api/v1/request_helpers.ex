@@ -64,4 +64,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpers do
   def error_body(:openai, type, message) do
     %{error: %{message: message, type: type}}
   end
+
+  @doc """
+  Generates a URL-safe random ID for API response objects.
+  """
+  def generate_id do
+    :crypto.strong_rand_bytes(12) |> Base.url_encode64(padding: false)
+  end
 end

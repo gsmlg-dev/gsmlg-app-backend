@@ -62,6 +62,20 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpersTest do
     end
   end
 
+  describe "generate_id/0" do
+    test "returns a URL-safe string" do
+      id = RequestHelpers.generate_id()
+      assert is_binary(id)
+      assert String.length(id) == 16
+      assert id =~ ~r/^[A-Za-z0-9_-]+$/
+    end
+
+    test "returns unique values" do
+      ids = for _ <- 1..100, do: RequestHelpers.generate_id()
+      assert length(Enum.uniq(ids)) == 100
+    end
+  end
+
   describe "error_body/3" do
     test "returns OpenAI error format" do
       body = RequestHelpers.error_body(:openai, "auth_error", "Invalid key")
