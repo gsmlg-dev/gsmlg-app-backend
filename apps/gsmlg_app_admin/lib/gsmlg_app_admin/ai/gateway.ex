@@ -147,8 +147,12 @@ defmodule GsmlgAppAdmin.AI.Gateway do
 
     with {:ok, provider} <- resolve_provider(api_key, model),
          :ok <- check_scope(api_key, :agents) do
-      # Load agent's tools
-      {:ok, tools} = AI.list_tools_for_agent(agent.id)
+      # Load agent's tools (empty list on error — agent can still run without tools)
+      tools =
+        case AI.list_tools_for_agent(agent.id) do
+          {:ok, t} -> t
+          _ -> []
+        end
 
       # Build agent request with agent's own system prompt + caller system prompt
       caller_system = Keyword.get(opts, :caller_system)
