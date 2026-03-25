@@ -33,6 +33,18 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpersTest do
     end
   end
 
+  describe "client_ip/1" do
+    test "formats IPv4 address" do
+      conn = %{Plug.Test.conn(:post, "/") | remote_ip: {127, 0, 0, 1}}
+      assert RequestHelpers.client_ip(conn) == "127.0.0.1"
+    end
+
+    test "formats IPv6 address" do
+      conn = %{Plug.Test.conn(:post, "/") | remote_ip: {0, 0, 0, 0, 0, 0, 0, 1}}
+      assert RequestHelpers.client_ip(conn) == "::1"
+    end
+  end
+
   describe "api_format/1" do
     test "returns :anthropic for /messages path" do
       conn = Plug.Test.conn(:post, "/api/v1/messages")

@@ -33,6 +33,13 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpers do
   def safe_role(_), do: :user
 
   @doc """
+  Extracts the client IP address from a connection, handling both IPv4 and IPv6.
+  """
+  def client_ip(%Plug.Conn{remote_ip: ip}) do
+    :inet.ntoa(ip) |> to_string()
+  end
+
+  @doc """
   Detects whether a request targets an Anthropic-format endpoint based on the path.
   Returns `:anthropic` for `/api/v1/messages`, `:openai` otherwise.
   """

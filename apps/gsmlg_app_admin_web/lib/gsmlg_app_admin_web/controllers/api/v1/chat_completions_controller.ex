@@ -56,7 +56,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
   end
 
   defp non_stream_response(conn, api_key, request) do
-    case Gateway.chat(api_key, request) do
+    case Gateway.chat(api_key, request, request_ip: RequestHelpers.client_ip(conn)) do
       {:ok, response} ->
         json(conn, format_openai_response(response, request.model))
 
@@ -126,7 +126,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
         send(parent, {:sse_chunk, chunk})
     end
 
-    opts = [stream_callback: callback]
+    opts = [stream_callback: callback, request_ip: RequestHelpers.client_ip(conn)]
 
     task =
       Task.async(fn ->

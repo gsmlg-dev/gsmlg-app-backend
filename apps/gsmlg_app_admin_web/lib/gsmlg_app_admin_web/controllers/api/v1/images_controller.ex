@@ -8,13 +8,14 @@ defmodule GsmlgAppAdminWeb.Api.V1.ImagesController do
   use GsmlgAppAdminWeb, :controller
 
   alias GsmlgAppAdmin.AI.Gateway
+  alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
   alias GsmlgAppAdminWeb.Plugs.ApiKeyAuth
 
   def create(conn, params) do
     api_key = conn.assigns.api_key
 
     if ApiKeyAuth.has_scope?(api_key, :images) do
-      case Gateway.generate_image(api_key, params) do
+      case Gateway.generate_image(api_key, params, request_ip: RequestHelpers.client_ip(conn)) do
         {:ok, result} ->
           json(conn, result)
 

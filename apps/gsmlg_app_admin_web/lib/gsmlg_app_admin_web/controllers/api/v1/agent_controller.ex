@@ -153,7 +153,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
           stream: stream,
           model: model,
           max_iterations: max_iter,
-          request_ip: get_client_ip(conn)
+          request_ip: RequestHelpers.client_ip(conn)
         ]
 
         case Gateway.run_agent(api_key, agent, messages, opts) do
@@ -181,9 +181,5 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
         |> put_status(404)
         |> json(%{error: %{message: "Agent not found.", type: "not_found_error"}})
     end
-  end
-
-  defp get_client_ip(conn) do
-    conn.remote_ip |> Tuple.to_list() |> Enum.join(".")
   end
 end

@@ -31,6 +31,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
       request = inject_system_context(api_key, request)
       messages = build_messages(request)
       call_opts = build_call_opts(request, opts)
+      request_ip = Keyword.get(opts, :request_ip)
 
       if request[:stream] do
         stream_callback = Keyword.get(opts, :stream_callback)
@@ -38,22 +39,27 @@ defmodule GsmlgAppAdmin.AI.Gateway do
 
         case result do
           {:ok, :streaming_complete} ->
-            log_usage(api_key, provider, request, :chat, :success)
+            log_usage(api_key, provider, request, :chat, :success, request_ip: request_ip)
             {:ok, :streaming_complete}
 
           {:error, reason} ->
-            log_usage(api_key, provider, request, :chat, :error)
+            log_usage(api_key, provider, request, :chat, :error, request_ip: request_ip)
             {:error, reason}
         end
       else
         case Client.chat_completion(provider, messages, call_opts) do
           {:ok, response} ->
             tokens = get_in(response, [:usage, "total_tokens"]) || 0
-            log_usage(api_key, provider, request, :chat, :success, tokens: tokens)
+
+            log_usage(api_key, provider, request, :chat, :success,
+              tokens: tokens,
+              request_ip: request_ip
+            )
+
             {:ok, response}
 
           {:error, reason} ->
-            log_usage(api_key, provider, request, :chat, :error)
+            log_usage(api_key, provider, request, :chat, :error, request_ip: request_ip)
             {:error, reason}
         end
       end
@@ -160,9 +166,14 @@ defmodule GsmlgAppAdmin.AI.Gateway do
         end
 
       # Run the agent loop
+      request_ip = Keyword.get(opts, :request_ip)
+
       case agent_loop(provider, all_messages, call_opts, tools, max_iterations, 0) do
         {:ok, content, iterations, total_tokens} ->
-          log_usage(api_key, provider, request, :agent, :success, tokens: total_tokens)
+          log_usage(api_key, provider, request, :agent, :success,
+            tokens: total_tokens,
+            request_ip: request_ip
+          )
 
           {:ok,
            %{
@@ -175,7 +186,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
            }}
 
         {:error, reason} ->
-          log_usage(api_key, provider, request, :agent, :error)
+          log_usage(api_key, provider, request, :agent, :error, request_ip: request_ip)
           {:error, reason}
       end
     end
@@ -277,17 +288,24 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     with :ok <- check_scope(api_key, :images) do
       model = params["model"]
       client_opts = Keyword.get(opts, :client_opts, [])
+      request_ip = Keyword.get(opts, :request_ip)
 
       if model do
         case resolve_provider(api_key, model) do
           {:ok, provider} ->
             case Client.image_generation(provider, params, client_opts) do
               {:ok, response} ->
-                log_usage(api_key, provider, %{model: model}, :image, :success)
+                log_usage(api_key, provider, %{model: model}, :image, :success,
+                  request_ip: request_ip
+                )
+
                 {:ok, response}
 
               {:error, reason} ->
-                log_usage(api_key, provider, %{model: model}, :image, :error)
+                log_usage(api_key, provider, %{model: model}, :image, :error,
+                  request_ip: request_ip
+                )
+
                 {:error, reason}
             end
 
@@ -303,7 +321,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
   @doc """
   Extracts text from an image via OCR.
   """
-  def extract_text(api_key, params) do
+  def extract_text(api_key, params, opts \\ []) do
     with :ok <- check_scope(api_key, :ocr) do
       model = params["model"]
 
@@ -351,7 +369,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
           params: %{max_tokens: 4096}
         }
 
-        case chat(api_key, request) do
+        case chat(api_key, request, opts) do
           {:ok, response} ->
             {:ok,
              %{
@@ -524,21 +542,27 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     end
   end
 
-  defp log_usage(api_key, provider, request, endpoint_type, status, opts \\ []) do
+  defp log_usage(api_key, provider, request, endpoint_type, status, opts) do
     tokens = Keyword.get(opts, :tokens, 0)
+    request_ip = Keyword.get(opts, :request_ip)
 
     Task.start(fn ->
       try do
         AI.ApiKey.increment_usage(api_key, 1, tokens)
 
-        AI.ApiUsageLog.create(%{
+        log_attrs = %{
           endpoint_type: endpoint_type,
           model: request[:model] || to_string(request.model),
           total_tokens: tokens,
           status: status,
           api_key_id: api_key.id,
           provider_id: provider.id
-        })
+        }
+
+        log_attrs =
+          if request_ip, do: Map.put(log_attrs, :request_ip, request_ip), else: log_attrs
+
+        AI.ApiUsageLog.create(log_attrs)
       rescue
         e ->
           Logger.warning(
