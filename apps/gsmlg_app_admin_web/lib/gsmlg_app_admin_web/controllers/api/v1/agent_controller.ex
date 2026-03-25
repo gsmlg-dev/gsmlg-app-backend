@@ -165,6 +165,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
             |> put_status(422)
             |> json(%{error: %{message: reason, type: "invalid_request_error"}})
 
+          {:error, "API key does not have" <> _ = reason} ->
+            conn
+            |> put_status(403)
+            |> json(%{error: %{message: reason, type: "permission_error"}})
+
           {:error, reason} ->
             conn
             |> put_status(500)

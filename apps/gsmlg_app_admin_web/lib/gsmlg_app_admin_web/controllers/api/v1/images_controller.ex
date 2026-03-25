@@ -44,6 +44,9 @@ defmodule GsmlgAppAdminWeb.Api.V1.ImagesController do
       String.contains?(reason_str, "No provider found") ->
         {422, "invalid_request_error"}
 
+      String.contains?(reason_str, "API key does not have") ->
+        {403, "permission_error"}
+
       true ->
         {500, "server_error"}
     end
