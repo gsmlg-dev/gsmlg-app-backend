@@ -96,50 +96,62 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
 
     opts = [stream_callback: callback]
 
-    Task.start(fn ->
-      result = Gateway.chat(api_key, request, opts)
-      send(parent, {:stream_done, result})
-    end)
+    task =
+      Task.async(fn ->
+        Gateway.chat(api_key, request, opts)
+      end)
 
-    stream_loop(conn, id, created, request.model)
+    stream_loop(conn, task, id, created, request.model)
   end
 
-  defp stream_loop(conn, id, created, model) do
+  defp stream_loop(conn, task, id, created, model) do
     receive do
       {:sse_chunk, chunk} ->
         case Plug.Conn.chunk(conn, "data: #{Jason.encode!(chunk)}\n\n") do
-          {:ok, conn} -> stream_loop(conn, id, created, model)
-          {:error, _} -> conn
+          {:ok, conn} -> stream_loop(conn, task, id, created, model)
+          {:error, _} -> shutdown_task(task, conn)
         end
 
-      {:stream_done, _result} ->
-        # Send finish chunk
-        finish_chunk = %{
-          id: id,
-          object: "chat.completion.chunk",
-          created: created,
-          model: model,
-          choices: [
-            %{
-              index: 0,
-              delta: %{},
-              finish_reason: "stop"
-            }
-          ]
-        }
+      {ref, _result} when ref == task.ref ->
+        Process.demonitor(task.ref, [:flush])
+        send_finish_chunk(conn, id, created, model)
 
-        case Plug.Conn.chunk(conn, "data: #{Jason.encode!(finish_chunk)}\n\n") do
-          {:ok, conn} ->
-            Plug.Conn.chunk(conn, "data: [DONE]\n\n")
-            conn
-
-          {:error, _} ->
-            conn
-        end
+      {:DOWN, ref, :process, _pid, _reason} when ref == task.ref ->
+        send_finish_chunk(conn, id, created, model)
     after
       120_000 ->
+        shutdown_task(task, conn)
+    end
+  end
+
+  defp send_finish_chunk(conn, id, created, model) do
+    finish_chunk = %{
+      id: id,
+      object: "chat.completion.chunk",
+      created: created,
+      model: model,
+      choices: [
+        %{
+          index: 0,
+          delta: %{},
+          finish_reason: "stop"
+        }
+      ]
+    }
+
+    case Plug.Conn.chunk(conn, "data: #{Jason.encode!(finish_chunk)}\n\n") do
+      {:ok, conn} ->
+        Plug.Conn.chunk(conn, "data: [DONE]\n\n")
+        conn
+
+      {:error, _} ->
         conn
     end
+  end
+
+  defp shutdown_task(task, conn) do
+    Task.shutdown(task, :brutal_kill)
+    conn
   end
 
   defp normalize_openai_request(params) do

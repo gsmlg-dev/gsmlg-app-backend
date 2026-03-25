@@ -107,34 +107,43 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
 
     opts = [stream_callback: callback]
 
-    Task.start(fn ->
-      result = Gateway.chat(api_key, request, opts)
-      send(parent, {:stream_done, result})
-    end)
+    task =
+      Task.async(fn ->
+        Gateway.chat(api_key, request, opts)
+      end)
 
-    anthropic_stream_loop(conn, msg_id, request.model)
+    anthropic_stream_loop(conn, task)
   end
 
-  defp anthropic_stream_loop(conn, msg_id, model) do
+  defp anthropic_stream_loop(conn, task) do
     receive do
       {:sse_event, event_type, data} ->
         conn
         |> send_sse!(event_type, data)
-        |> anthropic_stream_loop(msg_id, model)
+        |> anthropic_stream_loop(task)
 
-      {:stream_done, _result} ->
-        conn
-        |> send_sse!("content_block_stop", %{type: "content_block_stop", index: 0})
-        |> send_sse!("message_delta", %{
-          type: "message_delta",
-          delta: %{stop_reason: "end_turn"},
-          usage: %{output_tokens: 0}
-        })
-        |> send_sse!("message_stop", %{type: "message_stop"})
+      {ref, _result} when ref == task.ref ->
+        Process.demonitor(task.ref, [:flush])
+        send_finish_events(conn)
+
+      {:DOWN, ref, :process, _pid, _reason} when ref == task.ref ->
+        send_finish_events(conn)
     after
       120_000 ->
+        Task.shutdown(task, :brutal_kill)
         conn
     end
+  end
+
+  defp send_finish_events(conn) do
+    conn
+    |> send_sse!("content_block_stop", %{type: "content_block_stop", index: 0})
+    |> send_sse!("message_delta", %{
+      type: "message_delta",
+      delta: %{stop_reason: "end_turn"},
+      usage: %{output_tokens: 0}
+    })
+    |> send_sse!("message_stop", %{type: "message_stop"})
   end
 
   # Sends an SSE event chunk, returning the (possibly unchanged) conn on error.
