@@ -273,14 +273,15 @@ defmodule GsmlgAppAdmin.AI.Gateway do
   Proxies the request to an upstream provider's OpenAI-compatible images endpoint.
   The model in `params["model"]` is resolved against active providers.
   """
-  def generate_image(api_key, params) do
+  def generate_image(api_key, params, opts \\ []) do
     with :ok <- check_scope(api_key, :images) do
       model = params["model"]
+      client_opts = Keyword.get(opts, :client_opts, [])
 
       if model do
         case resolve_provider(api_key, model) do
           {:ok, provider} ->
-            case Client.image_generation(provider, params) do
+            case Client.image_generation(provider, params, client_opts) do
               {:ok, response} ->
                 log_usage(api_key, provider, %{model: model}, :image, :success)
                 {:ok, response}

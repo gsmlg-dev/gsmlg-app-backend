@@ -19,15 +19,25 @@ defmodule GsmlgAppAdminWeb.Api.V1.ImagesController do
           json(conn, result)
 
         {:error, reason} ->
+          {status, type} = classify_error(reason)
+
           conn
-          |> put_status(500)
-          |> json(%{error: %{message: to_string(reason), type: "server_error"}})
+          |> put_status(status)
+          |> json(%{error: %{message: to_string(reason), type: type}})
       end
     else
       conn
       |> put_status(403)
       |> json(%{error: %{message: "API key lacks 'images' scope.", type: "permission_error"}})
       |> halt()
+    end
+  end
+
+  defp classify_error(reason) do
+    cond do
+      String.contains?(reason, "Missing required parameter") -> {400, "invalid_request_error"}
+      String.contains?(reason, "No provider found") -> {422, "invalid_request_error"}
+      true -> {500, "server_error"}
     end
   end
 end

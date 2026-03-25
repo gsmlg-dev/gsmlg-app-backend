@@ -100,6 +100,87 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
 
       assert reason =~ "provider" or reason =~ "model"
     end
+
+    test "returns {:ok, response} on happy path when provider resolves and upstream returns 200" do
+      stub = :"gw_image_ok_#{System.unique_integer([:positive])}"
+
+      Req.Test.stub(stub, fn conn ->
+        Req.Test.json(conn, %{
+          "created" => 1_000_000,
+          "data" => [%{"url" => "https://example.com/img.png"}]
+        })
+      end)
+
+      {:ok, _provider} =
+        GsmlgAppAdmin.AI.Provider
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Test Provider #{System.unique_integer([:positive])}",
+          slug: "test-provider-#{System.unique_integer([:positive])}",
+          api_base_url: "http://fake.local",
+          api_key: "test-api-key",
+          model: "dall-e-3",
+          available_models: ["dall-e-3"],
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:images],
+        allowed_providers: [],
+        allowed_models: []
+      }
+
+      assert {:ok, body} =
+               Gateway.generate_image(
+                 api_key,
+                 %{"model" => "dall-e-3", "prompt" => "a cat"},
+                 client_opts: [plug: {Req.Test, stub}]
+               )
+
+      assert is_map(body)
+    end
+
+    test "returns {:error, reason} when provider resolves but Client.image_generation fails" do
+      stub = :"gw_image_err_#{System.unique_integer([:positive])}"
+
+      Req.Test.stub(stub, fn conn ->
+        conn
+        |> Plug.Conn.put_status(429)
+        |> Req.Test.json(%{"error" => %{"message" => "Rate limit exceeded"}})
+      end)
+
+      {:ok, _provider} =
+        GsmlgAppAdmin.AI.Provider
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Test Provider #{System.unique_integer([:positive])}",
+          slug: "test-provider-#{System.unique_integer([:positive])}",
+          api_base_url: "http://fake.local",
+          api_key: "test-api-key",
+          model: "dall-e-3",
+          available_models: ["dall-e-3"],
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:images],
+        allowed_providers: [],
+        allowed_models: []
+      }
+
+      assert {:error, reason} =
+               Gateway.generate_image(
+                 api_key,
+                 %{"model" => "dall-e-3", "prompt" => "a cat"},
+                 client_opts: [plug: {Req.Test, stub}]
+               )
+
+      assert reason =~ "429"
+    end
   end
 
   describe "resolve_provider/2" do
