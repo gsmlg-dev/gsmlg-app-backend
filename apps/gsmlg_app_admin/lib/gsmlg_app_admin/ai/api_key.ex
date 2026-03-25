@@ -169,14 +169,8 @@ defmodule GsmlgAppAdmin.AI.ApiKey do
         tokens = Ash.Changeset.get_argument(changeset, :tokens) || 0
 
         changeset
-        |> Ash.Changeset.change_attribute(
-          :total_requests,
-          (changeset.data.total_requests || 0) + requests
-        )
-        |> Ash.Changeset.change_attribute(
-          :total_tokens,
-          (changeset.data.total_tokens || 0) + tokens
-        )
+        |> Ash.Changeset.atomic_update(:total_requests, expr(total_requests + ^requests))
+        |> Ash.Changeset.atomic_update(:total_tokens, expr(total_tokens + ^tokens))
         |> Ash.Changeset.change_attribute(:last_used_at, DateTime.utc_now())
       end)
     end
