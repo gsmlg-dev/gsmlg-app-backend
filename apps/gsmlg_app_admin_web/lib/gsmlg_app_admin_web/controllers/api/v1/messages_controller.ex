@@ -214,7 +214,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
         %{role: RequestHelpers.safe_role(msg["role"]), content: content}
       end)
 
-    %{
+    request = %{
       model: params["model"],
       system: system,
       messages: messages,
@@ -225,6 +225,18 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
         top_p: params["top_p"]
       }
     }
+
+    # Pass through client-provided tools for function calling
+    request =
+      case params["tools"] do
+        tools when is_list(tools) and tools != [] -> Map.put(request, :tools, tools)
+        _ -> request
+      end
+
+    case params["tool_choice"] do
+      nil -> request
+      choice -> Map.put(request, :tool_choice, choice)
+    end
   end
 
   defp extract_text_from_blocks(blocks) do
@@ -234,17 +246,47 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
   end
 
   defp format_anthropic_response(response, model) do
+    tool_calls = response[:tool_calls] || []
+
+    content_blocks =
+      if response.content do
+        [%{type: "text", text: response.content}]
+      else
+        []
+      end
+
+    # Append tool_use blocks if the LLM requested tool calls
+    content_blocks =
+      content_blocks ++
+        Enum.map(tool_calls, fn tc ->
+          %{
+            type: "tool_use",
+            id: tc["id"] || tc[:id],
+            name: get_in(tc, ["function", "name"]) || get_in(tc, [:function, :name]),
+            input: parse_tool_input(tc)
+          }
+        end)
+
+    stop_reason = if tool_calls != [], do: "tool_use", else: "end_turn"
+
     %{
       id: "msg_#{generate_id()}",
       type: "message",
       role: "assistant",
-      content: [
-        %{type: "text", text: response.content}
-      ],
+      content: content_blocks,
       model: model,
-      stop_reason: "end_turn",
+      stop_reason: stop_reason,
       usage: format_anthropic_usage(response[:usage])
     }
+  end
+
+  defp parse_tool_input(tc) do
+    args = get_in(tc, ["function", "arguments"]) || get_in(tc, [:function, :arguments]) || "{}"
+
+    case Jason.decode(args) do
+      {:ok, parsed} -> parsed
+      _ -> %{"raw" => args}
+    end
   end
 
   defp format_anthropic_usage(nil), do: %{input_tokens: 0, output_tokens: 0}

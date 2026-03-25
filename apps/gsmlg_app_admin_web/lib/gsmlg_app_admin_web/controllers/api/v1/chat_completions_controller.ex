@@ -206,7 +206,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
         end
       end)
 
-    %{
+    request = %{
       model: params["model"],
       system: system,
       messages: user_messages,
@@ -217,9 +217,31 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
         top_p: params["top_p"]
       }
     }
+
+    # Pass through client-provided tools for function calling
+    request =
+      case params["tools"] do
+        tools when is_list(tools) and tools != [] -> Map.put(request, :tools, tools)
+        _ -> request
+      end
+
+    case params["tool_choice"] do
+      nil -> request
+      choice -> Map.put(request, :tool_choice, choice)
+    end
   end
 
   defp format_openai_response(response, model) do
+    tool_calls = response[:tool_calls] || []
+
+    message =
+      %{role: "assistant", content: response.content}
+      |> then(fn msg ->
+        if tool_calls != [], do: Map.put(msg, :tool_calls, tool_calls), else: msg
+      end)
+
+    finish_reason = if tool_calls != [], do: "tool_calls", else: "stop"
+
     %{
       id: "chatcmpl-#{generate_id()}",
       object: "chat.completion",
@@ -228,11 +250,8 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
       choices: [
         %{
           index: 0,
-          message: %{
-            role: "assistant",
-            content: response.content
-          },
-          finish_reason: "stop"
+          message: message,
+          finish_reason: finish_reason
         }
       ],
       usage: response[:usage] || %{prompt_tokens: 0, completion_tokens: 0, total_tokens: 0}

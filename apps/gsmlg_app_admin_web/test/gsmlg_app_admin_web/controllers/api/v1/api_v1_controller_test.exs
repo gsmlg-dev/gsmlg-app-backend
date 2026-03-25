@@ -539,6 +539,76 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
     end
   end
 
+  # ── Tool passthrough ─────────────────────────────────────────────────
+
+  describe "tool passthrough" do
+    test "chat/completions accepts tools array without crashing", %{conn: conn} do
+      {raw_key, _} = create_api_key([:chat_completions])
+
+      tools = [
+        %{
+          "type" => "function",
+          "function" => %{
+            "name" => "get_weather",
+            "description" => "Get weather for a location",
+            "parameters" => %{
+              "type" => "object",
+              "properties" => %{
+                "location" => %{"type" => "string"}
+              },
+              "required" => ["location"]
+            }
+          }
+        }
+      ]
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/chat/completions", %{
+          "model" => "gpt-4o",
+          "messages" => [%{"role" => "user", "content" => "What's the weather?"}],
+          "tools" => tools,
+          "tool_choice" => "auto"
+        })
+
+      # Should not crash — may fail on provider, not on tool parsing
+      refute conn.status == 500
+    end
+
+    test "messages accepts tools array without crashing", %{conn: conn} do
+      {raw_key, _} = create_api_key([:messages])
+
+      tools = [
+        %{
+          "name" => "get_weather",
+          "description" => "Get weather for a location",
+          "input_schema" => %{
+            "type" => "object",
+            "properties" => %{
+              "location" => %{"type" => "string"}
+            },
+            "required" => ["location"]
+          }
+        }
+      ]
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/messages", %{
+          "model" => "claude-sonnet-4-20250514",
+          "messages" => [%{"role" => "user", "content" => "What's the weather?"}],
+          "tools" => tools
+        })
+
+      # Should not crash — may fail on provider, not on tool parsing
+      refute conn.status == 500
+    end
+  end
+
   # ── Nil content safety ─────────────────────────────────────────────────
 
   describe "nil content safety" do

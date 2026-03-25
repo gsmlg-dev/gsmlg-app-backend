@@ -496,6 +496,8 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     |> maybe_put_opt(:temperature, params[:temperature] || params["temperature"])
     |> maybe_put_opt(:max_tokens, params[:max_tokens] || params["max_tokens"])
     |> maybe_put_opt(:top_p, params[:top_p] || params["top_p"])
+    |> maybe_put_opt(:tools, request[:tools])
+    |> maybe_put_opt(:tool_choice, request[:tool_choice])
   end
 
   defp maybe_put_opt(opts, _key, nil), do: opts
