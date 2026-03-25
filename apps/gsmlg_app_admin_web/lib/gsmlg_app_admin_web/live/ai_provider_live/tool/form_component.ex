@@ -4,6 +4,9 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Tool.FormComponent do
 
   alias GsmlgAppAdmin.AI
 
+  @valid_webhook_methods ~w(post get put delete)
+  @valid_execution_types ~w(webhook builtin code mcp passthrough)
+
   @impl true
   def update(%{tool: tool, action: action} = assigns, socket) do
     form =
@@ -46,11 +49,13 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Tool.FormComponent do
 
   @impl true
   def handle_event("save", %{"form" => params}, socket) do
+    webhook_method = safe_enum(params["webhook_method"] || "post", @valid_webhook_methods, "post")
+
     base_attrs = %{
       name: params["name"],
       description: params["description"],
       webhook_url: blank_to_nil(params["webhook_url"]),
-      webhook_method: String.to_existing_atom(params["webhook_method"] || "post"),
+      webhook_method: String.to_existing_atom(webhook_method),
       builtin_handler: blank_to_nil(params["builtin_handler"]),
       timeout_ms: String.to_integer(params["timeout_ms"] || "30000"),
       is_active: params["is_active"] == "true"
@@ -59,9 +64,12 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Tool.FormComponent do
     attrs =
       case socket.assigns.action do
         :new ->
+          exec_type =
+            safe_enum(params["execution_type"], @valid_execution_types, "webhook")
+
           base_attrs
           |> Map.put(:slug, params["slug"])
-          |> Map.put(:execution_type, String.to_existing_atom(params["execution_type"]))
+          |> Map.put(:execution_type, String.to_existing_atom(exec_type))
 
         :edit ->
           base_attrs
@@ -90,4 +98,10 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Tool.FormComponent do
   defp blank_to_nil(""), do: nil
   defp blank_to_nil(nil), do: nil
   defp blank_to_nil(val), do: val
+
+  defp safe_enum(val, allowed, default) when is_binary(val) do
+    if val in allowed, do: val, else: default
+  end
+
+  defp safe_enum(_, _allowed, default), do: default
 end

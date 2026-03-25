@@ -4,6 +4,9 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Memory.FormComponent do
 
   alias GsmlgAppAdmin.AI
 
+  @valid_categories ~w(fact instruction preference context)
+  @valid_scopes ~w(global user api_key agent)
+
   @impl true
   def update(%{memory: memory, action: action} = assigns, socket) do
     form =
@@ -31,10 +34,13 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Memory.FormComponent do
 
   @impl true
   def handle_event("save", %{"form" => params}, socket) do
+    category = safe_enum(params["category"], @valid_categories, "fact")
+    scope = safe_enum(params["scope"], @valid_scopes, "global")
+
     attrs = %{
       content: params["content"],
-      category: String.to_existing_atom(params["category"]),
-      scope: String.to_existing_atom(params["scope"]),
+      category: String.to_existing_atom(category),
+      scope: String.to_existing_atom(scope),
       priority: String.to_integer(params["priority"] || "0")
     }
 
@@ -57,4 +63,10 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Memory.FormComponent do
         {:noreply, put_flash(socket, :error, "Failed to save memory.")}
     end
   end
+
+  defp safe_enum(val, allowed, default) when is_binary(val) do
+    if val in allowed, do: val, else: default
+  end
+
+  defp safe_enum(_, _allowed, default), do: default
 end

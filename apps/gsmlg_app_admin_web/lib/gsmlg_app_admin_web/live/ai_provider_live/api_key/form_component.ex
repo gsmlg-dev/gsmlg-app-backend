@@ -5,6 +5,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
   alias GsmlgAppAdmin.AI
 
   @all_scopes ~w(chat_completions messages images ocr agents models_list)
+  @valid_scopes @all_scopes
 
   @impl true
   def update(%{api_key: api_key, action: action} = assigns, socket) do
@@ -58,6 +59,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
   defp save(socket, :new, params) do
     scopes =
       (params["scopes"] || [])
+      |> Enum.filter(&(&1 in @valid_scopes))
       |> Enum.map(&String.to_existing_atom/1)
 
     attrs = %{
@@ -91,6 +93,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
   defp save(socket, :edit, params) do
     scopes =
       (params["scopes"] || [])
+      |> Enum.filter(&(&1 in @valid_scopes))
       |> Enum.map(&String.to_existing_atom/1)
 
     attrs = %{

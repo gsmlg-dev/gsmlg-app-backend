@@ -445,7 +445,11 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Form do
   defp get_platforms_from_params(params) do
     case params do
       %{"app" => %{"platforms" => platforms}} when is_list(platforms) ->
-        Enum.map(platforms, &String.to_existing_atom/1)
+        valid = ~w(ios android macos windows linux)
+
+        platforms
+        |> Enum.filter(&(&1 in valid))
+        |> Enum.map(&String.to_existing_atom/1)
 
       _ ->
         []
@@ -460,7 +464,11 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Form do
         |> Enum.map(fn {_k, v} ->
           %{
             id: nil,
-            store_type: String.to_existing_atom(v["store_type"] || "other"),
+            store_type:
+              if((v["store_type"] || "other") in ~w(appstore playstore fdroid other),
+                do: String.to_existing_atom(v["store_type"] || "other"),
+                else: :other
+              ),
             url: v["url"] || "",
             display_order: 0
           }
