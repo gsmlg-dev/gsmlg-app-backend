@@ -97,13 +97,13 @@ defmodule GsmlgAppAdmin.Accounts do
 
   defp apply_role_filter(query, role) do
     require Ash.Query
-    Ash.Query.filter(query, role == ^String.to_atom(role))
+    Ash.Query.filter(query, role == ^String.to_existing_atom(role))
   end
 
   defp apply_status_filter(query, "all"), do: query
 
   defp apply_status_filter(query, status) do
     require Ash.Query
-    Ash.Query.filter(query, status == ^String.to_atom(status))
+    Ash.Query.filter(query, status == ^String.to_existing_atom(status))
   end
 end
