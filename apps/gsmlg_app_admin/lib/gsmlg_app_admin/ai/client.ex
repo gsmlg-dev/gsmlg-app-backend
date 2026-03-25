@@ -129,10 +129,16 @@ defmodule GsmlgAppAdmin.AI.Client do
 
   defp format_messages(messages) do
     Enum.map(messages, fn msg ->
-      %{
-        "role" => to_string(msg.role || msg["role"]),
-        "content" => msg.content || msg["content"]
+      base = %{
+        "role" => to_string(msg[:role] || msg["role"]),
+        "content" => msg[:content] || msg["content"]
       }
+
+      # Preserve tool-related fields for multi-turn tool use
+      base
+      |> maybe_put("tool_call_id", msg[:tool_call_id] || msg["tool_call_id"])
+      |> maybe_put("tool_calls", msg[:tool_calls] || msg["tool_calls"])
+      |> maybe_put("name", msg[:name] || msg["name"])
     end)
   end
 
