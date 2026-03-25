@@ -74,6 +74,41 @@
         </div>
       </div>
 
+      <div class="form-control">
+        <label class="label"><span class="label-text">Allowed Models</span></label>
+        <input
+          type="text"
+          name="form[allowed_models]"
+          value={@form[:allowed_models].value}
+          class="input input-bordered w-full"
+          placeholder="Comma-separated (empty = all models)"
+        />
+        <label class="label">
+          <span class="label-text-alt">e.g. gpt-4o, claude-sonnet-4-20250514</span>
+        </label>
+      </div>
+
+      <div class="form-control">
+        <label class="label"><span class="label-text">Allowed Providers</span></label>
+        <div class="flex flex-wrap gap-2">
+          <%= for p <- @providers do %>
+            <label class="label cursor-pointer gap-2">
+              <input
+                type="checkbox"
+                name="form[allowed_providers][]"
+                value={p.id}
+                checked={to_string(p.id) in (@form[:allowed_providers].value || [])}
+                class="checkbox checkbox-sm"
+              />
+              <span class="label-text">{p.name}</span>
+            </label>
+          <% end %>
+        </div>
+        <label class="label">
+          <span class="label-text-alt">Empty = all providers</span>
+        </label>
+      </div>
+
       <div class="flex justify-end gap-2 mt-6">
         <.link patch={@patch} class="btn btn-ghost">Cancel</.link>
         <button type="submit" class="btn btn-primary">

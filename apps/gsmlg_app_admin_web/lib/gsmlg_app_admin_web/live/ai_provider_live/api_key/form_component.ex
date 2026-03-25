@@ -8,10 +8,18 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
 
   @impl true
   def update(%{api_key: api_key, action: action} = assigns, socket) do
+    {:ok, providers} = AI.list_providers()
+
     form =
       case action do
         :new ->
-          %{"name" => "", "description" => "", "scopes" => default_scopes()}
+          %{
+            "name" => "",
+            "description" => "",
+            "scopes" => default_scopes(),
+            "allowed_models" => "",
+            "allowed_providers" => []
+          }
           |> to_form()
 
         :edit ->
@@ -20,7 +28,9 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
             "description" => api_key.description || "",
             "scopes" => Enum.map(api_key.scopes || [], &to_string/1),
             "rate_limit_rpm" => api_key.rate_limit_rpm,
-            "rate_limit_rpd" => api_key.rate_limit_rpd
+            "rate_limit_rpd" => api_key.rate_limit_rpd,
+            "allowed_models" => Enum.join(api_key.allowed_models || [], ", "),
+            "allowed_providers" => Enum.map(api_key.allowed_providers || [], &to_string/1)
           }
           |> to_form()
       end
@@ -29,7 +39,8 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
      socket
      |> assign(assigns)
      |> assign(:form, form)
-     |> assign(:all_scopes, @all_scopes)}
+     |> assign(:all_scopes, @all_scopes)
+     |> assign(:providers, providers)}
   end
 
   @impl true
@@ -53,6 +64,8 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
       scopes: scopes,
       rate_limit_rpm: parse_int(params["rate_limit_rpm"]),
       rate_limit_rpd: parse_int(params["rate_limit_rpd"]),
+      allowed_models: parse_comma_list(params["allowed_models"]),
+      allowed_providers: params["allowed_providers"] || [],
       user_id: socket.assigns.current_user.id
     }
 
@@ -80,7 +93,9 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
       description: params["description"],
       scopes: scopes,
       rate_limit_rpm: parse_int(params["rate_limit_rpm"]),
-      rate_limit_rpd: parse_int(params["rate_limit_rpd"])
+      rate_limit_rpd: parse_int(params["rate_limit_rpd"]),
+      allowed_models: parse_comma_list(params["allowed_models"]),
+      allowed_providers: params["allowed_providers"] || []
     }
 
     case AI.update_api_key(socket.assigns.api_key, attrs) do
@@ -110,6 +125,13 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
   end
 
   defp parse_int(val) when is_integer(val), do: val
+
+  defp parse_comma_list(nil), do: []
+  defp parse_comma_list(""), do: []
+
+  defp parse_comma_list(str) when is_binary(str) do
+    str |> String.split(",") |> Enum.map(&String.trim/1) |> Enum.reject(&(&1 == ""))
+  end
 
   defp default_scopes do
     ~w(chat_completions messages images ocr agents models_list)
