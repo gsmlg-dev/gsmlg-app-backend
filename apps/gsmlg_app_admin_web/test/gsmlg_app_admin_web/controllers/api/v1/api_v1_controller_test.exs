@@ -40,6 +40,23 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
     {api_key.__raw_key__, api_key}
   end
 
+  defp create_api_key_with_allowed_models(scopes, allowed_models) do
+    user = create_user()
+
+    {:ok, api_key} =
+      ApiKey
+      |> Ash.Changeset.for_create(:create, %{
+        name: "test-key-#{:erlang.unique_integer([:positive])}",
+        scopes: scopes,
+        allowed_models: allowed_models,
+        is_active: true,
+        user_id: user.id
+      })
+      |> Ash.create(authorize?: false)
+
+    {api_key.__raw_key__, api_key}
+  end
+
   # ── ChatCompletionsController ──────────────────────────────────────────────
 
   describe "POST /api/v1/chat/completions" do
@@ -126,6 +143,24 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
       body = Jason.decode!(conn.resp_body)
       assert body["error"]["type"] == "invalid_request_error"
       assert body["error"]["message"] =~ "provider"
+    end
+
+    test "returns 403 when model is not in allowed_models", %{conn: conn} do
+      {raw_key, _} = create_api_key_with_allowed_models([:chat_completions], ["gpt-4o"])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/chat/completions", %{
+          "model" => "gpt-4-turbo",
+          "messages" => [%{"role" => "user", "content" => "hi"}]
+        })
+
+      assert conn.status == 403
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "permission_error"
+      assert body["error"]["message"] =~ "gpt-4-turbo"
     end
   end
 
