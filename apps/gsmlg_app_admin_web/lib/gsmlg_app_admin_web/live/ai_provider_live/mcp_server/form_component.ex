@@ -49,15 +49,20 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.McpServer.FormComponent do
         {:error, _} -> %{}
       end
 
-    attrs = %{
+    base_attrs = %{
       name: params["name"],
-      slug: params["slug"],
       description: blank_to_nil(params["description"]),
       transport_type: String.to_existing_atom(params["transport_type"]),
       connection_config: connection_config,
       is_active: params["is_active"] == "true",
       auto_sync_tools: params["auto_sync_tools"] == "true"
     }
+
+    attrs =
+      case socket.assigns.action do
+        :new -> Map.put(base_attrs, :slug, params["slug"])
+        :edit -> base_attrs
+      end
 
     result =
       case socket.assigns.action do

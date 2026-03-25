@@ -40,14 +40,19 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.FormComponent do
 
   @impl true
   def handle_event("save", %{"form" => params}, socket) do
-    attrs = %{
+    base_attrs = %{
       name: params["name"],
-      slug: params["slug"],
       content: params["content"],
       is_default: params["is_default"] == "true",
       is_active: params["is_active"] == "true",
       priority: String.to_integer(params["priority"] || "0")
     }
+
+    attrs =
+      case socket.assigns.action do
+        :new -> Map.put(base_attrs, :slug, params["slug"])
+        :edit -> base_attrs
+      end
 
     result =
       case socket.assigns.action do

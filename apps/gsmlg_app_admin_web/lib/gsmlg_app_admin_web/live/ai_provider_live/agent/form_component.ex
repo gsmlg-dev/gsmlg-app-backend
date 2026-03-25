@@ -48,9 +48,8 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Agent.FormComponent do
 
   @impl true
   def handle_event("save", %{"form" => params}, socket) do
-    attrs = %{
+    base_attrs = %{
       name: params["name"],
-      slug: params["slug"],
       description: blank_to_nil(params["description"]),
       system_prompt: blank_to_nil(params["system_prompt"]),
       model: blank_to_nil(params["model"]),
@@ -59,6 +58,12 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Agent.FormComponent do
       tool_choice: params["tool_choice"] || "auto",
       is_active: params["is_active"] == "true"
     }
+
+    attrs =
+      case socket.assigns.action do
+        :new -> Map.put(base_attrs, :slug, params["slug"])
+        :edit -> base_attrs
+      end
 
     result =
       case socket.assigns.action do

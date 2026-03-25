@@ -763,7 +763,9 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
 
       # Without agent_id: template not injected
       result_without = Gateway.inject_system_context(api_key, request)
-      refute is_binary(result_without.system) and result_without.system =~ "AGENT_TEMPLATE_INSTRUCTION"
+
+      refute is_binary(result_without.system) and
+               result_without.system =~ "AGENT_TEMPLATE_INSTRUCTION"
 
       # With agent_id: template injected
       result_with = Gateway.inject_system_context(api_key, request, agent_id: agent.id)
