@@ -309,6 +309,35 @@ defmodule GsmlgAppAdmin.AI do
   end
 
   @doc """
+  Gets active templates associated with a specific API key.
+  Returns templates linked via the ApiKeyTemplate join table.
+  """
+  def list_templates_for_key(api_key_id) when is_binary(api_key_id) do
+    require Ash.Query
+
+    case ApiKeyTemplate
+         |> Ash.Query.filter(api_key_id == ^api_key_id)
+         |> Ash.read(authorize?: false) do
+      {:ok, key_templates} ->
+        template_ids = Enum.map(key_templates, & &1.system_prompt_template_id)
+
+        if template_ids == [] do
+          {:ok, []}
+        else
+          SystemPromptTemplate
+          |> Ash.Query.filter(id in ^template_ids and is_active == true)
+          |> Ash.Query.sort(priority: :desc)
+          |> Ash.read(authorize?: false)
+        end
+
+      {:error, _} ->
+        {:ok, []}
+    end
+  end
+
+  def list_templates_for_key(_), do: {:ok, []}
+
+  @doc """
   Creates a system prompt template.
   """
   def create_system_prompt_template(attrs) do

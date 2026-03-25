@@ -505,12 +505,22 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     Map.put(request, :system, combined_system)
   end
 
-  defp fetch_templates(_api_key) do
-    # Get default templates
-    case AI.list_default_templates() do
-      {:ok, templates} -> templates
-      _ -> []
-    end
+  defp fetch_templates(api_key) do
+    # Default templates (auto-injected for all requests)
+    defaults =
+      case AI.list_default_templates() do
+        {:ok, templates} -> templates
+        _ -> []
+      end
+
+    # Key-specific templates appended after defaults
+    key_specific =
+      case AI.list_templates_for_key(api_key.id) do
+        {:ok, templates} -> templates
+        _ -> []
+      end
+
+    defaults ++ key_specific
   end
 
   defp fetch_memories(api_key) do

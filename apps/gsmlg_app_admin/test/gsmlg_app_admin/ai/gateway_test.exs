@@ -596,6 +596,106 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
       refute result.system =~ "{{user.display_name}}"
       assert result.system =~ "User: "
     end
+
+    test "injects key-specific template for matching api_key" do
+      uid = System.unique_integer([:positive])
+
+      # Create the API key in the DB so we can link a template to it
+      {:ok, user} =
+        GsmlgAppAdmin.Accounts.User
+        |> Ash.Changeset.for_create(:admin_create, %{
+          email: "keytemplate#{uid}@example.com",
+          password: "StrongPass123!"
+        })
+        |> Ash.create(authorize?: false)
+
+      {:ok, db_key} =
+        GsmlgAppAdmin.AI.ApiKey
+        |> Ash.Changeset.for_create(:create, %{
+          name: "key-tmpl-test-#{uid}",
+          scopes: [:chat_completions],
+          is_active: true,
+          user_id: user.id
+        })
+        |> Ash.create(authorize?: false)
+
+      {:ok, template} =
+        GsmlgAppAdmin.AI.SystemPromptTemplate
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Key Template #{uid}",
+          slug: "key-tmpl-#{uid}",
+          content: "KEY_SPECIFIC_INSTRUCTION",
+          is_default: false,
+          is_active: true,
+          priority: 5
+        })
+        |> Ash.create(authorize?: false)
+
+      # Link template to the API key
+      {:ok, _} =
+        GsmlgAppAdmin.AI.ApiKeyTemplate
+        |> Ash.Changeset.for_create(:create, %{
+          api_key_id: db_key.id,
+          system_prompt_template_id: template.id
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{id: db_key.id, user_id: nil, scopes: [:chat_completions]}
+
+      request = %{model: "gpt-4o", system: nil, messages: [], stream: false, params: %{}}
+
+      result = Gateway.inject_system_context(api_key, request)
+      assert result.system =~ "KEY_SPECIFIC_INSTRUCTION"
+    end
+
+    test "does not inject key-specific template for a different api_key" do
+      uid = System.unique_integer([:positive])
+
+      {:ok, user} =
+        GsmlgAppAdmin.Accounts.User
+        |> Ash.Changeset.for_create(:admin_create, %{
+          email: "keytemplate2#{uid}@example.com",
+          password: "StrongPass123!"
+        })
+        |> Ash.create(authorize?: false)
+
+      {:ok, db_key} =
+        GsmlgAppAdmin.AI.ApiKey
+        |> Ash.Changeset.for_create(:create, %{
+          name: "key-other-#{uid}",
+          scopes: [:chat_completions],
+          is_active: true,
+          user_id: user.id
+        })
+        |> Ash.create(authorize?: false)
+
+      {:ok, template} =
+        GsmlgAppAdmin.AI.SystemPromptTemplate
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Other Key Template #{uid}",
+          slug: "other-key-tmpl-#{uid}",
+          content: "OTHER_KEY_SECRET",
+          is_default: false,
+          is_active: true,
+          priority: 5
+        })
+        |> Ash.create(authorize?: false)
+
+      {:ok, _} =
+        GsmlgAppAdmin.AI.ApiKeyTemplate
+        |> Ash.Changeset.for_create(:create, %{
+          api_key_id: db_key.id,
+          system_prompt_template_id: template.id
+        })
+        |> Ash.create(authorize?: false)
+
+      # Use a DIFFERENT api_key id — should not see the template
+      different_api_key = %{id: Ash.UUID.generate(), user_id: nil, scopes: [:chat_completions]}
+      request = %{model: "gpt-4o", system: nil, messages: [], stream: false, params: %{}}
+
+      result = Gateway.inject_system_context(different_api_key, request)
+      refute is_binary(result.system) and result.system =~ "OTHER_KEY_SECRET"
+    end
   end
 
   describe "check_scope (via chat/3)" do
