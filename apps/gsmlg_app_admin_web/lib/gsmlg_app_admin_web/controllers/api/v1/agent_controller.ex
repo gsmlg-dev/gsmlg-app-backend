@@ -32,9 +32,12 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
           json(conn, %{data: data})
 
         {:error, reason} ->
+          require Logger
+          Logger.error("Agent list error: #{inspect(reason)}")
+
           conn
           |> put_status(500)
-          |> json(%{error: %{message: to_string(reason), type: "server_error"}})
+          |> json(%{error: %{message: "An internal error occurred.", type: "server_error"}})
       end
     else
       conn
@@ -171,9 +174,12 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
             |> json(%{error: %{message: reason, type: "permission_error"}})
 
           {:error, reason} ->
+            require Logger
+            Logger.error("Agent chat error: #{inspect(reason)}")
+
             conn
             |> put_status(500)
-            |> json(%{error: %{message: to_string(reason), type: "server_error"}})
+            |> json(%{error: %{message: "An internal error occurred.", type: "server_error"}})
         end
 
       {:error, _} ->

@@ -83,11 +83,14 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
         })
 
       {:error, reason} ->
+        require Logger
+        Logger.error("Messages API error: #{inspect(reason)}")
+
         conn
         |> put_status(500)
         |> json(%{
           type: "error",
-          error: %{type: "api_error", message: to_string(reason)}
+          error: %{type: "api_error", message: "An internal error occurred."}
         })
     end
   end

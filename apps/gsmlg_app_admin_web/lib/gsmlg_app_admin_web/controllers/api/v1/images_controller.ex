@@ -21,10 +21,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.ImagesController do
 
         {:error, reason} ->
           {status, type} = classify_error(reason)
+          message = sanitize_error_message(reason, status)
 
           conn
           |> put_status(status)
-          |> json(%{error: %{message: to_string(reason), type: type}})
+          |> json(%{error: %{message: message, type: type}})
       end
     else
       conn
@@ -50,5 +51,14 @@ defmodule GsmlgAppAdminWeb.Api.V1.ImagesController do
       true ->
         {500, "server_error"}
     end
+  end
+
+  # For client errors (4xx), show the actual message. For server errors (5xx), hide details.
+  defp sanitize_error_message(reason, status) when status < 500, do: to_string(reason)
+
+  defp sanitize_error_message(reason, _status) do
+    require Logger
+    Logger.error("Image generation error: #{inspect(reason)}")
+    "An internal error occurred."
   end
 end

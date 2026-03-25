@@ -71,9 +71,12 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
         |> json(%{error: %{message: reason, type: "permission_error"}})
 
       {:error, reason} ->
+        require Logger
+        Logger.error("Chat completions error: #{inspect(reason)}")
+
         conn
         |> put_status(500)
-        |> json(%{error: %{message: to_string(reason), type: "server_error"}})
+        |> json(%{error: %{message: "An internal error occurred.", type: "server_error"}})
     end
   end
 
@@ -224,9 +227,9 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
       messages: user_messages,
       stream: params["stream"] == true,
       params: %{
-        temperature: params["temperature"],
-        max_tokens: params["max_tokens"],
-        top_p: params["top_p"]
+        temperature: clamp_float(params["temperature"], 0.0, 2.0),
+        max_tokens: clamp_int(params["max_tokens"], 1, 100_000),
+        top_p: clamp_float(params["top_p"], 0.0, 1.0)
       }
     }
 
@@ -274,4 +277,12 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
   defp maybe_put_field(map, key, value), do: Map.put(map, key, value)
 
   defp generate_id, do: RequestHelpers.generate_id()
+
+  defp clamp_float(nil, _min, _max), do: nil
+  defp clamp_float(val, min, max) when is_number(val), do: val |> max(min) |> min(max)
+  defp clamp_float(_val, _min, _max), do: nil
+
+  defp clamp_int(nil, _min, _max), do: nil
+  defp clamp_int(val, min, max) when is_integer(val), do: val |> max(min) |> min(max)
+  defp clamp_int(_val, _min, _max), do: nil
 end
