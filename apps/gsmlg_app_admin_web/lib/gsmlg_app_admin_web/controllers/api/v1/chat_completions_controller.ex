@@ -114,7 +114,9 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
     stream_loop(conn, task, id, created, request.model)
   end
 
-  defp stream_loop(conn, task, id, created, model) do
+  # Dialyzer warns about Task.ref() being opaque — this is a known limitation
+  @dialyzer {:nowarn_function, stream_loop: 5}
+  defp stream_loop(conn, %Task{ref: ref} = task, id, created, model) do
     receive do
       {:sse_chunk, chunk} ->
         case Plug.Conn.chunk(conn, "data: #{Jason.encode!(chunk)}\n\n") do
@@ -122,11 +124,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
           {:error, _} -> shutdown_task(task, conn)
         end
 
-      {ref, _result} when ref == task.ref ->
-        Process.demonitor(task.ref, [:flush])
+      {^ref, _result} ->
+        Process.demonitor(ref, [:flush])
         send_finish_chunk(conn, id, created, model)
 
-      {:DOWN, ref, :process, _pid, _reason} when ref == task.ref ->
+      {:DOWN, ^ref, :process, _pid, _reason} ->
         send_finish_chunk(conn, id, created, model)
     after
       120_000 ->

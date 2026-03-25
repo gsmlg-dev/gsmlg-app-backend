@@ -131,18 +131,20 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
     anthropic_stream_loop(conn, task)
   end
 
-  defp anthropic_stream_loop(conn, task) do
+  # Dialyzer warns about Task.ref() being opaque — this is a known limitation
+  @dialyzer {:nowarn_function, anthropic_stream_loop: 2}
+  defp anthropic_stream_loop(conn, %Task{ref: ref} = task) do
     receive do
       {:sse_event, event_type, data} ->
         conn
         |> send_sse!(event_type, data)
         |> anthropic_stream_loop(task)
 
-      {ref, _result} when ref == task.ref ->
-        Process.demonitor(task.ref, [:flush])
+      {^ref, _result} ->
+        Process.demonitor(ref, [:flush])
         send_finish_events(conn)
 
-      {:DOWN, ref, :process, _pid, _reason} when ref == task.ref ->
+      {:DOWN, ^ref, :process, _pid, _reason} ->
         send_finish_events(conn)
     after
       120_000 ->
