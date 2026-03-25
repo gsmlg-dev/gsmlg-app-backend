@@ -574,6 +574,61 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
   end
 
   describe "resolve_provider/2 with key restrictions" do
+    test "rejects model not in allowed_models list" do
+      {:ok, _provider} =
+        GsmlgAppAdmin.AI.Provider
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Model Restrict #{System.unique_integer([:positive])}",
+          slug: "model-restrict-#{System.unique_integer([:positive])}",
+          api_base_url: "http://fake.local",
+          api_key: "test-key",
+          model: "gpt-4o",
+          available_models: ["gpt-4o", "gpt-4-turbo"],
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      # Key allows only gpt-4o — gpt-4-turbo should be rejected
+      api_key = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:chat_completions],
+        allowed_providers: [],
+        allowed_models: ["gpt-4o"]
+      }
+
+      assert {:error, reason} = Gateway.resolve_provider(api_key, "gpt-4-turbo")
+      assert reason =~ "not allowed"
+
+      # Same key with the allowed model — should succeed
+      assert {:ok, _} = Gateway.resolve_provider(api_key, "gpt-4o")
+    end
+
+    test "empty allowed_models permits any model" do
+      {:ok, _provider} =
+        GsmlgAppAdmin.AI.Provider
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Open Provider #{System.unique_integer([:positive])}",
+          slug: "open-provider-#{System.unique_integer([:positive])}",
+          api_base_url: "http://fake.local",
+          api_key: "test-key",
+          model: "open-model-x",
+          available_models: ["open-model-x"],
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:chat_completions],
+        allowed_providers: [],
+        allowed_models: []
+      }
+
+      assert {:ok, _} = Gateway.resolve_provider(api_key, "open-model-x")
+    end
+
     test "filters by allowed_providers" do
       {:ok, provider} =
         GsmlgAppAdmin.AI.Provider

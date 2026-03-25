@@ -74,20 +74,26 @@ defmodule GsmlgAppAdmin.AI.Gateway do
   def resolve_provider(api_key, model) do
     require Ash.Query
 
-    case AI.list_active_providers() do
-      {:ok, providers} ->
-        providers =
-          providers
-          |> filter_by_key_restrictions(api_key)
-          |> find_provider_for_model(model)
+    allowed_models = Map.get(api_key, :allowed_models, [])
 
-        case providers do
-          nil -> {:error, "No provider found for model '#{model}'."}
-          provider -> {:ok, provider}
-        end
+    if allowed_models != [] and model not in allowed_models do
+      {:error, "Model '#{model}' is not allowed for this API key."}
+    else
+      case AI.list_active_providers() do
+        {:ok, providers} ->
+          providers =
+            providers
+            |> filter_by_key_restrictions(api_key)
+            |> find_provider_for_model(model)
 
-      {:error, _} ->
-        {:error, "Failed to load providers."}
+          case providers do
+            nil -> {:error, "No provider found for model '#{model}'."}
+            provider -> {:ok, provider}
+          end
+
+        {:error, _} ->
+          {:error, "Failed to load providers."}
+      end
     end
   end
 
