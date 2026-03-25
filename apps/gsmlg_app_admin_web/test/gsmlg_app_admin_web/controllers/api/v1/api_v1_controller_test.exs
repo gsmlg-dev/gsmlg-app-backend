@@ -609,6 +609,69 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
     end
   end
 
+  # ── Format-aware error responses ──────────────────────────────────────
+
+  describe "format-aware error responses" do
+    test "401 on /messages returns Anthropic error format", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer gsk_invalid_key_that_does_not_exist_1234")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/messages", %{})
+
+      assert conn.status == 401
+      body = Jason.decode!(conn.resp_body)
+      assert body["type"] == "error"
+      assert body["error"]["type"] == "authentication_error"
+    end
+
+    test "401 on /chat/completions returns OpenAI error format", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer gsk_invalid_key_that_does_not_exist_1234")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/chat/completions", %{})
+
+      assert conn.status == 401
+      body = Jason.decode!(conn.resp_body)
+      refute Map.has_key?(body, "type")
+      assert body["error"]["type"] == "authentication_error"
+    end
+  end
+
+  # ── Scope isolation ──────────────────────────────────────────────────
+
+  describe "scope isolation" do
+    test "messages-only key can access /messages but not /chat/completions", %{conn: conn} do
+      {raw_key, _} = create_api_key([:messages])
+
+      # Messages endpoint should work (may fail on provider, not scope)
+      messages_conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/messages", %{
+          "model" => "claude-sonnet-4-20250514",
+          "messages" => [%{"role" => "user", "content" => "hi"}]
+        })
+
+      # Should not be 403 (scope error)
+      refute messages_conn.status == 403
+
+      # Chat completions should be rejected
+      chat_conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/chat/completions", %{
+          "model" => "gpt-4o",
+          "messages" => [%{"role" => "user", "content" => "hi"}]
+        })
+
+      assert chat_conn.status == 403
+    end
+  end
+
   # ── Nil content safety ─────────────────────────────────────────────────
 
   describe "nil content safety" do
