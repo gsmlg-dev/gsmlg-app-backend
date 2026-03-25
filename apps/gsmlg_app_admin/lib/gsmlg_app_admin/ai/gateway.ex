@@ -170,8 +170,8 @@ defmodule GsmlgAppAdmin.AI.Gateway do
       # Run the agent loop
       request_ip = Keyword.get(opts, :request_ip)
 
-      case agent_loop(provider, all_messages, call_opts, tools, max_iterations, 0) do
-        {:ok, content, iterations, total_tokens} ->
+      case agent_loop(provider, all_messages, call_opts, tools, max_iterations, 0, []) do
+        {:ok, content, iterations, total_tokens, tool_calls_made} ->
           log_usage(api_key, provider, request, :agent, :success,
             tokens: total_tokens,
             request_ip: request_ip
@@ -183,6 +183,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
              agent: agent.slug,
              model: model,
              content: content,
+             tool_calls_made: tool_calls_made,
              iterations: iterations,
              usage: %{"total_tokens" => total_tokens}
            }}
@@ -194,12 +195,12 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     end
   end
 
-  defp agent_loop(_provider, _messages, _call_opts, _tools, max_iter, iteration)
+  defp agent_loop(_provider, _messages, _call_opts, _tools, max_iter, iteration, _acc)
        when iteration >= max_iter do
     {:error, "Agent reached maximum iterations (#{max_iter}) without a final response."}
   end
 
-  defp agent_loop(provider, messages, call_opts, tools, max_iter, iteration) do
+  defp agent_loop(provider, messages, call_opts, tools, max_iter, iteration, tool_calls_acc) do
     case Client.chat_completion(provider, messages, call_opts) do
       {:ok, response} ->
         tokens = get_in(response, [:usage, "total_tokens"]) || 0
@@ -207,10 +208,10 @@ defmodule GsmlgAppAdmin.AI.Gateway do
 
         if tool_calls == [] do
           # No tool calls — final response
-          {:ok, response.content, iteration + 1, tokens}
+          {:ok, response.content, iteration + 1, tokens, tool_calls_acc}
         else
-          # Execute each tool call and build tool result messages
-          tool_messages = execute_tool_calls(tool_calls, tools)
+          # Execute each tool call with timing, build tool result messages
+          {tool_messages, new_metadata} = execute_tool_calls_with_timing(tool_calls, tools)
 
           # Append assistant message (with tool_calls) and tool results
           updated_messages =
@@ -218,7 +219,15 @@ defmodule GsmlgAppAdmin.AI.Gateway do
               [%{role: "assistant", content: response.content, tool_calls: tool_calls}] ++
               tool_messages
 
-          agent_loop(provider, updated_messages, call_opts, tools, max_iter, iteration + 1)
+          agent_loop(
+            provider,
+            updated_messages,
+            call_opts,
+            tools,
+            max_iter,
+            iteration + 1,
+            tool_calls_acc ++ new_metadata
+          )
         end
 
       {:error, reason} ->
@@ -226,18 +235,32 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     end
   end
 
-  defp execute_tool_calls(tool_calls, tools) do
+  defp execute_tool_calls_with_timing(tool_calls, tools) do
     tools_by_name = Map.new(tools, fn t -> {t.name, t} end)
-    Enum.map(tool_calls, &execute_single_tool_call(&1, tools_by_name))
-  end
 
-  defp execute_single_tool_call(tc, tools_by_name) do
-    tool_name = tc["function"]["name"] || tc[:function][:name]
-    arguments = parse_tool_arguments(tc["function"]["arguments"] || tc[:function][:arguments])
-    call_id = tc["id"] || tc[:id] || generate_id()
+    {messages, metadata} =
+      Enum.map(tool_calls, fn tc ->
+        tool_name = tc["function"]["name"] || tc[:function][:name]
+        arguments = parse_tool_arguments(tc["function"]["arguments"] || tc[:function][:arguments])
+        call_id = tc["id"] || tc[:id] || generate_id()
 
-    result = run_tool(tools_by_name, tool_name, arguments)
-    %{role: "tool", tool_call_id: call_id, content: result}
+        start = System.monotonic_time(:millisecond)
+        result = run_tool(tools_by_name, tool_name, arguments)
+        duration_ms = System.monotonic_time(:millisecond) - start
+
+        message = %{role: "tool", tool_call_id: call_id, content: result}
+
+        meta = %{
+          tool: tool_name,
+          arguments: arguments,
+          duration_ms: duration_ms
+        }
+
+        {message, meta}
+      end)
+      |> Enum.unzip()
+
+    {messages, metadata}
   end
 
   defp parse_tool_arguments(args) when is_binary(args) do
