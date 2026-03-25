@@ -9,7 +9,8 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiUsage.Index do
   @impl true
   def mount(_params, _session, socket) do
     {:ok, logs} = AI.list_recent_usage_logs()
-    {:ok, assign(socket, logs: logs, page_title: "API Usage")}
+    summary = AI.usage_summary(logs)
+    {:ok, assign(socket, logs: logs, summary: summary, page_title: "API Usage")}
   end
 
   @impl true

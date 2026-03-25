@@ -35,8 +35,9 @@ defmodule GsmlgAppAdminWeb.Plugs.RateLimit do
         rpm_count >= rpm_limit ->
           retry_after = 60 - rem(now, 60)
 
-          rate_limit_response(
-            conn,
+          conn
+          |> put_rate_limit_headers(rpm_limit, 0, retry_after)
+          |> rate_limit_response(
             retry_after,
             "Rate limit exceeded: #{rpm_limit} requests per minute."
           )
@@ -44,19 +45,29 @@ defmodule GsmlgAppAdminWeb.Plugs.RateLimit do
         rpd_count >= rpd_limit ->
           retry_after = 86_400 - rem(now, 86_400)
 
-          rate_limit_response(
-            conn,
+          conn
+          |> put_rate_limit_headers(rpd_limit, 0, retry_after)
+          |> rate_limit_response(
             retry_after,
             "Rate limit exceeded: #{rpd_limit} requests per day."
           )
 
         true ->
           record_request(key_id, now)
+
           conn
+          |> put_rate_limit_headers(rpm_limit, rpm_limit - rpm_count - 1, 60 - rem(now, 60))
       end
     else
       conn
     end
+  end
+
+  defp put_rate_limit_headers(conn, limit, remaining, reset) do
+    conn
+    |> put_resp_header("x-ratelimit-limit", to_string(limit))
+    |> put_resp_header("x-ratelimit-remaining", to_string(max(remaining, 0)))
+    |> put_resp_header("x-ratelimit-reset", to_string(reset))
   end
 
   defp rate_limit_response(conn, retry_after, message) do

@@ -4,6 +4,37 @@
       <h1 class="text-2xl font-bold">API Usage Logs</h1>
     </div>
 
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="card bg-base-200 p-4">
+        <div class="text-sm opacity-70">Total Requests</div>
+        <div class="text-2xl font-bold">{@summary.total_requests}</div>
+      </div>
+      <div class="card bg-base-200 p-4">
+        <div class="text-sm opacity-70">Total Tokens</div>
+        <div class="text-2xl font-bold">{@summary.total_tokens}</div>
+        <div class="text-xs opacity-50">
+          {@summary.total_prompt_tokens} prompt / {@summary.total_completion_tokens} completion
+        </div>
+      </div>
+      <div class="card bg-base-200 p-4">
+        <div class="text-sm opacity-70">Success</div>
+        <div class="text-2xl font-bold text-success">{@summary.success_count}</div>
+      </div>
+      <div class="card bg-base-200 p-4">
+        <div class="text-sm opacity-70">Errors</div>
+        <div class="text-2xl font-bold text-error">{@summary.error_count}</div>
+      </div>
+    </div>
+
+    <div :if={@summary.by_model != %{}} class="mb-6">
+      <h2 class="text-lg font-semibold mb-2">By Model</h2>
+      <div class="flex flex-wrap gap-2">
+        <span :for={{model, count} <- @summary.by_model} class="badge badge-outline gap-1">
+          {model} <span class="badge badge-sm badge-neutral">{count}</span>
+        </span>
+      </div>
+    </div>
+
     <div class="overflow-x-auto">
       <table class="table table-sm w-full">
         <thead>

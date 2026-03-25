@@ -353,7 +353,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
   # ── OCR additional tests ─────────────────────────────────────────────────
 
   describe "POST /api/v1/ocr - additional" do
-    test "returns error when model is missing but has ocr scope", %{conn: conn} do
+    test "returns 400 when model is missing but has ocr scope", %{conn: conn} do
       {raw_key, _} = create_api_key([:ocr])
 
       conn =
@@ -362,9 +362,25 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
         |> put_req_header("content-type", "application/json")
         |> post("/api/v1/ocr", %{})
 
-      assert conn.status == 500
+      assert conn.status == 400
       body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "invalid_request_error"
       assert body["error"]["message"] =~ "model" or body["error"]["message"] =~ "OCR"
+    end
+
+    test "returns 422 when model has no matching provider", %{conn: conn} do
+      {raw_key, _} = create_api_key([:ocr])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/ocr", %{"model" => "nonexistent-vision-model"})
+
+      assert conn.status == 422
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "invalid_request_error"
+      assert body["error"]["message"] =~ "provider"
     end
   end
 

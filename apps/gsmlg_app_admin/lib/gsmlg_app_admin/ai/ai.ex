@@ -633,4 +633,26 @@ defmodule GsmlgAppAdmin.AI do
   def list_usage_logs_for_key(api_key_id) do
     ApiUsageLog.for_api_key(api_key_id)
   end
+
+  @doc """
+  Computes summary statistics from usage logs for the dashboard.
+  Returns a map with total_requests, total_tokens, error_count, and endpoint breakdown.
+  """
+  def usage_summary(logs) do
+    %{
+      total_requests: length(logs),
+      total_tokens: Enum.reduce(logs, 0, fn log, acc -> acc + (log.total_tokens || 0) end),
+      total_prompt_tokens:
+        Enum.reduce(logs, 0, fn log, acc -> acc + (log.prompt_tokens || 0) end),
+      total_completion_tokens:
+        Enum.reduce(logs, 0, fn log, acc -> acc + (log.completion_tokens || 0) end),
+      error_count: Enum.count(logs, fn log -> log.status == :error end),
+      success_count: Enum.count(logs, fn log -> log.status == :success end),
+      by_endpoint: Enum.frequencies_by(logs, fn log -> log.endpoint_type end),
+      by_model:
+        logs
+        |> Enum.reject(fn log -> is_nil(log.model) end)
+        |> Enum.frequencies_by(fn log -> log.model end)
+    }
+  end
 end

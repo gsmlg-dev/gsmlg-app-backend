@@ -18,6 +18,16 @@ defmodule GsmlgAppAdminWeb.Api.V1.OcrController do
         {:ok, result} ->
           json(conn, result)
 
+        {:error, "No OCR model" <> _ = reason} ->
+          conn
+          |> put_status(400)
+          |> json(%{error: %{message: reason, type: "invalid_request_error"}})
+
+        {:error, "No provider found" <> _ = reason} ->
+          conn
+          |> put_status(422)
+          |> json(%{error: %{message: reason, type: "invalid_request_error"}})
+
         {:error, reason} ->
           conn
           |> put_status(500)

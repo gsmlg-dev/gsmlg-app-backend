@@ -87,7 +87,8 @@ defmodule GsmlgAppAdmin.AI.Client do
       |> maybe_put(:response_format, params["response_format"])
       |> maybe_put(:style, params["style"])
 
-    req_options = Keyword.merge([headers: headers, json: body, receive_timeout: 120_000], req_opts)
+    req_options =
+      Keyword.merge([headers: headers, json: body, receive_timeout: 120_000], req_opts)
 
     case Req.post(url, req_options) do
       {:ok, %Req.Response{status: 200, body: body}} ->
