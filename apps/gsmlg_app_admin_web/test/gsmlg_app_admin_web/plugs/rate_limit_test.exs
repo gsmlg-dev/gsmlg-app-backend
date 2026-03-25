@@ -109,5 +109,103 @@ defmodule GsmlgAppAdminWeb.Plugs.RateLimitTest do
       assert ["3"] = get_resp_header(conn, "x-ratelimit-limit")
       assert ["0"] = get_resp_header(conn, "x-ratelimit-remaining")
     end
+
+    test "returns 429 when RPD limit exceeded" do
+      key_id = "rpd-test-key-#{System.unique_integer([:positive])}"
+
+      api_key = %{
+        id: key_id,
+        rate_limit_rpm: 1000,
+        rate_limit_rpd: 2
+      }
+
+      for _ <- 1..2 do
+        conn(:post, "/api/v1/chat/completions")
+        |> assign(:api_key, api_key)
+        |> RateLimit.call(RateLimit.init([]))
+      end
+
+      conn =
+        conn(:post, "/api/v1/chat/completions")
+        |> assign(:api_key, api_key)
+        |> RateLimit.call(RateLimit.init([]))
+
+      assert conn.status == 429
+      assert conn.halted
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["message"] =~ "per day"
+      assert body["error"]["code"] == "rate_limit_exceeded"
+    end
+
+    test "429 response body has correct error structure", %{api_key: api_key} do
+      for _ <- 1..3 do
+        conn(:post, "/api/v1/chat/completions")
+        |> assign(:api_key, api_key)
+        |> RateLimit.call(RateLimit.init([]))
+      end
+
+      conn =
+        conn(:post, "/api/v1/chat/completions")
+        |> assign(:api_key, api_key)
+        |> RateLimit.call(RateLimit.init([]))
+
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "rate_limit_error"
+      assert body["error"]["code"] == "rate_limit_exceeded"
+      assert body["error"]["message"] =~ "per minute"
+    end
+
+    test "different keys have independent rate limits" do
+      key1 = %{
+        id: "independent-key1-#{System.unique_integer([:positive])}",
+        rate_limit_rpm: 1,
+        rate_limit_rpd: 100
+      }
+
+      key2 = %{
+        id: "independent-key2-#{System.unique_integer([:positive])}",
+        rate_limit_rpm: 1,
+        rate_limit_rpd: 100
+      }
+
+      # Exhaust key1's limit
+      conn(:post, "/api/v1/chat/completions")
+      |> assign(:api_key, key1)
+      |> RateLimit.call(RateLimit.init([]))
+
+      # key1 should be rate limited
+      conn1 =
+        conn(:post, "/api/v1/chat/completions")
+        |> assign(:api_key, key1)
+        |> RateLimit.call(RateLimit.init([]))
+
+      assert conn1.status == 429
+
+      # key2 should still pass
+      conn2 =
+        conn(:post, "/api/v1/chat/completions")
+        |> assign(:api_key, key2)
+        |> RateLimit.call(RateLimit.init([]))
+
+      refute conn2.halted
+    end
+
+    test "uses system defaults when key has nil rate limits" do
+      key = %{
+        id: "nil-limits-key-#{System.unique_integer([:positive])}",
+        rate_limit_rpm: nil,
+        rate_limit_rpd: nil
+      }
+
+      conn =
+        conn(:post, "/api/v1/chat/completions")
+        |> assign(:api_key, key)
+        |> RateLimit.call(RateLimit.init([]))
+
+      refute conn.halted
+      # Default RPM is 60; remaining should be 59
+      [limit] = get_resp_header(conn, "x-ratelimit-limit")
+      assert String.to_integer(limit) == 60
+    end
   end
 end

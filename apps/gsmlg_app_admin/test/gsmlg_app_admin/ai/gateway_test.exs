@@ -350,4 +350,248 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
       end
     end
   end
+
+  describe "inject_system_context/2 with real DB templates" do
+    test "injects default template content into system prompt" do
+      {:ok, _template} =
+        GsmlgAppAdmin.AI.SystemPromptTemplate
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Test Default Template",
+          slug: "test-default-#{System.unique_integer([:positive])}",
+          content: "You are a helpful assistant. Today is {{date}}.",
+          is_default: true,
+          is_active: true,
+          priority: 10
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{id: "test-key", user_id: nil, scopes: [:chat_completions]}
+
+      request = %{
+        model: "gpt-4o",
+        system: "Be concise.",
+        messages: [],
+        stream: false,
+        params: %{}
+      }
+
+      result = Gateway.inject_system_context(api_key, request)
+
+      assert result.system =~ "You are a helpful assistant."
+      assert result.system =~ Date.utc_today() |> Date.to_iso8601()
+      assert result.system =~ "Be concise."
+    end
+
+    test "injects global memory into system prompt" do
+      {:ok, _memory} =
+        GsmlgAppAdmin.AI.Memory
+        |> Ash.Changeset.for_create(:create, %{
+          content: "The user prefers dark mode",
+          category: :preference,
+          scope: :global,
+          is_active: true,
+          priority: 5
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{
+        id: Ash.UUID.generate(),
+        user_id: nil,
+        scopes: [:chat_completions]
+      }
+
+      request = %{
+        model: "gpt-4o",
+        system: nil,
+        messages: [],
+        stream: false,
+        params: %{}
+      }
+
+      result = Gateway.inject_system_context(api_key, request)
+      assert result.system =~ "dark mode"
+      assert result.system =~ "[preference]"
+    end
+
+    test "template {{memory}} variable is replaced with memory content" do
+      {:ok, _template} =
+        GsmlgAppAdmin.AI.SystemPromptTemplate
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Memory Template",
+          slug: "memory-tmpl-#{System.unique_integer([:positive])}",
+          content: "Known facts:\n{{memory}}",
+          is_default: true,
+          is_active: true,
+          priority: 10
+        })
+        |> Ash.create(authorize?: false)
+
+      {:ok, _memory} =
+        GsmlgAppAdmin.AI.Memory
+        |> Ash.Changeset.for_create(:create, %{
+          content: "Company name is Acme Corp",
+          category: :fact,
+          scope: :global,
+          is_active: true,
+          priority: 5
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{
+        id: Ash.UUID.generate(),
+        user_id: nil,
+        scopes: [:chat_completions]
+      }
+
+      request = %{
+        model: "gpt-4o",
+        system: nil,
+        messages: [],
+        stream: false,
+        params: %{}
+      }
+
+      result = Gateway.inject_system_context(api_key, request)
+      assert result.system =~ "Known facts:"
+      assert result.system =~ "Acme Corp"
+    end
+
+    test "inactive templates are not injected" do
+      {:ok, _template} =
+        GsmlgAppAdmin.AI.SystemPromptTemplate
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Inactive Template",
+          slug: "inactive-tmpl-#{System.unique_integer([:positive])}",
+          content: "SECRET_INACTIVE_CONTENT",
+          is_default: true,
+          is_active: false,
+          priority: 10
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{id: "test-key", user_id: nil, scopes: [:chat_completions]}
+
+      request = %{
+        model: "gpt-4o",
+        system: "Base prompt",
+        messages: [],
+        stream: false,
+        params: %{}
+      }
+
+      result = Gateway.inject_system_context(api_key, request)
+      refute result.system =~ "SECRET_INACTIVE_CONTENT"
+    end
+
+    test "non-default templates are not auto-injected" do
+      {:ok, _template} =
+        GsmlgAppAdmin.AI.SystemPromptTemplate
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Non-default Template",
+          slug: "nondefault-#{System.unique_integer([:positive])}",
+          content: "NON_DEFAULT_CONTENT",
+          is_default: false,
+          is_active: true,
+          priority: 10
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{id: "test-key", user_id: nil, scopes: [:chat_completions]}
+
+      request = %{
+        model: "gpt-4o",
+        system: "Base prompt",
+        messages: [],
+        stream: false,
+        params: %{}
+      }
+
+      result = Gateway.inject_system_context(api_key, request)
+      refute result.system =~ "NON_DEFAULT_CONTENT"
+    end
+
+    test "inactive memories are not injected" do
+      {:ok, _memory} =
+        GsmlgAppAdmin.AI.Memory
+        |> Ash.Changeset.for_create(:create, %{
+          content: "INACTIVE_MEMORY_CONTENT",
+          category: :fact,
+          scope: :global,
+          is_active: false,
+          priority: 5
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{id: "test-key", user_id: nil, scopes: [:chat_completions]}
+
+      request = %{
+        model: "gpt-4o",
+        system: "Base prompt",
+        messages: [],
+        stream: false,
+        params: %{}
+      }
+
+      result = Gateway.inject_system_context(api_key, request)
+      refute result.system =~ "INACTIVE_MEMORY_CONTENT"
+    end
+  end
+
+  describe "list_models/1 with DB providers" do
+    test "returns models from active providers" do
+      {:ok, _provider} =
+        GsmlgAppAdmin.AI.Provider
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Models Test #{System.unique_integer([:positive])}",
+          slug: "models-test-#{System.unique_integer([:positive])}",
+          api_base_url: "http://fake.local",
+          api_key: "test-key",
+          model: "test-model-alpha",
+          available_models: ["test-model-alpha", "test-model-beta"],
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:models_list],
+        allowed_providers: [],
+        allowed_models: []
+      }
+
+      assert {:ok, models} = Gateway.list_models(api_key)
+      model_ids = Enum.map(models, & &1.id)
+      assert "test-model-alpha" in model_ids
+      assert "test-model-beta" in model_ids
+    end
+
+    test "filters models by allowed_models restriction" do
+      {:ok, _provider} =
+        GsmlgAppAdmin.AI.Provider
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Restricted Test #{System.unique_integer([:positive])}",
+          slug: "restricted-test-#{System.unique_integer([:positive])}",
+          api_base_url: "http://fake.local",
+          api_key: "test-key",
+          model: "restricted-model-a",
+          available_models: ["restricted-model-a", "restricted-model-b"],
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:models_list],
+        allowed_providers: [],
+        allowed_models: ["restricted-model-a"]
+      }
+
+      assert {:ok, models} = Gateway.list_models(api_key)
+      model_ids = Enum.map(models, & &1.id)
+      assert "restricted-model-a" in model_ids
+      refute "restricted-model-b" in model_ids
+    end
+  end
 end
