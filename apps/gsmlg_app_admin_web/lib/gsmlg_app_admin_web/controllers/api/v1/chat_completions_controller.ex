@@ -15,14 +15,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
   def create(conn, params) do
     api_key = conn.assigns.api_key
 
-    unless ApiKeyAuth.has_scope?(api_key, :chat_completions) do
-      conn
-      |> put_status(403)
-      |> json(%{
-        error: %{message: "API key lacks 'chat_completions' scope.", type: "permission_error"}
-      })
-      |> halt()
-    else
+    if ApiKeyAuth.has_scope?(api_key, :chat_completions) do
       normalized = normalize_openai_request(params)
 
       if normalized.stream do
@@ -30,6 +23,13 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
       else
         non_stream_response(conn, api_key, normalized)
       end
+    else
+      conn
+      |> put_status(403)
+      |> json(%{
+        error: %{message: "API key lacks 'chat_completions' scope.", type: "permission_error"}
+      })
+      |> halt()
     end
   end
 

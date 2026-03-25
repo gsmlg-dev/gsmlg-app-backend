@@ -215,47 +215,45 @@ defmodule GsmlgAppAdmin.AI.Gateway do
 
   defp execute_tool_calls(tool_calls, tools) do
     tools_by_name = Map.new(tools, fn t -> {t.name, t} end)
+    Enum.map(tool_calls, &execute_single_tool_call(&1, tools_by_name))
+  end
 
-    Enum.map(tool_calls, fn tc ->
-      tool_name = tc["function"]["name"] || tc[:function][:name]
-      arguments = tc["function"]["arguments"] || tc[:function][:arguments] || %{}
-      call_id = tc["id"] || tc[:id] || generate_id()
+  defp execute_single_tool_call(tc, tools_by_name) do
+    tool_name = tc["function"]["name"] || tc[:function][:name]
+    arguments = parse_tool_arguments(tc["function"]["arguments"] || tc[:function][:arguments])
+    call_id = tc["id"] || tc[:id] || generate_id()
 
-      arguments =
-        case arguments do
-          args when is_binary(args) ->
-            case Jason.decode(args) do
-              {:ok, parsed} -> parsed
-              _ -> %{"raw" => args}
-            end
+    result = run_tool(tools_by_name, tool_name, arguments)
+    %{role: "tool", tool_call_id: call_id, content: result}
+  end
 
-          args when is_map(args) ->
-            args
+  defp parse_tool_arguments(args) when is_binary(args) do
+    case Jason.decode(args) do
+      {:ok, parsed} -> parsed
+      _ -> %{"raw" => args}
+    end
+  end
 
-          _ ->
-            %{}
+  defp parse_tool_arguments(args) when is_map(args), do: args
+  defp parse_tool_arguments(_), do: %{}
+
+  defp run_tool(tools_by_name, tool_name, arguments) do
+    case Map.get(tools_by_name, tool_name) do
+      nil ->
+        "Error: unknown tool '#{tool_name}'"
+
+      tool ->
+        case ToolExecutor.execute(tool, arguments) do
+          {:ok, :passthrough} ->
+            "Tool '#{tool_name}' is passthrough — result delegated to caller."
+
+          {:ok, result} ->
+            result
+
+          {:error, reason} ->
+            "Error executing tool '#{tool_name}': #{reason}"
         end
-
-      result =
-        case Map.get(tools_by_name, tool_name) do
-          nil ->
-            "Error: unknown tool '#{tool_name}'"
-
-          tool ->
-            case ToolExecutor.execute(tool, arguments) do
-              {:ok, :passthrough} ->
-                "Tool '#{tool_name}' is passthrough — result delegated to caller."
-
-              {:ok, result} ->
-                result
-
-              {:error, reason} ->
-                "Error executing tool '#{tool_name}': #{reason}"
-            end
-        end
-
-      %{role: "tool", tool_call_id: call_id, content: result}
-    end)
+    end
   end
 
   defp tool_to_function_def(tool) do
@@ -279,9 +277,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     with :ok <- check_scope(api_key, :images) do
       model = params["model"]
 
-      unless model do
-        {:error, "Missing required parameter 'model'. Specify an image generation model."}
-      else
+      if model do
         case resolve_provider(api_key, model) do
           {:ok, provider} ->
             case Client.image_generation(provider, params) do
@@ -297,6 +293,8 @@ defmodule GsmlgAppAdmin.AI.Gateway do
           {:error, reason} ->
             {:error, reason}
         end
+      else
+        {:error, "Missing required parameter 'model'. Specify an image generation model."}
       end
     end
   end
@@ -409,9 +407,9 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     }
 
     rendered_templates =
-      templates
-      |> Enum.map(fn template -> render_template(template.content, variables) end)
-      |> Enum.join("\n\n")
+      Enum.map_join(templates, "\n\n", fn template ->
+        render_template(template.content, variables)
+      end)
 
     # 4. Merge admin system prompt with caller's system prompt
     admin_system =
@@ -465,9 +463,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
   defp format_memories([]), do: ""
 
   defp format_memories(memories) do
-    memories
-    |> Enum.map(fn m -> "- [#{m.category}] #{m.content}" end)
-    |> Enum.join("\n")
+    Enum.map_join(memories, "\n", fn m -> "- [#{m.category}] #{m.content}" end)
   end
 
   defp render_template(content, variables) do

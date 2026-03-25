@@ -1,4 +1,5 @@
 defmodule GsmlgAppAdminWeb.AiProviderLive.ApiUsage.Index do
+  @moduledoc "LiveView for viewing AI gateway API usage logs."
   use GsmlgAppAdminWeb, :live_view
 
   import GsmlgAppAdminWeb.AiProviderLive.Components

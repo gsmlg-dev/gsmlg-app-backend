@@ -13,12 +13,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.OcrController do
   def create(conn, params) do
     api_key = conn.assigns.api_key
 
-    unless ApiKeyAuth.has_scope?(api_key, :ocr) do
-      conn
-      |> put_status(403)
-      |> json(%{error: %{message: "API key lacks 'ocr' scope.", type: "permission_error"}})
-      |> halt()
-    else
+    if ApiKeyAuth.has_scope?(api_key, :ocr) do
       case Gateway.extract_text(api_key, params) do
         {:ok, result} ->
           json(conn, result)
@@ -28,6 +23,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.OcrController do
           |> put_status(500)
           |> json(%{error: %{message: to_string(reason), type: "server_error"}})
       end
+    else
+      conn
+      |> put_status(403)
+      |> json(%{error: %{message: "API key lacks 'ocr' scope.", type: "permission_error"}})
+      |> halt()
     end
   end
 end

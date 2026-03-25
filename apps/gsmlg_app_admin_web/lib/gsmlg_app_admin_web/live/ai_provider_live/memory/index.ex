@@ -1,4 +1,5 @@
 defmodule GsmlgAppAdminWeb.AiProviderLive.Memory.Index do
+  @moduledoc "LiveView for managing AI memory entries."
   use GsmlgAppAdminWeb, :live_view
 
   import GsmlgAppAdminWeb.AiProviderLive.Components

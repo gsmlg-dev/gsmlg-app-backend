@@ -1,4 +1,5 @@
 defmodule GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.Index do
+  @moduledoc "LiveView for managing AI system prompt templates."
   use GsmlgAppAdminWeb, :live_view
 
   import GsmlgAppAdminWeb.AiProviderLive.Components

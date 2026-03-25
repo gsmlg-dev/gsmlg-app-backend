@@ -102,6 +102,69 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
     end
   end
 
+  describe "resolve_provider/2" do
+    test "returns error when no providers exist for a model" do
+      api_key = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:chat_completions],
+        allowed_providers: [],
+        allowed_models: []
+      }
+
+      assert {:error, reason} = Gateway.resolve_provider(api_key, "nonexistent-model")
+      assert reason =~ "No provider found"
+    end
+  end
+
+  describe "chat/3" do
+    test "returns error when no matching provider exists" do
+      api_key = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:chat_completions],
+        allowed_providers: [],
+        allowed_models: []
+      }
+
+      request = %{
+        model: "nonexistent-model",
+        system: nil,
+        messages: [%{role: :user, content: "Hello"}],
+        stream: false,
+        params: %{}
+      }
+
+      assert {:error, reason} = Gateway.chat(api_key, request)
+      assert reason =~ "No provider found"
+    end
+  end
+
+  describe "run_agent/4" do
+    test "returns error when no matching provider exists" do
+      api_key = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:agents],
+        allowed_providers: [],
+        allowed_models: []
+      }
+
+      agent = %{
+        id: "test-agent-id",
+        slug: "test-agent",
+        model: "nonexistent-model",
+        max_iterations: 5,
+        model_params: %{}
+      }
+
+      messages = [%{role: :user, content: "Hello"}]
+
+      assert {:error, reason} = Gateway.run_agent(api_key, agent, messages)
+      assert reason =~ "No provider found"
+    end
+  end
+
   describe "extract_text/2" do
     test "returns permission error when api_key lacks ocr scope" do
       api_key = %{id: "test-key", user_id: nil, scopes: [:chat_completions]}

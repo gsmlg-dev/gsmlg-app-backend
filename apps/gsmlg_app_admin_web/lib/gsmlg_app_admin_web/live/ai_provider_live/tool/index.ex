@@ -1,4 +1,5 @@
 defmodule GsmlgAppAdminWeb.AiProviderLive.Tool.Index do
+  @moduledoc "LiveView for managing AI agent tools."
   use GsmlgAppAdminWeb, :live_view
 
   import GsmlgAppAdminWeb.AiProviderLive.Components

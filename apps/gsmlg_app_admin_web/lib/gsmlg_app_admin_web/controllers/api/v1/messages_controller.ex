@@ -15,15 +15,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
   def create(conn, params) do
     api_key = conn.assigns.api_key
 
-    unless ApiKeyAuth.has_scope?(api_key, :messages) do
-      conn
-      |> put_status(403)
-      |> json(%{
-        type: "error",
-        error: %{type: "permission_error", message: "API key lacks 'messages' scope."}
-      })
-      |> halt()
-    else
+    if ApiKeyAuth.has_scope?(api_key, :messages) do
       normalized = normalize_anthropic_request(params)
 
       if normalized.stream do
@@ -31,6 +23,14 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
       else
         non_stream_response(conn, api_key, normalized)
       end
+    else
+      conn
+      |> put_status(403)
+      |> json(%{
+        type: "error",
+        error: %{type: "permission_error", message: "API key lacks 'messages' scope."}
+      })
+      |> halt()
     end
   end
 

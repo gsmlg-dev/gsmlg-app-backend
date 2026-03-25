@@ -1,4 +1,5 @@
 defmodule GsmlgAppAdminWeb.AiProviderLive.McpServer.FormComponent do
+  @moduledoc false
   use GsmlgAppAdminWeb, :live_component
 
   alias GsmlgAppAdmin.AI

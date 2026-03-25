@@ -7,6 +7,8 @@ defmodule GsmlgAppAdminWeb.Plugs.ApiKeyAuth do
 
   import Plug.Conn
 
+  alias GsmlgAppAdmin.AI.ApiKey
+
   @behaviour Plug
 
   @impl true
@@ -56,7 +58,7 @@ defmodule GsmlgAppAdminWeb.Plugs.ApiKeyAuth do
 
     require Ash.Query
 
-    case GsmlgAppAdmin.AI.ApiKey
+    case ApiKey
          |> Ash.Query.filter(key_prefix == ^prefix)
          |> Ash.read_one(authorize?: false) do
       {:ok, nil} -> {:error, "Invalid API key."}
@@ -66,7 +68,7 @@ defmodule GsmlgAppAdminWeb.Plugs.ApiKeyAuth do
   end
 
   defp verify_key(raw_key, api_key) do
-    if GsmlgAppAdmin.AI.ApiKey.verify_key(raw_key, api_key.key_hash) do
+    if ApiKey.verify_key(raw_key, api_key.key_hash) do
       :ok
     else
       {:error, "Invalid API key."}

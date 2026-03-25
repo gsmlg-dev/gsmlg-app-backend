@@ -15,12 +15,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
   def index(conn, _params) do
     api_key = conn.assigns.api_key
 
-    unless ApiKeyAuth.has_scope?(api_key, :agents) do
-      conn
-      |> put_status(403)
-      |> json(%{error: %{message: "API key lacks 'agents' scope.", type: "permission_error"}})
-      |> halt()
-    else
+    if ApiKeyAuth.has_scope?(api_key, :agents) do
       case AI.list_active_agents() do
         {:ok, agents} ->
           data =
@@ -41,18 +36,18 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
           |> put_status(500)
           |> json(%{error: %{message: to_string(reason), type: "server_error"}})
       end
+    else
+      conn
+      |> put_status(403)
+      |> json(%{error: %{message: "API key lacks 'agents' scope.", type: "permission_error"}})
+      |> halt()
     end
   end
 
   def show(conn, %{"agent_slug" => slug}) do
     api_key = conn.assigns.api_key
 
-    unless ApiKeyAuth.has_scope?(api_key, :agents) do
-      conn
-      |> put_status(403)
-      |> json(%{error: %{message: "API key lacks 'agents' scope.", type: "permission_error"}})
-      |> halt()
-    else
+    if ApiKeyAuth.has_scope?(api_key, :agents) do
       case AI.get_agent_by_slug(slug) do
         {:ok, agent} ->
           json(conn, %{
@@ -70,18 +65,18 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
           |> put_status(404)
           |> json(%{error: %{message: "Agent not found.", type: "not_found_error"}})
       end
+    else
+      conn
+      |> put_status(403)
+      |> json(%{error: %{message: "API key lacks 'agents' scope.", type: "permission_error"}})
+      |> halt()
     end
   end
 
   def tools(conn, %{"agent_slug" => slug}) do
     api_key = conn.assigns.api_key
 
-    unless ApiKeyAuth.has_scope?(api_key, :agents) do
-      conn
-      |> put_status(403)
-      |> json(%{error: %{message: "API key lacks 'agents' scope.", type: "permission_error"}})
-      |> halt()
-    else
+    if ApiKeyAuth.has_scope?(api_key, :agents) do
       case AI.get_agent_by_slug(slug) do
         {:ok, agent} ->
           case AI.list_tools_for_agent(agent.id) do
@@ -106,18 +101,18 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
           |> put_status(404)
           |> json(%{error: %{message: "Agent not found.", type: "not_found_error"}})
       end
+    else
+      conn
+      |> put_status(403)
+      |> json(%{error: %{message: "API key lacks 'agents' scope.", type: "permission_error"}})
+      |> halt()
     end
   end
 
   def chat(conn, %{"agent_slug" => slug} = params) do
     api_key = conn.assigns.api_key
 
-    unless ApiKeyAuth.has_scope?(api_key, :agents) do
-      conn
-      |> put_status(403)
-      |> json(%{error: %{message: "API key lacks 'agents' scope.", type: "permission_error"}})
-      |> halt()
-    else
+    if ApiKeyAuth.has_scope?(api_key, :agents) do
       case AI.get_agent_by_slug(slug) do
         {:ok, agent} ->
           messages =
@@ -152,6 +147,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
           |> put_status(404)
           |> json(%{error: %{message: "Agent not found.", type: "not_found_error"}})
       end
+    else
+      conn
+      |> put_status(403)
+      |> json(%{error: %{message: "API key lacks 'agents' scope.", type: "permission_error"}})
+      |> halt()
     end
   end
 

@@ -202,6 +202,39 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
     end
   end
 
+  # ── ModelsController ──────────────────────────────────────────────────────
+
+  describe "GET /api/v1/models" do
+    test "returns 403 and halts when api_key lacks models_list scope", %{conn: conn} do
+      {raw_key, _} = create_api_key([:chat_completions])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> get("/api/v1/models")
+
+      assert conn.status == 403
+      assert conn.halted
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "permission_error"
+      assert body["error"]["message"] =~ "models_list"
+    end
+
+    test "returns model list when scope is present", %{conn: conn} do
+      {raw_key, _} = create_api_key([:models_list])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> get("/api/v1/models")
+
+      assert conn.status == 200
+      body = Jason.decode!(conn.resp_body)
+      assert body["object"] == "list"
+      assert is_list(body["data"])
+    end
+  end
+
   # ── AgentController ────────────────────────────────────────────────────────
 
   describe "GET /api/v1/agents" do
@@ -243,6 +276,125 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
 
       assert conn.status == 403
       assert conn.halted
+    end
+
+    test "returns 404 when agent slug does not exist", %{conn: conn} do
+      {raw_key, _} = create_api_key([:agents])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> get("/api/v1/agents/nonexistent-agent")
+
+      assert conn.status == 404
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "not_found_error"
+    end
+  end
+
+  describe "GET /api/v1/agents/:agent_slug/tools" do
+    test "returns 403 when api_key lacks agents scope", %{conn: conn} do
+      {raw_key, _} = create_api_key([:chat_completions])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> get("/api/v1/agents/my-agent/tools")
+
+      assert conn.status == 403
+      assert conn.halted
+    end
+
+    test "returns 404 when agent does not exist", %{conn: conn} do
+      {raw_key, _} = create_api_key([:agents])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> get("/api/v1/agents/nonexistent-agent/tools")
+
+      assert conn.status == 404
+    end
+  end
+
+  describe "POST /api/v1/agents/:agent_slug/chat" do
+    test "returns 403 when api_key lacks agents scope", %{conn: conn} do
+      {raw_key, _} = create_api_key([:chat_completions])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/agents/my-agent/chat", %{
+          "messages" => [%{"role" => "user", "content" => "hello"}]
+        })
+
+      assert conn.status == 403
+      assert conn.halted
+    end
+
+    test "returns 404 when agent does not exist", %{conn: conn} do
+      {raw_key, _} = create_api_key([:agents])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/agents/nonexistent-agent/chat", %{
+          "messages" => [%{"role" => "user", "content" => "hello"}]
+        })
+
+      assert conn.status == 404
+    end
+  end
+
+  # ── OCR additional tests ─────────────────────────────────────────────────
+
+  describe "POST /api/v1/ocr - additional" do
+    test "returns error when model is missing but has ocr scope", %{conn: conn} do
+      {raw_key, _} = create_api_key([:ocr])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/ocr", %{})
+
+      assert conn.status == 500
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["message"] =~ "model" or body["error"]["message"] =~ "OCR"
+    end
+  end
+
+  # ── Authentication tests ─────────────────────────────────────────────────
+
+  describe "API authentication" do
+    test "returns 401 when no auth header is provided", %{conn: conn} do
+      conn = get(conn, "/api/v1/models")
+
+      assert conn.status == 401
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "authentication_error"
+    end
+
+    test "returns 401 for invalid API key", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer gsk_invalid_key_that_does_not_exist_1234")
+        |> get("/api/v1/models")
+
+      assert conn.status == 401
+    end
+
+    test "x-api-key header works for authentication", %{conn: conn} do
+      {raw_key, _} = create_api_key([:models_list])
+
+      conn =
+        conn
+        |> put_req_header("x-api-key", raw_key)
+        |> get("/api/v1/models")
+
+      assert conn.status == 200
     end
   end
 end

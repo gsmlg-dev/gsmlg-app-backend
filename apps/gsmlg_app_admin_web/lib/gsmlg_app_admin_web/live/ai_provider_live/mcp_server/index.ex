@@ -1,4 +1,5 @@
 defmodule GsmlgAppAdminWeb.AiProviderLive.McpServer.Index do
+  @moduledoc "LiveView for managing AI gateway MCP servers."
   use GsmlgAppAdminWeb, :live_view
 
   import GsmlgAppAdminWeb.AiProviderLive.Components

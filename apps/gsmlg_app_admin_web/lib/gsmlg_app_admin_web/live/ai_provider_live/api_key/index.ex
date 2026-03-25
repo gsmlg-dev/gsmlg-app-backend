@@ -1,4 +1,5 @@
 defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.Index do
+  @moduledoc "LiveView for managing AI gateway API keys."
   use GsmlgAppAdminWeb, :live_view
 
   import GsmlgAppAdminWeb.AiProviderLive.Components
