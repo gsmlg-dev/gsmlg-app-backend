@@ -55,6 +55,33 @@ defmodule GsmlgAppAdmin.AI.ToolExecutorTest do
     end
   end
 
+  describe "execute/3 - webhook GET with nested arguments" do
+    test "does not crash when arguments contain nested maps" do
+      Req.Test.stub(:webhook_get_nested, fn conn ->
+        Req.Test.json(conn, %{"result" => "ok"})
+      end)
+
+      tool = %{
+        execution_type: :webhook,
+        timeout_ms: 5000,
+        webhook_url: "https://api.example.com/webhook",
+        webhook_method: :get,
+        webhook_headers: nil
+      }
+
+      # Nested maps would crash URI.encode_query/1 without our fix
+      arguments = %{
+        "query" => "hello",
+        "options" => %{"limit" => 5, "nested" => true}
+      }
+
+      # This should not raise — nested values get JSON-encoded
+      result = ToolExecutor.execute(tool, arguments)
+      # Will fail on SSRF or DNS (test URL), but should not crash
+      assert match?({:ok, _}, result) or match?({:error, _}, result)
+    end
+  end
+
   describe "validate_webhook_url/1" do
     test "allows https URLs" do
       assert :ok = ToolExecutor.validate_webhook_url("https://api.example.com/webhook")

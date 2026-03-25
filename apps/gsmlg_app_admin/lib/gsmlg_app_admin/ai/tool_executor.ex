@@ -103,7 +103,13 @@ defmodule GsmlgAppAdmin.AI.ToolExecutor do
   end
 
   defp execute_webhook(:get, url, arguments, headers, timeout) do
-    query_params = URI.encode_query(arguments)
+    # Flatten nested values to strings for query encoding
+    flat_args =
+      Enum.map(arguments, fn {key, value} ->
+        {to_string(key), if(is_binary(value), do: value, else: Jason.encode!(value))}
+      end)
+
+    query_params = URI.encode_query(flat_args)
     full_url = "#{url}?#{query_params}"
 
     case Req.get(full_url, headers: headers, receive_timeout: timeout) do
