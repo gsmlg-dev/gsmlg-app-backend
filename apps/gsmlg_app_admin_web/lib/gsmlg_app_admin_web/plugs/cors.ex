@@ -42,6 +42,10 @@ defmodule GsmlgAppAdminWeb.Plugs.CORS do
       "access-control-allow-headers",
       "authorization, x-api-key, content-type, anthropic-version"
     )
+    |> put_resp_header(
+      "access-control-expose-headers",
+      "x-ratelimit-limit, x-ratelimit-remaining, x-ratelimit-reset, retry-after"
+    )
     |> put_resp_header("access-control-max-age", "86400")
   end
 

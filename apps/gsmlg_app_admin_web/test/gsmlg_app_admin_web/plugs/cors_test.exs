@@ -28,5 +28,18 @@ defmodule GsmlgAppAdminWeb.Plugs.CORSTest do
       refute conn.halted
       assert get_resp_header(conn, "access-control-allow-origin") == ["*"]
     end
+
+    test "exposes rate limit headers via access-control-expose-headers" do
+      conn =
+        conn(:post, "/api/v1/chat/completions")
+        |> put_req_header("origin", "https://example.com")
+        |> CORS.call(CORS.init([]))
+
+      [expose_headers] = get_resp_header(conn, "access-control-expose-headers")
+      assert expose_headers =~ "x-ratelimit-limit"
+      assert expose_headers =~ "x-ratelimit-remaining"
+      assert expose_headers =~ "x-ratelimit-reset"
+      assert expose_headers =~ "retry-after"
+    end
   end
 end
