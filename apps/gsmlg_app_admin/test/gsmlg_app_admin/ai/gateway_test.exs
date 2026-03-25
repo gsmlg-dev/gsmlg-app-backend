@@ -35,6 +35,21 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
       assert result.system =~ "Custom system prompt"
     end
 
+    test "preserves agent system_prompt as the system field" do
+      api_key = %{id: "test-key", user_id: nil, scopes: [:chat_completions]}
+
+      request = %{
+        model: "gpt-4o",
+        system: "You are an agent.",
+        messages: [],
+        stream: false,
+        params: %{}
+      }
+
+      result = Gateway.inject_system_context(api_key, request)
+      assert result.system =~ "You are an agent."
+    end
+
     test "does not raise when user_id is non-nil but no DB records exist" do
       api_key = %{id: "test-key", user_id: "nonexistent-user-id", scopes: [:chat_completions]}
 
@@ -236,13 +251,52 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
         slug: "test-agent",
         model: "nonexistent-model",
         max_iterations: 5,
-        model_params: %{}
+        model_params: %{},
+        system_prompt: nil
       }
 
       messages = [%{role: :user, content: "Hello"}]
 
       assert {:error, reason} = Gateway.run_agent(api_key, agent, messages)
       assert reason =~ "No provider found"
+    end
+
+    test "returns error when api_key lacks agents scope and provider exists" do
+      # Create a provider so provider resolution succeeds
+      {:ok, _provider} =
+        GsmlgAppAdmin.AI.Provider
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Agent Test Provider #{System.unique_integer([:positive])}",
+          slug: "agent-test-#{System.unique_integer([:positive])}",
+          api_base_url: "http://fake.local",
+          api_key: "test-key",
+          model: "agent-test-model",
+          available_models: ["agent-test-model"],
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:chat_completions],
+        allowed_providers: [],
+        allowed_models: []
+      }
+
+      agent = %{
+        id: "test-agent-id",
+        slug: "test-agent",
+        model: "agent-test-model",
+        max_iterations: 5,
+        model_params: %{},
+        system_prompt: nil
+      }
+
+      messages = [%{role: :user, content: "Hello"}]
+
+      assert {:error, reason} = Gateway.run_agent(api_key, agent, messages)
+      assert reason =~ "agents"
     end
   end
 
