@@ -59,6 +59,23 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
       assert body["error"]["message"] =~ "chat_completions"
     end
 
+    test "returns 400 when model is missing", %{conn: conn} do
+      {raw_key, _} = create_api_key([:chat_completions])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/chat/completions", %{
+          "messages" => [%{"role" => "user", "content" => "hi"}]
+        })
+
+      assert conn.status == 400
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "invalid_request_error"
+      assert body["error"]["message"] =~ "model"
+    end
+
     test "returns 400 when messages array is empty", %{conn: conn} do
       {raw_key, _} = create_api_key([:chat_completions])
 
@@ -66,7 +83,10 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
         conn
         |> put_req_header("authorization", "Bearer #{raw_key}")
         |> put_req_header("content-type", "application/json")
-        |> post("/api/v1/chat/completions", %{"messages" => []})
+        |> post("/api/v1/chat/completions", %{
+          "model" => "gpt-4o",
+          "messages" => []
+        })
 
       assert conn.status == 400
       body = Jason.decode!(conn.resp_body)
@@ -112,6 +132,23 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
   # ── MessagesController ─────────────────────────────────────────────────────
 
   describe "POST /api/v1/messages" do
+    test "returns 400 when model is missing", %{conn: conn} do
+      {raw_key, _} = create_api_key([:messages])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/messages", %{
+          "messages" => [%{"role" => "user", "content" => "hi"}]
+        })
+
+      assert conn.status == 400
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "invalid_request_error"
+      assert body["error"]["message"] =~ "model"
+    end
+
     test "returns 400 when messages array is empty", %{conn: conn} do
       {raw_key, _} = create_api_key([:messages])
 
@@ -119,7 +156,10 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
         conn
         |> put_req_header("authorization", "Bearer #{raw_key}")
         |> put_req_header("content-type", "application/json")
-        |> post("/api/v1/messages", %{"messages" => []})
+        |> post("/api/v1/messages", %{
+          "model" => "claude-sonnet-4-20250514",
+          "messages" => []
+        })
 
       assert conn.status == 400
       body = Jason.decode!(conn.resp_body)

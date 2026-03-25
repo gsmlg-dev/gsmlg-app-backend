@@ -19,6 +19,16 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
       normalized = normalize_openai_request(params)
 
       cond do
+        is_nil(params["model"]) or params["model"] == "" ->
+          conn
+          |> put_status(400)
+          |> json(%{
+            error: %{
+              message: "model is required.",
+              type: "invalid_request_error"
+            }
+          })
+
         normalized.messages == [] ->
           conn
           |> put_status(400)
@@ -196,7 +206,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
       end)
 
     %{
-      model: params["model"] || "gpt-4o",
+      model: params["model"],
       system: system,
       messages: user_messages,
       stream: params["stream"] == true,

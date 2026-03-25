@@ -19,6 +19,17 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
       normalized = normalize_anthropic_request(params)
 
       cond do
+        is_nil(params["model"]) or params["model"] == "" ->
+          conn
+          |> put_status(400)
+          |> json(%{
+            type: "error",
+            error: %{
+              type: "invalid_request_error",
+              message: "model is required."
+            }
+          })
+
         normalized.messages == [] ->
           conn
           |> put_status(400)
@@ -204,7 +215,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
       end)
 
     %{
-      model: params["model"] || "claude-sonnet-4-20250514",
+      model: params["model"],
       system: system,
       messages: messages,
       stream: params["stream"] == true,
