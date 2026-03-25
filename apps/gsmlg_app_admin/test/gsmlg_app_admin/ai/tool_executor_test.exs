@@ -54,4 +54,46 @@ defmodule GsmlgAppAdmin.AI.ToolExecutorTest do
       assert msg =~ "Invalid builtin handler"
     end
   end
+
+  describe "validate_webhook_url/1" do
+    test "allows https URLs" do
+      assert :ok = ToolExecutor.validate_webhook_url("https://api.example.com/webhook")
+    end
+
+    test "allows http URLs" do
+      assert :ok = ToolExecutor.validate_webhook_url("http://api.example.com/webhook")
+    end
+
+    test "rejects non-http schemes" do
+      assert {:error, msg} = ToolExecutor.validate_webhook_url("file:///etc/passwd")
+      assert msg =~ "http or https"
+
+      assert {:error, _} = ToolExecutor.validate_webhook_url("ftp://server.com/data")
+      assert {:error, _} = ToolExecutor.validate_webhook_url("gopher://server.com/")
+    end
+
+    test "rejects URLs without host" do
+      assert {:error, msg} = ToolExecutor.validate_webhook_url("http://")
+      assert msg =~ "valid host"
+    end
+
+    test "blocks localhost" do
+      assert {:error, msg} = ToolExecutor.validate_webhook_url("http://127.0.0.1/internal")
+      assert msg =~ "blocked"
+    end
+
+    test "blocks private IP ranges" do
+      assert {:error, _} = ToolExecutor.validate_webhook_url("http://10.0.0.1/internal")
+      assert {:error, _} = ToolExecutor.validate_webhook_url("http://172.16.0.1/internal")
+      assert {:error, _} = ToolExecutor.validate_webhook_url("http://192.168.1.1/internal")
+    end
+
+    test "blocks link-local addresses (cloud metadata)" do
+      assert {:error, _} = ToolExecutor.validate_webhook_url("http://169.254.169.254/metadata")
+    end
+
+    test "rejects nil" do
+      assert {:error, _} = ToolExecutor.validate_webhook_url(nil)
+    end
+  end
 end

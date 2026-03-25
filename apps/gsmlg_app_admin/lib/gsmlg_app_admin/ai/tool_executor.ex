@@ -6,6 +6,23 @@ defmodule GsmlgAppAdmin.AI.ToolExecutor do
   """
 
   require Logger
+  import Bitwise
+
+  # Private/internal IP ranges to block for SSRF protection
+  @blocked_ip_ranges [
+    # Loopback
+    {127, 0, 0, 0, 8},
+    # Private Class A
+    {10, 0, 0, 0, 8},
+    # Private Class B
+    {172, 16, 0, 0, 12},
+    # Private Class C
+    {192, 168, 0, 0, 16},
+    # Link-local
+    {169, 254, 0, 0, 16},
+    # IPv6 mapped IPv4 loopback
+    {0, 0, 0, 0, 8}
+  ]
 
   @doc """
   Executes a tool with the given arguments.
@@ -28,36 +45,8 @@ defmodule GsmlgAppAdmin.AI.ToolExecutor do
     method = tool.webhook_method || :post
     headers = build_headers(tool.webhook_headers)
 
-    case method do
-      :post ->
-        case Req.post(url, json: arguments, headers: headers, receive_timeout: tool.timeout_ms) do
-          {:ok, %{status: status, body: body}} when status in 200..299 ->
-            {:ok, format_result(body)}
-
-          {:ok, %{status: status, body: body}} ->
-            {:error, "Webhook returned HTTP #{status}: #{inspect(body)}"}
-
-          {:error, error} ->
-            {:error, "Webhook request failed: #{inspect(error)}"}
-        end
-
-      :get ->
-        query_params = URI.encode_query(arguments)
-        full_url = "#{url}?#{query_params}"
-
-        case Req.get(full_url, headers: headers, receive_timeout: tool.timeout_ms) do
-          {:ok, %{status: status, body: body}} when status in 200..299 ->
-            {:ok, format_result(body)}
-
-          {:ok, %{status: status, body: body}} ->
-            {:error, "Webhook returned HTTP #{status}: #{inspect(body)}"}
-
-          {:error, error} ->
-            {:error, "Webhook request failed: #{inspect(error)}"}
-        end
-
-      _ ->
-        {:error, "Unsupported webhook method: #{method}"}
+    with :ok <- validate_webhook_url(url) do
+      execute_webhook(method, url, arguments, headers, tool.timeout_ms)
     end
   end
 
@@ -100,6 +89,39 @@ defmodule GsmlgAppAdmin.AI.ToolExecutor do
     {:error, "Unknown execution type: #{inspect(tool.execution_type)}"}
   end
 
+  defp execute_webhook(:post, url, arguments, headers, timeout) do
+    case Req.post(url, json: arguments, headers: headers, receive_timeout: timeout) do
+      {:ok, %{status: status, body: body}} when status in 200..299 ->
+        {:ok, format_result(body)}
+
+      {:ok, %{status: status}} ->
+        {:error, "Webhook returned HTTP #{status}"}
+
+      {:error, _error} ->
+        {:error, "Webhook request failed"}
+    end
+  end
+
+  defp execute_webhook(:get, url, arguments, headers, timeout) do
+    query_params = URI.encode_query(arguments)
+    full_url = "#{url}?#{query_params}"
+
+    case Req.get(full_url, headers: headers, receive_timeout: timeout) do
+      {:ok, %{status: status, body: body}} when status in 200..299 ->
+        {:ok, format_result(body)}
+
+      {:ok, %{status: status}} ->
+        {:error, "Webhook returned HTTP #{status}"}
+
+      {:error, _error} ->
+        {:error, "Webhook request failed"}
+    end
+  end
+
+  defp execute_webhook(method, _url, _arguments, _headers, _timeout) do
+    {:error, "Unsupported webhook method: #{method}"}
+  end
+
   defp build_headers(nil), do: []
 
   defp build_headers(headers) when is_map(headers) do
@@ -120,7 +142,7 @@ defmodule GsmlgAppAdmin.AI.ToolExecutor do
   defp resolve_builtin_handler(handler) when is_binary(handler) do
     case String.split(handler, ".") do
       parts when length(parts) >= 2 ->
-        function = List.last(parts) |> String.to_atom()
+        function = List.last(parts) |> String.to_existing_atom()
         module_parts = Enum.drop(parts, -1)
         module = Module.concat(module_parts)
         {:ok, {module, function}}
@@ -128,9 +150,63 @@ defmodule GsmlgAppAdmin.AI.ToolExecutor do
       _ ->
         {:error, "Invalid builtin handler format: #{handler}"}
     end
+  rescue
+    ArgumentError -> {:error, "Invalid builtin handler: unknown function atom"}
   end
 
   defp resolve_builtin_handler(_), do: {:error, "Invalid builtin handler"}
+
+  # -- SSRF Protection --
+
+  @doc false
+  def validate_webhook_url(url) when is_binary(url) do
+    uri = URI.parse(url)
+
+    cond do
+      uri.scheme not in ["http", "https"] ->
+        {:error, "Webhook URL must use http or https scheme"}
+
+      is_nil(uri.host) or uri.host == "" ->
+        {:error, "Webhook URL must have a valid host"}
+
+      blocked_host?(uri.host) ->
+        {:error, "Webhook URL targets a blocked address"}
+
+      true ->
+        :ok
+    end
+  end
+
+  def validate_webhook_url(_), do: {:error, "Invalid webhook URL"}
+
+  defp blocked_host?(host) do
+    case :inet.parse_address(String.to_charlist(host)) do
+      {:ok, ip_tuple} -> ip_in_blocked_range?(ip_tuple)
+      {:error, _} -> dns_resolves_to_blocked?(host)
+    end
+  end
+
+  defp dns_resolves_to_blocked?(host) do
+    case :inet.getaddr(String.to_charlist(host), :inet) do
+      {:ok, ip_tuple} -> ip_in_blocked_range?(ip_tuple)
+      {:error, _} -> false
+    end
+  end
+
+  defp ip_in_blocked_range?(ip_tuple) when tuple_size(ip_tuple) == 4 do
+    Enum.any?(@blocked_ip_ranges, fn {net_a, net_b, net_c, net_d, prefix_len} ->
+      ip_int = ip_to_integer(ip_tuple)
+      net_int = ip_to_integer({net_a, net_b, net_c, net_d})
+      mask = bsl(0xFFFFFFFF, 32 - prefix_len) &&& 0xFFFFFFFF
+      (ip_int &&& mask) == (net_int &&& mask)
+    end)
+  end
+
+  defp ip_in_blocked_range?(_), do: false
+
+  defp ip_to_integer({a, b, c, d}) do
+    bsl(a, 24) + bsl(b, 16) + bsl(c, 8) + d
+  end
 
   defp format_result(result) when is_binary(result), do: result
   defp format_result(result) when is_map(result), do: Jason.encode!(result)
