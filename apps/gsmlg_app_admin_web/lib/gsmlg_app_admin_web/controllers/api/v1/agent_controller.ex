@@ -111,57 +111,75 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
 
   def chat(conn, %{"agent_slug" => slug} = params) do
     api_key = conn.assigns.api_key
+    raw_messages = params["messages"] || []
 
-    if ApiKeyAuth.has_scope?(api_key, :agents) do
-      case AI.get_agent_by_slug(slug) do
-        {:ok, agent} ->
-          messages =
-            (params["messages"] || [])
-            |> Enum.map(fn msg ->
-              %{role: RequestHelpers.safe_role(msg["role"]), content: msg["content"]}
-            end)
+    cond do
+      not ApiKeyAuth.has_scope?(api_key, :agents) ->
+        conn
+        |> put_status(403)
+        |> json(%{
+          error: %{message: "API key lacks 'agents' scope.", type: "permission_error"}
+        })
+        |> halt()
 
-          stream = params["stream"] == true
-          model = params["model"] || agent.model
-          max_iter = min(params["max_iterations"] || agent.max_iterations, agent.max_iterations)
+      raw_messages == [] ->
+        conn
+        |> put_status(400)
+        |> json(%{
+          error: %{
+            message: "messages is required and must be non-empty.",
+            type: "invalid_request_error"
+          }
+        })
 
-          opts = [
-            stream: stream,
-            model: model,
-            max_iterations: max_iter,
-            request_ip: get_client_ip(conn)
-          ]
+      true ->
+        run_agent_chat(conn, api_key, slug, params, raw_messages)
+    end
+  end
 
-          case Gateway.run_agent(api_key, agent, messages, opts) do
-            {:ok, result} ->
-              json(conn, result)
+  defp run_agent_chat(conn, api_key, slug, params, raw_messages) do
+    case AI.get_agent_by_slug(slug) do
+      {:ok, agent} ->
+        messages =
+          Enum.map(raw_messages, fn msg ->
+            %{role: RequestHelpers.safe_role(msg["role"]), content: msg["content"]}
+          end)
 
-            {:error, "No provider found" <> _ = reason} ->
-              conn
-              |> put_status(422)
-              |> json(%{error: %{message: reason, type: "invalid_request_error"}})
+        stream = params["stream"] == true
+        model = params["model"] || agent.model
+        max_iter = min(params["max_iterations"] || agent.max_iterations, agent.max_iterations)
 
-            {:error, "Agent reached maximum" <> _ = reason} ->
-              conn
-              |> put_status(422)
-              |> json(%{error: %{message: reason, type: "invalid_request_error"}})
+        opts = [
+          stream: stream,
+          model: model,
+          max_iterations: max_iter,
+          request_ip: get_client_ip(conn)
+        ]
 
-            {:error, reason} ->
-              conn
-              |> put_status(500)
-              |> json(%{error: %{message: to_string(reason), type: "server_error"}})
-          end
+        case Gateway.run_agent(api_key, agent, messages, opts) do
+          {:ok, result} ->
+            json(conn, result)
 
-        {:error, _} ->
-          conn
-          |> put_status(404)
-          |> json(%{error: %{message: "Agent not found.", type: "not_found_error"}})
-      end
-    else
-      conn
-      |> put_status(403)
-      |> json(%{error: %{message: "API key lacks 'agents' scope.", type: "permission_error"}})
-      |> halt()
+          {:error, "No provider found" <> _ = reason} ->
+            conn
+            |> put_status(422)
+            |> json(%{error: %{message: reason, type: "invalid_request_error"}})
+
+          {:error, "Agent reached maximum" <> _ = reason} ->
+            conn
+            |> put_status(422)
+            |> json(%{error: %{message: reason, type: "invalid_request_error"}})
+
+          {:error, reason} ->
+            conn
+            |> put_status(500)
+            |> json(%{error: %{message: to_string(reason), type: "server_error"}})
+        end
+
+      {:error, _} ->
+        conn
+        |> put_status(404)
+        |> json(%{error: %{message: "Agent not found.", type: "not_found_error"}})
     end
   end
 

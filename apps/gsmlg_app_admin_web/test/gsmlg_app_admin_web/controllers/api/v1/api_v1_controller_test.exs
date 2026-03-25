@@ -443,6 +443,21 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
       assert conn.halted
     end
 
+    test "returns 400 when messages array is empty", %{conn: conn} do
+      {raw_key, _} = create_api_key([:agents])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/agents/my-agent/chat", %{"messages" => []})
+
+      assert conn.status == 400
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "invalid_request_error"
+      assert body["error"]["message"] =~ "messages"
+    end
+
     test "returns 404 when agent does not exist", %{conn: conn} do
       {raw_key, _} = create_api_key([:agents])
 
