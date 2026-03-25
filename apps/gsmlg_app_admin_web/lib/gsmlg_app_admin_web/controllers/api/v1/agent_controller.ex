@@ -136,6 +136,16 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
             {:ok, result} ->
               json(conn, result)
 
+            {:error, "No provider found" <> _ = reason} ->
+              conn
+              |> put_status(422)
+              |> json(%{error: %{message: reason, type: "invalid_request_error"}})
+
+            {:error, "Agent reached maximum" <> _ = reason} ->
+              conn
+              |> put_status(422)
+              |> json(%{error: %{message: reason, type: "invalid_request_error"}})
+
             {:error, reason} ->
               conn
               |> put_status(500)
