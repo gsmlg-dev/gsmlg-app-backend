@@ -177,7 +177,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ProviderSettings.Form do
       |> Enum.uniq()
       |> Enum.reject(&(&1 in socket.assigns.supported_models))
 
-    if length(new_models) > 0 do
+    if new_models != [] do
       supported = socket.assigns.supported_models ++ new_models
       selected = socket.assigns.selected_models ++ new_models
 

@@ -42,7 +42,7 @@ defmodule GsmlgAppWeb.MixProject do
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 1.0"},
       {:phoenix_live_dashboard, "~> 0.8.0"},
-      {:phoenix_duskmoon, "== 9.0.0-rc.1"},
+      {:phoenix_duskmoon, "~> 9.0"},
       {:floki, ">= 0.30.0", only: :test},
       {:bun, "~> 1.0", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},

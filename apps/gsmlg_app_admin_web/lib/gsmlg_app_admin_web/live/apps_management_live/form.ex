@@ -63,7 +63,7 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Form do
       if app.platforms, do: app.platforms, else: []
 
     store_links =
-      if is_list(app.store_links) && length(app.store_links) > 0 do
+      if is_list(app.store_links) && app.store_links != [] do
         Enum.map(app.store_links, fn link ->
           %{
             id: link.id,

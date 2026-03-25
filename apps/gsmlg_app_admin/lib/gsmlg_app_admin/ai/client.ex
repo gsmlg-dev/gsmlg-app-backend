@@ -153,7 +153,7 @@ defmodule GsmlgAppAdmin.AI.Client do
   defp normalize_response(response, provider, opts) do
     text = ReqLLM.Response.text(response)
     usage = ReqLLM.Response.usage(response)
-    tool_calls = ReqLLM.Response.tool_calls(response) || []
+    tool_calls = ReqLLM.Response.tool_calls(response)
 
     %{
       content: text,
@@ -176,8 +176,6 @@ defmodule GsmlgAppAdmin.AI.Client do
       "total_tokens" => usage[:total_tokens] || usage["total_tokens"] || 0
     }
   end
-
-  defp normalize_usage(_), do: %{}
 
   # -- Private: Error Formatting --
 

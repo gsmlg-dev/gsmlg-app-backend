@@ -41,6 +41,8 @@ defmodule GsmlgApp.Umbrella.MixProject do
     [
       # Required to run "mix format" on ~H/.heex files from the umbrella root
       {:phoenix_live_view, ">= 1.0.0"},
+      # Pin idna to 6.x for swoosh compatibility
+      {:idna, "~> 6.0"},
       # Code quality tools
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}

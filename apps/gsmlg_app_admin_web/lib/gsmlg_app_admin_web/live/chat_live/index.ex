@@ -605,7 +605,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   # Get all models for a provider (only from available_models, no duplicates)
   defp get_provider_models(provider) do
     case provider.available_models do
-      models when is_list(models) and length(models) > 0 ->
+      [_ | _] = models ->
         # Only show models from available_models, remove duplicates
         Enum.uniq(models)
 
