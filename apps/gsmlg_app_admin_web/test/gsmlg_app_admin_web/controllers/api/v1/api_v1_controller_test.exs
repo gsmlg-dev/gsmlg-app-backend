@@ -59,6 +59,21 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
       assert body["error"]["message"] =~ "chat_completions"
     end
 
+    test "returns 400 when messages array is empty", %{conn: conn} do
+      {raw_key, _} = create_api_key([:chat_completions])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/chat/completions", %{"messages" => []})
+
+      assert conn.status == 400
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "invalid_request_error"
+      assert body["error"]["message"] =~ "messages"
+    end
+
     test "proceeds past scope check when chat_completions scope present", %{conn: conn} do
       {raw_key, _} = create_api_key([:chat_completions])
 
@@ -97,6 +112,21 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
   # ── MessagesController ─────────────────────────────────────────────────────
 
   describe "POST /api/v1/messages" do
+    test "returns 400 when messages array is empty", %{conn: conn} do
+      {raw_key, _} = create_api_key([:messages])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/messages", %{"messages" => []})
+
+      assert conn.status == 400
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "invalid_request_error"
+      assert body["error"]["message"] =~ "messages"
+    end
+
     test "returns 403 and halts when api_key lacks messages scope", %{conn: conn} do
       {raw_key, _} = create_api_key([:chat_completions])
 

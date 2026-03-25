@@ -18,10 +18,22 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
     if ApiKeyAuth.has_scope?(api_key, :chat_completions) do
       normalized = normalize_openai_request(params)
 
-      if normalized.stream do
-        stream_response(conn, api_key, normalized)
-      else
-        non_stream_response(conn, api_key, normalized)
+      cond do
+        normalized.messages == [] ->
+          conn
+          |> put_status(400)
+          |> json(%{
+            error: %{
+              message: "messages is required and must be non-empty.",
+              type: "invalid_request_error"
+            }
+          })
+
+        normalized.stream ->
+          stream_response(conn, api_key, normalized)
+
+        true ->
+          non_stream_response(conn, api_key, normalized)
       end
     else
       conn
