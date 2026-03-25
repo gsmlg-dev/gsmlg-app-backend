@@ -140,10 +140,32 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
   defp run_agent_chat(conn, api_key, slug, params, raw_messages) do
     case AI.get_agent_by_slug(slug) do
       {:ok, agent} ->
-        messages =
-          Enum.map(raw_messages, fn msg ->
-            %{role: RequestHelpers.safe_role(msg["role"]), content: msg["content"] || ""}
+        # Extract system messages and convert to system prompt;
+        # pass remaining messages as user/assistant/tool messages
+        {system_parts, user_msgs} =
+          Enum.reduce(raw_messages, {[], []}, fn msg, {sys, msgs} ->
+            case msg["role"] do
+              "system" ->
+                {[msg["content"] || "" | sys], msgs}
+
+              _ ->
+                normalized = %{
+                  role: RequestHelpers.safe_role(msg["role"]),
+                  content: msg["content"] || ""
+                }
+
+                {sys, [normalized | msgs]}
+            end
           end)
+
+        messages = Enum.reverse(user_msgs)
+
+        # Combine system messages from the request (if any)
+        caller_system =
+          case Enum.reverse(system_parts) do
+            [] -> nil
+            parts -> Enum.join(parts, "\n")
+          end
 
         stream = params["stream"] == true
         model = params["model"] || agent.model
@@ -153,6 +175,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
           stream: stream,
           model: model,
           max_iterations: max_iter,
+          caller_system: caller_system,
           request_ip: RequestHelpers.client_ip(conn)
         ]
 

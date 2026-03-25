@@ -143,10 +143,20 @@ defmodule GsmlgAppAdmin.AI.Gateway do
       # Load agent's tools
       {:ok, tools} = AI.list_tools_for_agent(agent.id)
 
-      # Build agent request with agent's own system prompt
+      # Build agent request with agent's own system prompt + caller system prompt
+      caller_system = Keyword.get(opts, :caller_system)
+
+      agent_system =
+        case {agent[:system_prompt], caller_system} do
+          {nil, nil} -> nil
+          {nil, cs} -> cs
+          {as, nil} -> as
+          {as, cs} -> "#{as}\n\n#{cs}"
+        end
+
       request = %{
         model: model,
-        system: agent[:system_prompt],
+        system: agent_system,
         messages: messages,
         stream: false,
         params: agent.model_params || %{}
