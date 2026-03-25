@@ -454,8 +454,8 @@ defmodule GsmlgAppAdmin.AI.Gateway do
   def inject_system_context(api_key, request, opts \\ []) do
     agent_id = Keyword.get(opts, :agent_id)
 
-    # 1. Fetch default templates + key-specific templates
-    templates = fetch_templates(api_key)
+    # 1. Fetch default templates + key-specific + agent-specific templates
+    templates = fetch_templates(api_key, agent_id: agent_id)
 
     # 2. Fetch memories (global + user + key + agent scoped)
     memories = fetch_memories(api_key, agent_id: agent_id)
@@ -507,7 +507,9 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     Map.put(request, :system, combined_system)
   end
 
-  defp fetch_templates(api_key) do
+  defp fetch_templates(api_key, opts) do
+    agent_id = Keyword.get(opts, :agent_id)
+
     # Default templates (auto-injected for all requests)
     defaults =
       case AI.list_default_templates() do
@@ -522,7 +524,14 @@ defmodule GsmlgAppAdmin.AI.Gateway do
         _ -> []
       end
 
-    defaults ++ key_specific
+    # Agent-specific templates appended last (highest precedence)
+    agent_specific =
+      case AI.list_templates_for_agent(agent_id) do
+        {:ok, templates} -> templates
+        _ -> []
+      end
+
+    defaults ++ key_specific ++ agent_specific
   end
 
   defp fetch_memories(api_key, opts) do

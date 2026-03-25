@@ -338,6 +338,35 @@ defmodule GsmlgAppAdmin.AI do
   def list_templates_for_key(_), do: {:ok, []}
 
   @doc """
+  Gets active templates associated with a specific agent.
+  Returns templates linked via the AgentTemplate join table.
+  """
+  def list_templates_for_agent(agent_id) when is_binary(agent_id) do
+    require Ash.Query
+
+    case AgentTemplate
+         |> Ash.Query.filter(agent_id == ^agent_id)
+         |> Ash.read(authorize?: false) do
+      {:ok, agent_templates} ->
+        template_ids = Enum.map(agent_templates, & &1.system_prompt_template_id)
+
+        if template_ids == [] do
+          {:ok, []}
+        else
+          SystemPromptTemplate
+          |> Ash.Query.filter(id in ^template_ids and is_active == true)
+          |> Ash.Query.sort(priority: :desc)
+          |> Ash.read(authorize?: false)
+        end
+
+      {:error, _} ->
+        {:ok, []}
+    end
+  end
+
+  def list_templates_for_agent(_), do: {:ok, []}
+
+  @doc """
   Creates a system prompt template.
   """
   def create_system_prompt_template(attrs) do
