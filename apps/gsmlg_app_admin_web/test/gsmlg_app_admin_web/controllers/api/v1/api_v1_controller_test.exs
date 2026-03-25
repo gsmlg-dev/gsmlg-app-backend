@@ -779,4 +779,120 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
       assert conn.status == 404
     end
   end
+
+  # ── Input Validation Security Tests ────────────────────────────────────────
+
+  describe "model length validation" do
+    test "rejects oversized model string in chat completions", %{conn: conn} do
+      {raw_key, _} = create_api_key([:chat_completions])
+      long_model = String.duplicate("a", 300)
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/chat/completions", %{
+          "model" => long_model,
+          "messages" => [%{"role" => "user", "content" => "hi"}]
+        })
+
+      assert conn.status == 400
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["message"] =~ "256"
+    end
+
+    test "rejects oversized model string in messages", %{conn: conn} do
+      {raw_key, _} = create_api_key([:messages])
+      long_model = String.duplicate("a", 300)
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/messages", %{
+          "model" => long_model,
+          "messages" => [%{"role" => "user", "content" => "hi"}]
+        })
+
+      assert conn.status == 400
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["message"] =~ "256"
+    end
+  end
+
+  describe "OCR image URL validation" do
+    test "rejects private network URLs in OCR endpoint", %{conn: conn} do
+      {raw_key, _} = create_api_key([:ocr])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/ocr", %{
+          "model" => "gpt-4o",
+          "image" => "http://169.254.169.254/latest/meta-data/"
+        })
+
+      assert conn.status == 400
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["message"] =~ "private"
+    end
+
+    test "rejects non-http scheme in OCR image URL", %{conn: conn} do
+      {raw_key, _} = create_api_key([:ocr])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/ocr", %{
+          "model" => "gpt-4o",
+          "image" => "file:///etc/passwd"
+        })
+
+      assert conn.status == 400
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["message"] =~ "http"
+    end
+  end
+
+  describe "streaming pre-validation" do
+    test "chat completions streaming returns 422 for missing provider instead of empty stream",
+         %{conn: conn} do
+      {raw_key, _} = create_api_key([:chat_completions])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/chat/completions", %{
+          "model" => "nonexistent-stream-model",
+          "messages" => [%{"role" => "user", "content" => "hi"}],
+          "stream" => true
+        })
+
+      assert conn.status == 422
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["message"] =~ "No provider found"
+    end
+
+    test "messages streaming returns 422 for missing provider instead of empty stream",
+         %{conn: conn} do
+      {raw_key, _} = create_api_key([:messages])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/messages", %{
+          "model" => "nonexistent-stream-model",
+          "messages" => [%{"role" => "user", "content" => "hi"}],
+          "stream" => true
+        })
+
+      assert conn.status == 422
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["message"] =~ "No provider found"
+    end
+  end
 end
