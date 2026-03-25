@@ -140,41 +140,13 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
   defp run_agent_chat(conn, api_key, slug, params, raw_messages) do
     case AI.get_agent_by_slug(slug) do
       {:ok, agent} ->
-        # Extract system messages and convert to system prompt;
-        # pass remaining messages as user/assistant/tool messages
-        {system_parts, user_msgs} =
-          Enum.reduce(raw_messages, {[], []}, fn msg, {sys, msgs} ->
-            case msg["role"] do
-              "system" ->
-                {[msg["content"] || "" | sys], msgs}
-
-              _ ->
-                normalized = %{
-                  role: RequestHelpers.safe_role(msg["role"]),
-                  content: msg["content"] || ""
-                }
-
-                {sys, [normalized | msgs]}
-            end
-          end)
-
-        messages = Enum.reverse(user_msgs)
-
-        # Combine system messages from the request (if any)
-        caller_system =
-          case Enum.reverse(system_parts) do
-            [] -> nil
-            parts -> Enum.join(parts, "\n")
-          end
-
-        stream = params["stream"] == true
-        model = params["model"] || agent.model
-        max_iter = min(params["max_iterations"] || agent.max_iterations, agent.max_iterations)
+        {messages, caller_system} = normalize_agent_messages(raw_messages)
 
         opts = [
-          stream: stream,
-          model: model,
-          max_iterations: max_iter,
+          stream: params["stream"] == true,
+          model: params["model"] || agent.model,
+          max_iterations:
+            min(params["max_iterations"] || agent.max_iterations, agent.max_iterations),
           caller_system: caller_system,
           request_ip: RequestHelpers.client_ip(conn)
         ]
@@ -204,5 +176,31 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
         |> put_status(404)
         |> json(%{error: %{message: "Agent not found.", type: "not_found_error"}})
     end
+  end
+
+  defp normalize_agent_messages(raw_messages) do
+    {system_parts, user_msgs} =
+      Enum.reduce(raw_messages, {[], []}, fn msg, {sys, msgs} ->
+        case msg["role"] do
+          "system" ->
+            {[msg["content"] || "" | sys], msgs}
+
+          _ ->
+            normalized = %{
+              role: RequestHelpers.safe_role(msg["role"]),
+              content: msg["content"] || ""
+            }
+
+            {sys, [normalized | msgs]}
+        end
+      end)
+
+    caller_system =
+      case Enum.reverse(system_parts) do
+        [] -> nil
+        parts -> Enum.join(parts, "\n")
+      end
+
+    {Enum.reverse(user_msgs), caller_system}
   end
 end

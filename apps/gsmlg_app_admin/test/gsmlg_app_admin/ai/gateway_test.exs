@@ -537,6 +537,124 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
     end
   end
 
+  describe "check_scope (via chat/3)" do
+    test "returns scope error when key lacks required scope" do
+      {:ok, _provider} =
+        GsmlgAppAdmin.AI.Provider
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Scope Test #{System.unique_integer([:positive])}",
+          slug: "scope-test-#{System.unique_integer([:positive])}",
+          api_base_url: "http://fake.local",
+          api_key: "test-key",
+          model: "scope-test-model",
+          available_models: ["scope-test-model"],
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:images],
+        allowed_providers: [],
+        allowed_models: []
+      }
+
+      request = %{
+        model: "scope-test-model",
+        system: nil,
+        messages: [%{role: :user, content: "Hello"}],
+        stream: false,
+        params: %{}
+      }
+
+      assert {:error, reason} = Gateway.chat(api_key, request)
+      assert reason =~ "chat_completions"
+    end
+  end
+
+  describe "resolve_provider/2 with key restrictions" do
+    test "filters by allowed_providers" do
+      {:ok, provider} =
+        GsmlgAppAdmin.AI.Provider
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Allowed Provider #{System.unique_integer([:positive])}",
+          slug: "allowed-#{System.unique_integer([:positive])}",
+          api_base_url: "http://fake.local",
+          api_key: "test-key",
+          model: "allowed-model-xyz",
+          available_models: ["allowed-model-xyz"],
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      # Key restricted to a different provider — should fail
+      api_key = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:chat_completions],
+        allowed_providers: [Ash.UUID.generate()],
+        allowed_models: []
+      }
+
+      assert {:error, _} = Gateway.resolve_provider(api_key, "allowed-model-xyz")
+
+      # Key with the correct provider ID — should succeed
+      api_key_ok = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:chat_completions],
+        allowed_providers: [provider.id],
+        allowed_models: []
+      }
+
+      assert {:ok, _} = Gateway.resolve_provider(api_key_ok, "allowed-model-xyz")
+    end
+  end
+
+  describe "list_models/1 filters by allowed_providers" do
+    test "only returns models from allowed providers" do
+      {:ok, provider} =
+        GsmlgAppAdmin.AI.Provider
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Prov Filter #{System.unique_integer([:positive])}",
+          slug: "prov-filter-#{System.unique_integer([:positive])}",
+          api_base_url: "http://fake.local",
+          api_key: "test-key",
+          model: "prov-filter-model",
+          available_models: ["prov-filter-model"],
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      # Key restricted to a non-existent provider
+      api_key_no_match = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:models_list],
+        allowed_providers: [Ash.UUID.generate()],
+        allowed_models: []
+      }
+
+      assert {:ok, models} = Gateway.list_models(api_key_no_match)
+      model_ids = Enum.map(models, & &1.id)
+      refute "prov-filter-model" in model_ids
+
+      # Key with matching provider
+      api_key_match = %{
+        id: "test-key",
+        user_id: nil,
+        scopes: [:models_list],
+        allowed_providers: [provider.id],
+        allowed_models: []
+      }
+
+      assert {:ok, models} = Gateway.list_models(api_key_match)
+      model_ids = Enum.map(models, & &1.id)
+      assert "prov-filter-model" in model_ids
+    end
+  end
+
   describe "list_models/1 with DB providers" do
     test "returns models from active providers" do
       {:ok, _provider} =
