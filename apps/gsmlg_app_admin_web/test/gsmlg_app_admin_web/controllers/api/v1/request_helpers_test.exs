@@ -125,4 +125,114 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpersTest do
       assert body == %{type: "error", error: %{type: "auth_error", message: "Invalid key"}}
     end
   end
+
+  describe "validate_model/1" do
+    test "rejects nil and empty string" do
+      assert {:error, "model is required."} = RequestHelpers.validate_model(nil)
+      assert {:error, "model is required."} = RequestHelpers.validate_model("")
+    end
+
+    test "accepts valid model strings" do
+      assert {:ok, "gpt-4o"} = RequestHelpers.validate_model("gpt-4o")
+
+      assert {:ok, "claude-sonnet-4-20250514"} =
+               RequestHelpers.validate_model("claude-sonnet-4-20250514")
+    end
+
+    test "rejects model strings exceeding max length" do
+      long_model = String.duplicate("a", 257)
+      assert {:error, _} = RequestHelpers.validate_model(long_model)
+    end
+
+    test "accepts model strings at exactly max length" do
+      model = String.duplicate("a", 256)
+      assert {:ok, ^model} = RequestHelpers.validate_model(model)
+    end
+
+    test "rejects non-string values" do
+      assert {:error, "model must be a string."} = RequestHelpers.validate_model(123)
+      assert {:error, "model must be a string."} = RequestHelpers.validate_model(true)
+    end
+  end
+
+  describe "validate_tools/1" do
+    test "returns nil for non-list input" do
+      assert RequestHelpers.validate_tools(nil) == nil
+      assert RequestHelpers.validate_tools("not a list") == nil
+      assert RequestHelpers.validate_tools([]) == nil
+    end
+
+    test "passes through small lists unchanged" do
+      tools = [%{"type" => "function", "function" => %{"name" => "test"}}]
+      assert RequestHelpers.validate_tools(tools) == tools
+    end
+
+    test "caps lists at 128 items" do
+      tools = for i <- 1..200, do: %{"name" => "tool_#{i}"}
+      result = RequestHelpers.validate_tools(tools)
+      assert length(result) == 128
+    end
+  end
+
+  describe "validate_image_url/1" do
+    test "allows nil and empty string" do
+      assert :ok = RequestHelpers.validate_image_url(nil)
+      assert :ok = RequestHelpers.validate_image_url("")
+    end
+
+    test "allows valid public URLs" do
+      assert :ok = RequestHelpers.validate_image_url("https://example.com/image.png")
+      assert :ok = RequestHelpers.validate_image_url("http://example.com/image.jpg")
+    end
+
+    test "rejects non-http schemes" do
+      assert {:error, _} = RequestHelpers.validate_image_url("ftp://example.com/image.png")
+      assert {:error, _} = RequestHelpers.validate_image_url("file:///etc/passwd")
+    end
+
+    test "rejects localhost URLs" do
+      assert {:error, _} = RequestHelpers.validate_image_url("http://localhost/image.png")
+      assert {:error, _} = RequestHelpers.validate_image_url("http://127.0.0.1/image.png")
+    end
+
+    test "rejects private network URLs" do
+      assert {:error, _} = RequestHelpers.validate_image_url("http://10.0.0.1/image.png")
+      assert {:error, _} = RequestHelpers.validate_image_url("http://192.168.1.1/image.png")
+      assert {:error, _} = RequestHelpers.validate_image_url("http://172.16.0.1/image.png")
+    end
+
+    test "rejects link-local addresses" do
+      assert {:error, _} =
+               RequestHelpers.validate_image_url("http://169.254.169.254/latest/meta-data/")
+    end
+
+    test "rejects non-string values" do
+      assert {:error, _} = RequestHelpers.validate_image_url(123)
+    end
+  end
+
+  describe "validate_image_count/1" do
+    test "returns nil for nil" do
+      assert RequestHelpers.validate_image_count(nil) == nil
+    end
+
+    test "caps at 4" do
+      assert RequestHelpers.validate_image_count(10) == 4
+    end
+
+    test "floors at 1" do
+      assert RequestHelpers.validate_image_count(0) == 1
+      assert RequestHelpers.validate_image_count(-5) == 1
+    end
+
+    test "passes through valid counts" do
+      assert RequestHelpers.validate_image_count(2) == 2
+      assert RequestHelpers.validate_image_count(3) == 3
+    end
+
+    test "returns nil for non-integer" do
+      assert RequestHelpers.validate_image_count("2") == nil
+      assert RequestHelpers.validate_image_count(1.5) == nil
+    end
+  end
 end

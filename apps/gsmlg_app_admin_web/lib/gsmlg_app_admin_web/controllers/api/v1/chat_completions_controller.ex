@@ -16,34 +16,32 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
     api_key = conn.assigns.api_key
 
     if ApiKeyAuth.has_scope?(api_key, :chat_completions) do
-      normalized = normalize_openai_request(params)
-
-      cond do
-        is_nil(params["model"]) or params["model"] == "" ->
+      case RequestHelpers.validate_model(params["model"]) do
+        {:error, message} ->
           conn
           |> put_status(400)
-          |> json(%{
-            error: %{
-              message: "model is required.",
-              type: "invalid_request_error"
-            }
-          })
+          |> json(%{error: %{message: message, type: "invalid_request_error"}})
 
-        normalized.messages == [] ->
-          conn
-          |> put_status(400)
-          |> json(%{
-            error: %{
-              message: "messages is required and must be non-empty.",
-              type: "invalid_request_error"
-            }
-          })
+        {:ok, _model} ->
+          normalized = normalize_openai_request(params)
 
-        normalized.stream ->
-          stream_response(conn, api_key, normalized)
+          cond do
+            normalized.messages == [] ->
+              conn
+              |> put_status(400)
+              |> json(%{
+                error: %{
+                  message: "messages is required and must be non-empty.",
+                  type: "invalid_request_error"
+                }
+              })
 
-        true ->
-          non_stream_response(conn, api_key, normalized)
+            normalized.stream ->
+              stream_response(conn, api_key, normalized)
+
+            true ->
+              non_stream_response(conn, api_key, normalized)
+          end
       end
     else
       conn
@@ -81,6 +79,32 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
   end
 
   defp stream_response(conn, api_key, request) do
+    # Pre-validate provider before committing to a 200 response
+    case Gateway.resolve_provider(api_key, request.model) do
+      {:error, "No provider found" <> _ = reason} ->
+        conn
+        |> put_status(422)
+        |> json(%{error: %{message: reason, type: "invalid_request_error"}})
+
+      {:error, "API key does not have" <> _ = reason} ->
+        conn
+        |> put_status(403)
+        |> json(%{error: %{message: reason, type: "permission_error"}})
+
+      {:error, reason} ->
+        require Logger
+        Logger.error("Stream pre-validation error: #{inspect(reason)}")
+
+        conn
+        |> put_status(500)
+        |> json(%{error: %{message: "An internal error occurred.", type: "server_error"}})
+
+      {:ok, _provider} ->
+        do_stream_response(conn, api_key, request)
+    end
+  end
+
+  defp do_stream_response(conn, api_key, request) do
     conn =
       conn
       |> put_resp_content_type("text/event-stream")
@@ -233,11 +257,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
       }
     }
 
-    # Pass through client-provided tools for function calling
+    # Pass through client-provided tools (capped for safety)
     request =
-      case params["tools"] do
-        tools when is_list(tools) and tools != [] -> Map.put(request, :tools, tools)
-        _ -> request
+      case RequestHelpers.validate_tools(params["tools"]) do
+        nil -> request
+        tools -> Map.put(request, :tools, tools)
       end
 
     case params["tool_choice"] do

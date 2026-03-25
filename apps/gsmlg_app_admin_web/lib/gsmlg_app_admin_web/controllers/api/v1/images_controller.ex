@@ -15,6 +15,13 @@ defmodule GsmlgAppAdminWeb.Api.V1.ImagesController do
     api_key = conn.assigns.api_key
 
     if ApiKeyAuth.has_scope?(api_key, :images) do
+      # Cap n parameter to prevent cost abuse
+      params =
+        case RequestHelpers.validate_image_count(params["n"]) do
+          nil -> params
+          n -> Map.put(params, "n", n)
+        end
+
       case Gateway.generate_image(api_key, params, request_ip: RequestHelpers.client_ip(conn)) do
         {:ok, result} ->
           json(conn, result)
