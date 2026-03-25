@@ -59,7 +59,10 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
   end
 
   defp non_stream_response(conn, api_key, request) do
-    case Gateway.chat(api_key, request, request_ip: RequestHelpers.client_ip(conn)) do
+    case Gateway.chat(api_key, request,
+           scope: :messages,
+           request_ip: RequestHelpers.client_ip(conn)
+         ) do
       {:ok, response} ->
         json(conn, format_anthropic_response(response, request.model))
 
@@ -145,7 +148,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
         send(parent, {:sse_event, "content_block_delta", delta})
     end
 
-    opts = [stream_callback: callback, request_ip: RequestHelpers.client_ip(conn)]
+    opts = [
+      stream_callback: callback,
+      scope: :messages,
+      request_ip: RequestHelpers.client_ip(conn)
+    ]
 
     task =
       Task.async(fn ->

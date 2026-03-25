@@ -25,8 +25,10 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     - {:error, reason} on failure
   """
   def chat(api_key, request, opts \\ []) do
+    scope = Keyword.get(opts, :scope, :chat_completions)
+
     with {:ok, provider} <- resolve_provider(api_key, request.model),
-         :ok <- check_scope(api_key, :chat_completions) do
+         :ok <- check_scope(api_key, scope) do
       # Inject system prompts and memories
       request = inject_system_context(api_key, request)
       messages = build_messages(request)
@@ -369,7 +371,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
           params: %{max_tokens: 4096}
         }
 
-        case chat(api_key, request, opts) do
+        case chat(api_key, request, Keyword.put(opts, :scope, :ocr)) do
           {:ok, response} ->
             {:ok,
              %{
