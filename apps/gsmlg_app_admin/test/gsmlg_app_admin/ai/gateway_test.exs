@@ -723,6 +723,52 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
       result_with = Gateway.inject_system_context(api_key, request, agent_id: agent_id)
       assert result_with.system =~ "AGENT_SCOPED_MEMORY"
     end
+
+    test "injects agent-linked system prompt template when agent_id is provided" do
+      uid = System.unique_integer([:positive])
+
+      # Create a real agent in DB so we can link a template to it
+      {:ok, agent} =
+        GsmlgAppAdmin.AI.Agent
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Test Agent #{uid}",
+          slug: "test-agent-#{uid}",
+          model: "gpt-4o",
+          is_active: true
+        })
+        |> Ash.create(authorize?: false)
+
+      {:ok, template} =
+        GsmlgAppAdmin.AI.SystemPromptTemplate
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Agent Template #{uid}",
+          slug: "agent-tmpl-#{uid}",
+          content: "AGENT_TEMPLATE_INSTRUCTION",
+          is_default: false,
+          is_active: true,
+          priority: 5
+        })
+        |> Ash.create(authorize?: false)
+
+      {:ok, _} =
+        GsmlgAppAdmin.AI.AgentTemplate
+        |> Ash.Changeset.for_create(:create, %{
+          agent_id: agent.id,
+          system_prompt_template_id: template.id
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{id: Ash.UUID.generate(), user_id: nil, scopes: [:agents]}
+      request = %{model: "gpt-4o", system: nil, messages: [], stream: false, params: %{}}
+
+      # Without agent_id: template not injected
+      result_without = Gateway.inject_system_context(api_key, request)
+      refute is_binary(result_without.system) and result_without.system =~ "AGENT_TEMPLATE_INSTRUCTION"
+
+      # With agent_id: template injected
+      result_with = Gateway.inject_system_context(api_key, request, agent_id: agent.id)
+      assert result_with.system =~ "AGENT_TEMPLATE_INSTRUCTION"
+    end
   end
 
   describe "check_scope (via chat/3)" do
