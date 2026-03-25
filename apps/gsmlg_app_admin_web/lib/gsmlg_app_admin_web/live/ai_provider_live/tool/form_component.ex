@@ -50,9 +50,9 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Tool.FormComponent do
       name: params["name"],
       slug: params["slug"],
       description: params["description"],
-      execution_type: String.to_atom(params["execution_type"]),
+      execution_type: String.to_existing_atom(params["execution_type"]),
       webhook_url: blank_to_nil(params["webhook_url"]),
-      webhook_method: String.to_atom(params["webhook_method"] || "post"),
+      webhook_method: String.to_existing_atom(params["webhook_method"] || "post"),
       builtin_handler: blank_to_nil(params["builtin_handler"]),
       timeout_ms: String.to_integer(params["timeout_ms"] || "30000"),
       is_active: params["is_active"] == "true"

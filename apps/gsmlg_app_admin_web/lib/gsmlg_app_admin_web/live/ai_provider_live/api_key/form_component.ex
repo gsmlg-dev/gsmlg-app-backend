@@ -45,7 +45,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
   defp save(socket, :new, params) do
     scopes =
       (params["scopes"] || [])
-      |> Enum.map(&String.to_atom/1)
+      |> Enum.map(&String.to_existing_atom/1)
 
     attrs = %{
       name: params["name"],
@@ -73,7 +73,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
   defp save(socket, :edit, params) do
     scopes =
       (params["scopes"] || [])
-      |> Enum.map(&String.to_atom/1)
+      |> Enum.map(&String.to_existing_atom/1)
 
     attrs = %{
       name: params["name"],

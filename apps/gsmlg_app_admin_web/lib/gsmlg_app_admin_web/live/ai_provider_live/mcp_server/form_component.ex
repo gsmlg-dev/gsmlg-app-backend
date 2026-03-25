@@ -53,7 +53,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.McpServer.FormComponent do
       name: params["name"],
       slug: params["slug"],
       description: blank_to_nil(params["description"]),
-      transport_type: String.to_atom(params["transport_type"]),
+      transport_type: String.to_existing_atom(params["transport_type"]),
       connection_config: connection_config,
       is_active: params["is_active"] == "true",
       auto_sync_tools: params["auto_sync_tools"] == "true"

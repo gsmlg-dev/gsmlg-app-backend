@@ -33,8 +33,8 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Memory.FormComponent do
   def handle_event("save", %{"form" => params}, socket) do
     attrs = %{
       content: params["content"],
-      category: String.to_atom(params["category"]),
-      scope: String.to_atom(params["scope"]),
+      category: String.to_existing_atom(params["category"]),
+      scope: String.to_existing_atom(params["scope"]),
       priority: String.to_integer(params["priority"] || "0")
     }
 
