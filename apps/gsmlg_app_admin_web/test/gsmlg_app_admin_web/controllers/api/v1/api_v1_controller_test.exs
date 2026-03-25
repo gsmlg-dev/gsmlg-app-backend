@@ -252,6 +252,25 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
       assert body["error"]["message"] =~ "provider"
     end
 
+    test "returns 403 when model is not in allowed_models", %{conn: conn} do
+      {raw_key, _} = create_api_key_with_allowed_models([:messages], ["claude-3-5-sonnet"])
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{raw_key}")
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/messages", %{
+          "model" => "claude-opus-4-0",
+          "messages" => [%{"role" => "user", "content" => "hi"}],
+          "stream" => false
+        })
+
+      assert conn.status == 403
+      body = Jason.decode!(conn.resp_body)
+      assert body["error"]["type"] == "permission_error"
+      assert body["error"]["message"] =~ "claude-opus-4-0"
+    end
+
     test "does not crash when content block is missing 'text' key", %{conn: conn} do
       # Tests extract_text_from_blocks/1 nil-safety: block["text"] || "" fallback
       {raw_key, _} = create_api_key([:messages])
