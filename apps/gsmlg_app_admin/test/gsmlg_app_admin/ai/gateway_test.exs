@@ -535,6 +535,67 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
       result = Gateway.inject_system_context(api_key, request)
       refute result.system =~ "INACTIVE_MEMORY_CONTENT"
     end
+
+    test "injects {{user.display_name}} variable from user record" do
+      uid = System.unique_integer([:positive])
+
+      {:ok, user} =
+        GsmlgAppAdmin.Accounts.User
+        |> Ash.Changeset.for_create(:admin_create, %{
+          email: "display#{uid}@example.com",
+          password: "StrongPass123!",
+          display_name: "Alice Example"
+        })
+        |> Ash.create(authorize?: false)
+
+      {:ok, _template} =
+        GsmlgAppAdmin.AI.SystemPromptTemplate
+        |> Ash.Changeset.for_create(:create, %{
+          name: "User Greeting #{uid}",
+          slug: "user-greeting-#{uid}",
+          content: "Hello, {{user.display_name}}! How can I help?",
+          is_default: true,
+          is_active: true,
+          priority: 10
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{id: Ash.UUID.generate(), user_id: user.id, scopes: [:chat_completions]}
+
+      request = %{
+        model: "gpt-4o",
+        system: nil,
+        messages: [],
+        stream: false,
+        params: %{}
+      }
+
+      result = Gateway.inject_system_context(api_key, request)
+      assert result.system =~ "Alice Example"
+    end
+
+    test "{{user.display_name}} is empty string when no user_id" do
+      {:ok, _template} =
+        GsmlgAppAdmin.AI.SystemPromptTemplate
+        |> Ash.Changeset.for_create(:create, %{
+          name: "Anon Template #{System.unique_integer([:positive])}",
+          slug: "anon-tmpl-#{System.unique_integer([:positive])}",
+          content: "User: {{user.display_name}}",
+          is_default: true,
+          is_active: true,
+          priority: 10
+        })
+        |> Ash.create(authorize?: false)
+
+      api_key = %{id: Ash.UUID.generate(), user_id: nil, scopes: [:chat_completions]}
+
+      request = %{model: "gpt-4o", system: nil, messages: [], stream: false, params: %{}}
+
+      result = Gateway.inject_system_context(api_key, request)
+      # Variable replaced with empty string, not the literal {{user.display_name}}
+      refute result.system =~ "{{user.display_name}}"
+      assert result.system =~ "User: "
+    end
   end
 
   describe "check_scope (via chat/3)" do

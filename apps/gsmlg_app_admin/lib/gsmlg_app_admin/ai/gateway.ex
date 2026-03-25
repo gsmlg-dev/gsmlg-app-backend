@@ -6,6 +6,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
   Provides entry points for chat completions, image generation, OCR, and agent execution.
   """
 
+  alias GsmlgAppAdmin.Accounts
   alias GsmlgAppAdmin.AI
   alias GsmlgAppAdmin.AI.Client
   alias GsmlgAppAdmin.AI.ToolExecutor
@@ -459,12 +460,14 @@ defmodule GsmlgAppAdmin.AI.Gateway do
 
     # 3. Render templates with variables
     memory_text = format_memories(memories)
+    user_vars = fetch_user_variables(api_key)
 
-    variables = %{
-      "memory" => memory_text,
-      "date" => Date.utc_today() |> Date.to_iso8601(),
-      "datetime" => DateTime.utc_now() |> DateTime.to_iso8601()
-    }
+    variables =
+      Map.merge(user_vars, %{
+        "memory" => memory_text,
+        "date" => Date.utc_today() |> Date.to_iso8601(),
+        "datetime" => DateTime.utc_now() |> DateTime.to_iso8601()
+      })
 
     rendered_templates =
       Enum.map_join(templates, "\n\n", fn template ->
@@ -517,6 +520,26 @@ defmodule GsmlgAppAdmin.AI.Gateway do
          ) do
       {:ok, memories} -> memories
       _ -> []
+    end
+  end
+
+  defp fetch_user_variables(api_key) do
+    user_id = Map.get(api_key, :user_id)
+
+    if user_id do
+      try do
+        user = Accounts.get_user!(user_id)
+
+        %{
+          "user.display_name" => user.display_name || user.username || "",
+          "user.email" => to_string(user.email),
+          "user.username" => user.username || ""
+        }
+      rescue
+        _ -> %{"user.display_name" => "", "user.email" => "", "user.username" => ""}
+      end
+    else
+      %{"user.display_name" => "", "user.email" => "", "user.username" => ""}
     end
   end
 
