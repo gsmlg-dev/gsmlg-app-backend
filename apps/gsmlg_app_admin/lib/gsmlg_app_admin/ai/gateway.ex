@@ -114,7 +114,8 @@ defmodule GsmlgAppAdmin.AI.Gateway do
             all_models
             |> Enum.uniq()
             |> Enum.filter(fn model ->
-              api_key.allowed_models == [] or model in api_key.allowed_models
+              allowed_models = Map.get(api_key, :allowed_models, []) || []
+              allowed_models == [] or model in allowed_models
             end)
             |> Enum.map(fn model ->
               %{
@@ -441,9 +442,11 @@ defmodule GsmlgAppAdmin.AI.Gateway do
   end
 
   defp filter_by_key_restrictions(providers, api_key) do
+    allowed = Map.get(api_key, :allowed_providers, []) || []
+
     providers
     |> Enum.filter(fn provider ->
-      api_key.allowed_providers == [] or provider.id in api_key.allowed_providers
+      allowed == [] or provider.id in allowed
     end)
   end
 
