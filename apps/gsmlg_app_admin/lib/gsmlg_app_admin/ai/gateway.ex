@@ -509,12 +509,21 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     end
   end
 
-  defp log_usage(api_key, _provider, _request, endpoint_type, status, opts \\ []) do
+  defp log_usage(api_key, provider, request, endpoint_type, status, opts \\ []) do
     tokens = Keyword.get(opts, :tokens, 0)
 
     Task.start(fn ->
       try do
         AI.ApiKey.increment_usage(api_key, 1, tokens)
+
+        AI.ApiUsageLog.create(%{
+          endpoint_type: endpoint_type,
+          model: request[:model] || to_string(request.model),
+          total_tokens: tokens,
+          status: status,
+          api_key_id: api_key.id,
+          provider_id: provider.id
+        })
       rescue
         e ->
           Logger.warning(
