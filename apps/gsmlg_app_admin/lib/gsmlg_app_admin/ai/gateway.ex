@@ -531,7 +531,8 @@ defmodule GsmlgAppAdmin.AI.Gateway do
         _ -> []
       end
 
-    defaults ++ key_specific ++ agent_specific
+    (defaults ++ key_specific ++ agent_specific)
+    |> Enum.uniq_by(& &1.id)
   end
 
   defp fetch_memories(api_key, opts) do
