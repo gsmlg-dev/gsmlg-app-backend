@@ -598,7 +598,7 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
       }
 
       assert {:error, reason} = Gateway.resolve_provider(api_key, "gpt-4-turbo")
-      assert reason =~ "not allowed"
+      assert reason =~ "does not have access to model"
 
       # Same key with the allowed model — should succeed
       assert {:ok, _} = Gateway.resolve_provider(api_key, "gpt-4o")
