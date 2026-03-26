@@ -26,6 +26,15 @@
       </div>
     </div>
 
+    <div :if={@summary.by_endpoint != %{}} class="mb-6">
+      <h2 class="text-lg font-semibold mb-2">By Endpoint</h2>
+      <div class="flex flex-wrap gap-2">
+        <span :for={{endpoint, count} <- @summary.by_endpoint} class="badge badge-outline gap-1">
+          {endpoint} <span class="badge badge-sm badge-neutral">{count}</span>
+        </span>
+      </div>
+    </div>
+
     <div :if={@summary.by_model != %{}} class="mb-6">
       <h2 class="text-lg font-semibold mb-2">By Model</h2>
       <div class="flex flex-wrap gap-2">

@@ -48,6 +48,42 @@ defmodule GsmlgAppAdmin.AI.ToolExecutorTest do
   end
 
   describe "execute/3 - builtin" do
+    test "executes DateTime.now builtin and returns ISO 8601 datetime" do
+      tool = %{
+        execution_type: :builtin,
+        timeout_ms: 5000,
+        builtin_handler: "GsmlgAppAdmin.AI.Builtins.DateTime.now"
+      }
+
+      assert {:ok, result} = ToolExecutor.execute(tool, %{})
+      assert is_binary(result)
+      # ISO 8601 datetime contains "T" separator
+      assert result =~ ~r/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
+    end
+
+    test "executes DateTime.today builtin and returns ISO 8601 date" do
+      tool = %{
+        execution_type: :builtin,
+        timeout_ms: 5000,
+        builtin_handler: "GsmlgAppAdmin.AI.Builtins.DateTime.today"
+      }
+
+      assert {:ok, result} = ToolExecutor.execute(tool, %{})
+      assert result == Date.utc_today() |> Date.to_iso8601()
+    end
+
+    test "executes DateTime.time_now builtin and returns time string" do
+      tool = %{
+        execution_type: :builtin,
+        timeout_ms: 5000,
+        builtin_handler: "GsmlgAppAdmin.AI.Builtins.DateTime.time_now"
+      }
+
+      assert {:ok, result} = ToolExecutor.execute(tool, %{})
+      assert is_binary(result)
+      assert result =~ ~r/\d{2}:\d{2}:\d{2}/
+    end
+
     test "returns error for invalid handler format" do
       tool = %{execution_type: :builtin, timeout_ms: 5000, builtin_handler: "no_dots"}
       assert {:error, msg} = ToolExecutor.execute(tool, %{})
