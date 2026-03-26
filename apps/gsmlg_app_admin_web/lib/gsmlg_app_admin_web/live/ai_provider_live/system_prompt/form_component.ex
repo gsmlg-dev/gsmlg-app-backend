@@ -2,6 +2,8 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.FormComponent do
   @moduledoc false
   use GsmlgAppAdminWeb, :live_component
 
+  require Logger
+
   alias GsmlgAppAdmin.AI
 
   @impl true
@@ -68,7 +70,6 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.SystemPrompt.FormComponent do
          socket |> put_flash(:info, "Template saved.") |> push_patch(to: socket.assigns.patch)}
 
       {:error, error} ->
-        require Logger
         Logger.error("Failed to save template: #{inspect(error)}")
         {:noreply, put_flash(socket, :error, "Failed to save template.")}
     end

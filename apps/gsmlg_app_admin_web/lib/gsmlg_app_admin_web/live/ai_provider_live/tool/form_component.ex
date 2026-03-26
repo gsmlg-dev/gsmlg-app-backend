@@ -2,7 +2,10 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Tool.FormComponent do
   @moduledoc false
   use GsmlgAppAdminWeb, :live_component
 
+  require Logger
+
   alias GsmlgAppAdmin.AI
+  alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
 
   @valid_webhook_methods ~w(post get put delete)
   @valid_execution_types ~w(webhook builtin code mcp passthrough)
@@ -49,7 +52,8 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Tool.FormComponent do
 
   @impl true
   def handle_event("save", %{"form" => params}, socket) do
-    webhook_method = safe_enum(params["webhook_method"] || "post", @valid_webhook_methods, "post")
+    webhook_method =
+      RequestHelpers.safe_enum(params["webhook_method"] || "post", @valid_webhook_methods, "post")
 
     base_attrs = %{
       name: params["name"],
@@ -65,7 +69,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Tool.FormComponent do
       case socket.assigns.action do
         :new ->
           exec_type =
-            safe_enum(params["execution_type"], @valid_execution_types, "webhook")
+            RequestHelpers.safe_enum(params["execution_type"], @valid_execution_types, "webhook")
 
           base_attrs
           |> Map.put(:slug, params["slug"])
@@ -89,7 +93,6 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Tool.FormComponent do
          socket |> put_flash(:info, "Tool saved.") |> push_patch(to: socket.assigns.patch)}
 
       {:error, error} ->
-        require Logger
         Logger.error("Failed to save tool: #{inspect(error)}")
         {:noreply, put_flash(socket, :error, "Failed to save tool.")}
     end
@@ -98,10 +101,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Tool.FormComponent do
   defp blank_to_nil(""), do: nil
   defp blank_to_nil(nil), do: nil
   defp blank_to_nil(val), do: val
-
-  defp safe_enum(val, allowed, default) when is_binary(val) do
-    if val in allowed, do: val, else: default
-  end
-
-  defp safe_enum(_, _allowed, default), do: default
 end

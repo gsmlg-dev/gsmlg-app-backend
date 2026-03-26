@@ -2,7 +2,10 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Memory.FormComponent do
   @moduledoc false
   use GsmlgAppAdminWeb, :live_component
 
+  require Logger
+
   alias GsmlgAppAdmin.AI
+  alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
 
   @valid_categories ~w(fact instruction preference context)
   @valid_scopes ~w(global user api_key agent)
@@ -34,8 +37,8 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Memory.FormComponent do
 
   @impl true
   def handle_event("save", %{"form" => params}, socket) do
-    category = safe_enum(params["category"], @valid_categories, "fact")
-    scope = safe_enum(params["scope"], @valid_scopes, "global")
+    category = RequestHelpers.safe_enum(params["category"], @valid_categories, "fact")
+    scope = RequestHelpers.safe_enum(params["scope"], @valid_scopes, "global")
 
     attrs = %{
       content: params["content"],
@@ -58,15 +61,8 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Memory.FormComponent do
          socket |> put_flash(:info, "Memory saved.") |> push_patch(to: socket.assigns.patch)}
 
       {:error, error} ->
-        require Logger
         Logger.error("Failed to save memory: #{inspect(error)}")
         {:noreply, put_flash(socket, :error, "Failed to save memory.")}
     end
   end
-
-  defp safe_enum(val, allowed, default) when is_binary(val) do
-    if val in allowed, do: val, else: default
-  end
-
-  defp safe_enum(_, _allowed, default), do: default
 end

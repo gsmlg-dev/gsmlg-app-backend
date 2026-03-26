@@ -2,6 +2,8 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Agent.FormComponent do
   @moduledoc false
   use GsmlgAppAdminWeb, :live_component
 
+  require Logger
+
   alias GsmlgAppAdmin.AI
 
   @impl true
@@ -79,7 +81,6 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Agent.FormComponent do
          socket |> put_flash(:info, "Agent saved.") |> push_patch(to: socket.assigns.patch)}
 
       {:error, error} ->
-        require Logger
         Logger.error("Failed to save agent: #{inspect(error)}")
         {:noreply, put_flash(socket, :error, "Failed to save agent.")}
     end

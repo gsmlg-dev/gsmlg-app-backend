@@ -2,7 +2,10 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.McpServer.FormComponent do
   @moduledoc false
   use GsmlgAppAdminWeb, :live_component
 
+  require Logger
+
   alias GsmlgAppAdmin.AI
+  alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
 
   @valid_transport_types ~w(stdio sse streamable_http)
 
@@ -56,7 +59,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.McpServer.FormComponent do
       description: blank_to_nil(params["description"]),
       transport_type:
         params["transport_type"]
-        |> safe_enum(@valid_transport_types, "stdio")
+        |> RequestHelpers.safe_enum(@valid_transport_types, "stdio")
         |> String.to_existing_atom(),
       connection_config: connection_config,
       is_active: params["is_active"] == "true",
@@ -83,7 +86,6 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.McpServer.FormComponent do
          socket |> put_flash(:info, "MCP server saved.") |> push_patch(to: socket.assigns.patch)}
 
       {:error, error} ->
-        require Logger
         Logger.error("Failed to save MCP server: #{inspect(error)}")
         {:noreply, put_flash(socket, :error, "Failed to save MCP server.")}
     end
@@ -92,10 +94,4 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.McpServer.FormComponent do
   defp blank_to_nil(""), do: nil
   defp blank_to_nil(nil), do: nil
   defp blank_to_nil(val), do: val
-
-  defp safe_enum(val, allowed, default) when is_binary(val) do
-    if val in allowed, do: val, else: default
-  end
-
-  defp safe_enum(_, _allowed, default), do: default
 end

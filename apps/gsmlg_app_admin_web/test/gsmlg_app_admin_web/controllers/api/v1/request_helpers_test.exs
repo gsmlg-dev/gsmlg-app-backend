@@ -108,8 +108,13 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpersTest do
       assert RequestHelpers.clamp_int(999_999, 1, 100_000) == 100_000
     end
 
-    test "returns nil for non-integer input" do
-      assert RequestHelpers.clamp_int(1.5, 1, 100_000) == nil
+    test "truncates float values to integer" do
+      assert RequestHelpers.clamp_int(1.5, 1, 100_000) == 1
+      assert RequestHelpers.clamp_int(4096.0, 1, 100_000) == 4096
+      assert RequestHelpers.clamp_int(200_000.9, 1, 100_000) == 100_000
+    end
+
+    test "returns nil for non-numeric input" do
       assert RequestHelpers.clamp_int("500", 1, 100_000) == nil
     end
   end
@@ -233,6 +238,31 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpersTest do
     test "returns nil for non-integer" do
       assert RequestHelpers.validate_image_count("2") == nil
       assert RequestHelpers.validate_image_count(1.5) == nil
+    end
+  end
+
+  describe "safe_enum/3" do
+    test "returns value when in allowed list" do
+      assert RequestHelpers.safe_enum("fact", ~w(fact instruction), "fact") == "fact"
+
+      assert RequestHelpers.safe_enum("instruction", ~w(fact instruction), "fact") ==
+               "instruction"
+    end
+
+    test "returns default for values not in allowed list" do
+      assert RequestHelpers.safe_enum("evil", ~w(fact instruction), "fact") == "fact"
+      assert RequestHelpers.safe_enum("__struct__", ~w(fact instruction), "fact") == "fact"
+    end
+
+    test "returns default for non-string values" do
+      assert RequestHelpers.safe_enum(nil, ~w(fact instruction), "fact") == "fact"
+      assert RequestHelpers.safe_enum(123, ~w(fact instruction), "fact") == "fact"
+    end
+  end
+
+  describe "validate_image_url/1 (edge cases)" do
+    test "rejects empty host URLs" do
+      assert {:error, _} = RequestHelpers.validate_image_url("http:///etc/passwd")
     end
   end
 end

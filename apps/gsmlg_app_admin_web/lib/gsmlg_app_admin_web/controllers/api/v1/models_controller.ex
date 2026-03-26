@@ -7,6 +7,8 @@ defmodule GsmlgAppAdminWeb.Api.V1.ModelsController do
 
   use GsmlgAppAdminWeb, :controller
 
+  require Logger
+
   alias GsmlgAppAdmin.AI.Gateway
   alias GsmlgAppAdminWeb.Plugs.ApiKeyAuth
 
@@ -19,7 +21,6 @@ defmodule GsmlgAppAdminWeb.Api.V1.ModelsController do
           json(conn, %{object: "list", data: models})
 
         {:error, reason} ->
-          require Logger
           Logger.error("Models list error: #{inspect(reason)}")
 
           conn

@@ -7,6 +7,8 @@ defmodule GsmlgAppAdminWeb.Api.V1.OcrController do
 
   use GsmlgAppAdminWeb, :controller
 
+  require Logger
+
   alias GsmlgAppAdmin.AI.Gateway
   alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
   alias GsmlgAppAdminWeb.Plugs.ApiKeyAuth
@@ -53,7 +55,6 @@ defmodule GsmlgAppAdminWeb.Api.V1.OcrController do
         |> json(%{error: %{message: reason, type: "permission_error"}})
 
       {:error, reason} ->
-        require Logger
         Logger.error("OCR API error: #{inspect(reason)}")
 
         conn

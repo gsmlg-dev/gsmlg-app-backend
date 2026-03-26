@@ -2,6 +2,8 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
   @moduledoc false
   use GsmlgAppAdminWeb, :live_component
 
+  require Logger
+
   alias GsmlgAppAdmin.AI
 
   @all_scopes ~w(chat_completions messages images ocr agents models_list)
@@ -84,7 +86,6 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, error} ->
-        require Logger
         Logger.error("Failed to create API key: #{inspect(error)}")
         {:noreply, put_flash(socket, :error, "Failed to create API key.")}
     end
@@ -117,7 +118,6 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, error} ->
-        require Logger
         Logger.error("Failed to update API key: #{inspect(error)}")
         {:noreply, put_flash(socket, :error, "Failed to update API key.")}
     end

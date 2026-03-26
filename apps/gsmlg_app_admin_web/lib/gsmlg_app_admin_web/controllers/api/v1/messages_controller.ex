@@ -8,6 +8,8 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
 
   use GsmlgAppAdminWeb, :controller
 
+  require Logger
+
   alias GsmlgAppAdmin.AI.Gateway
   alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
   alias GsmlgAppAdminWeb.Plugs.ApiKeyAuth
@@ -83,7 +85,6 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
         })
 
       {:error, reason} ->
-        require Logger
         Logger.error("Messages API error: #{inspect(reason)}")
 
         conn
@@ -115,7 +116,6 @@ defmodule GsmlgAppAdminWeb.Api.V1.MessagesController do
         })
 
       {:error, reason} ->
-        require Logger
         Logger.error("Stream pre-validation error: #{inspect(reason)}")
 
         conn

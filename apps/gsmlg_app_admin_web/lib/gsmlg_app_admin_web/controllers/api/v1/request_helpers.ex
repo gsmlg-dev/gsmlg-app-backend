@@ -3,6 +3,8 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpers do
   Shared helpers for API v1 controllers.
   """
 
+  import Bitwise
+
   @doc """
   Converts a role string to an existing atom.
 
@@ -84,6 +86,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpers do
   """
   def clamp_int(nil, _min, _max), do: nil
   def clamp_int(val, min, max) when is_integer(val), do: val |> max(min) |> min(max)
+  def clamp_int(val, min, max) when is_float(val), do: clamp_int(trunc(val), min, max)
   def clamp_int(_val, _min, _max), do: nil
 
   @max_model_length 256
@@ -132,7 +135,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpers do
       %URI{scheme: scheme} when scheme not in ["http", "https"] ->
         {:error, "Image URL must use http or https scheme."}
 
-      %URI{host: host} when is_binary(host) ->
+      %URI{host: host} when is_binary(host) and host != "" ->
         if private_host?(host) do
           {:error, "Image URL must not point to private or internal addresses."}
         else
@@ -153,16 +156,42 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpers do
   def validate_image_count(n) when is_integer(n), do: min(max(n, 1), 4)
   def validate_image_count(_), do: nil
 
-  # Checks if a hostname resolves to a private/internal IP range.
-  defp private_host?(host) do
-    host = to_charlist(host)
+  @doc """
+  Validates a string value against an allowed list, returning a default if invalid.
 
-    case :inet.getaddr(host, :inet) do
-      {:ok, ip} -> private_ip?(ip)
-      {:error, _} -> false
+  Prevents atom exhaustion by keeping user input as strings.
+  """
+  def safe_enum(val, allowed, default) when is_binary(val) do
+    if val in allowed, do: val, else: default
+  end
+
+  def safe_enum(_val, _allowed, default), do: default
+
+  # Checks if a hostname resolves to a private/internal IP range (IPv4 and IPv6).
+  defp private_host?(host) do
+    charlist_host = to_charlist(host)
+
+    ipv4_private? =
+      case :inet.getaddr(charlist_host, :inet) do
+        {:ok, ip} -> private_ip?(ip)
+        {:error, _} -> false
+      end
+
+    ipv6_private? =
+      case :inet.getaddr(charlist_host, :inet6) do
+        {:ok, ip} -> private_ipv6?(ip)
+        {:error, _} -> false
+      end
+
+    # Block if either resolution yields a private address.
+    # Also block if the host cannot be resolved at all (prevents DNS rebinding TOCTOU).
+    case {:inet.getaddr(charlist_host, :inet), :inet.getaddr(charlist_host, :inet6)} do
+      {{:error, _}, {:error, _}} -> true
+      _ -> ipv4_private? or ipv6_private?
     end
   end
 
+  # IPv4 private ranges
   defp private_ip?({127, _, _, _}), do: true
   defp private_ip?({10, _, _, _}), do: true
   defp private_ip?({172, b, _, _}) when b >= 16 and b <= 31, do: true
@@ -170,4 +199,24 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpers do
   defp private_ip?({169, 254, _, _}), do: true
   defp private_ip?({0, 0, 0, 0}), do: true
   defp private_ip?(_), do: false
+
+  # IPv6 private/reserved ranges
+  # ::1 (loopback)
+  defp private_ipv6?({0, 0, 0, 0, 0, 0, 0, 1}), do: true
+  # :: (unspecified)
+  defp private_ipv6?({0, 0, 0, 0, 0, 0, 0, 0}), do: true
+  # fe80::/10 (link-local)
+  defp private_ipv6?({w, _, _, _, _, _, _, _}) when w >= 0xFE80 and w <= 0xFEBF, do: true
+  # fc00::/7 (unique local)
+  defp private_ipv6?({w, _, _, _, _, _, _, _}) when w >= 0xFC00 and w <= 0xFDFF, do: true
+  # ::ffff:0:0/96 (IPv4-mapped) — check the embedded IPv4 address
+  defp private_ipv6?({0, 0, 0, 0, 0, 0xFFFF, hi, lo}) do
+    a = hi >>> 8
+    b = hi &&& 0xFF
+    c = lo >>> 8
+    d = lo &&& 0xFF
+    private_ip?({a, b, c, d})
+  end
+
+  defp private_ipv6?(_), do: false
 end

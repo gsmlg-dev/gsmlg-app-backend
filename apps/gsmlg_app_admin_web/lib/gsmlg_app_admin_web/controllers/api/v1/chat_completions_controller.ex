@@ -8,6 +8,8 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
 
   use GsmlgAppAdminWeb, :controller
 
+  require Logger
+
   alias GsmlgAppAdmin.AI.Gateway
   alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
   alias GsmlgAppAdminWeb.Plugs.ApiKeyAuth
@@ -69,7 +71,6 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
         |> json(%{error: %{message: reason, type: "permission_error"}})
 
       {:error, reason} ->
-        require Logger
         Logger.error("Chat completions error: #{inspect(reason)}")
 
         conn
@@ -92,7 +93,6 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
         |> json(%{error: %{message: reason, type: "permission_error"}})
 
       {:error, reason} ->
-        require Logger
         Logger.error("Stream pre-validation error: #{inspect(reason)}")
 
         conn

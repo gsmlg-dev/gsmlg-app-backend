@@ -7,6 +7,8 @@ defmodule GsmlgAppAdminWeb.Api.V1.ImagesController do
 
   use GsmlgAppAdminWeb, :controller
 
+  require Logger
+
   alias GsmlgAppAdmin.AI.Gateway
   alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
   alias GsmlgAppAdminWeb.Plugs.ApiKeyAuth
@@ -64,7 +66,6 @@ defmodule GsmlgAppAdminWeb.Api.V1.ImagesController do
   defp sanitize_error_message(reason, status) when status < 500, do: to_string(reason)
 
   defp sanitize_error_message(reason, _status) do
-    require Logger
     Logger.error("Image generation error: #{inspect(reason)}")
     "An internal error occurred."
   end

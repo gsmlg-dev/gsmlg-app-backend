@@ -7,6 +7,8 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
 
   use GsmlgAppAdminWeb, :controller
 
+  require Logger
+
   alias GsmlgAppAdmin.AI
   alias GsmlgAppAdmin.AI.Gateway
   alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
@@ -32,7 +34,6 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
           json(conn, %{data: data})
 
         {:error, reason} ->
-          require Logger
           Logger.error("Agent list error: #{inspect(reason)}")
 
           conn
@@ -174,7 +175,6 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
             |> json(%{error: %{message: reason, type: "permission_error"}})
 
           {:error, reason} ->
-            require Logger
             Logger.error("Agent chat error: #{inspect(reason)}")
 
             conn
