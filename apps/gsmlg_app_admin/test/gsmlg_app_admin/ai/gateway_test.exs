@@ -324,7 +324,7 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
       }
 
       agent = %{
-        id: "test-agent-id-#{uid}",
+        id: Ash.UUID.generate(),
         slug: "zero-agent-#{uid}",
         model: "zero-iter-model-#{uid}",
         max_iterations: 0,
@@ -364,7 +364,7 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
 
       # Agent with max_iterations: 0 so we get the error without an LLM call
       agent = %{
-        id: "test-agent-sys-#{uid}",
+        id: Ash.UUID.generate(),
         slug: "agent-sys-#{uid}",
         model: "agent-sys-model-#{uid}",
         max_iterations: 0,

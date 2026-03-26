@@ -52,10 +52,10 @@ defmodule GsmlgAppAdmin.AI.Gateway do
       else
         case Client.chat_completion(provider, messages, call_opts) do
           {:ok, response} ->
-            tokens = get_in(response, [:usage, :total_tokens]) || 0
-
             log_usage(api_key, provider, request, :chat, :success,
-              tokens: tokens,
+              tokens: get_in(response, [:usage, :total_tokens]) || 0,
+              prompt_tokens: get_in(response, [:usage, :prompt_tokens]) || 0,
+              completion_tokens: get_in(response, [:usage, :completion_tokens]) || 0,
               request_ip: request_ip
             )
 
@@ -151,8 +151,12 @@ defmodule GsmlgAppAdmin.AI.Gateway do
       # Load agent's tools (empty list on error — agent can still run without tools)
       tools =
         case AI.list_tools_for_agent(agent.id) do
-          {:ok, t} -> t
-          _ -> []
+          {:ok, t} ->
+            t
+
+          {:error, reason} ->
+            Logger.warning("Agent #{agent.slug}: failed to load tools — #{inspect(reason)}")
+            []
         end
 
       # Build agent request with agent's own system prompt + caller system prompt
@@ -196,6 +200,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
         {:ok, content, iterations, total_tokens, tool_calls_made} ->
           log_usage(api_key, provider, request, :agent, :success,
             tokens: total_tokens,
+            agent_id: agent.id,
             request_ip: request_ip
           )
 
@@ -640,6 +645,9 @@ defmodule GsmlgAppAdmin.AI.Gateway do
 
   defp log_usage(api_key, provider, request, endpoint_type, status, opts) do
     tokens = Keyword.get(opts, :tokens, 0)
+    prompt_tokens = Keyword.get(opts, :prompt_tokens, 0)
+    completion_tokens = Keyword.get(opts, :completion_tokens, 0)
+    agent_id = Keyword.get(opts, :agent_id)
     request_ip = Keyword.get(opts, :request_ip)
 
     Task.Supervisor.start_child(GsmlgAppAdmin.TaskSupervisor, fn ->
@@ -649,6 +657,8 @@ defmodule GsmlgAppAdmin.AI.Gateway do
         log_attrs = %{
           endpoint_type: endpoint_type,
           model: request[:model] || to_string(request.model),
+          prompt_tokens: prompt_tokens,
+          completion_tokens: completion_tokens,
           total_tokens: tokens,
           status: status,
           api_key_id: api_key.id,
@@ -657,6 +667,9 @@ defmodule GsmlgAppAdmin.AI.Gateway do
 
         log_attrs =
           if request_ip, do: Map.put(log_attrs, :request_ip, request_ip), else: log_attrs
+
+        log_attrs =
+          if agent_id, do: Map.put(log_attrs, :agent_id, agent_id), else: log_attrs
 
         AI.ApiUsageLog.create(log_attrs)
       rescue
