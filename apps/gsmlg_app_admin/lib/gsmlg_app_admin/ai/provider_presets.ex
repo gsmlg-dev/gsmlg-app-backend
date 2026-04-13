@@ -17,6 +17,16 @@ defmodule GsmlgAppAdmin.AI.ProviderPresets do
       description: "Custom OpenAI-compatible API provider"
     },
     %{
+      id: "generic_anthropic",
+      name: "Generic (Anthropic Compatible)",
+      slug: "",
+      api_base_url: "",
+      model: "",
+      available_models: [],
+      default_params: %{"temperature" => 0.7, "max_tokens" => 4096},
+      description: "Custom Anthropic-compatible API provider (Messages API format)"
+    },
+    %{
       id: "openai",
       name: "OpenAI",
       slug: "openai",
@@ -264,6 +274,23 @@ defmodule GsmlgAppAdmin.AI.ProviderPresets do
       ],
       default_params: %{"temperature" => 0.7, "max_tokens" => 4096},
       description: "Fireworks AI - Optimized open source model inference"
+    },
+    %{
+      id: "minimax",
+      name: "MiniMax",
+      slug: "minimax",
+      api_base_url: "https://api.minimaxi.chat/v1",
+      model: "MiniMax-M1",
+      available_models: [
+        "MiniMax-M1",
+        "MiniMax-Text-01",
+        "abab7-chat-preview",
+        "abab6.5s-chat",
+        "abab6.5-chat",
+        "abab5.5-chat"
+      ],
+      default_params: %{"temperature" => 0.7, "max_tokens" => 4096},
+      description: "MiniMax - Chinese AI models with strong multilingual capabilities"
     },
     %{
       id: "ollama",

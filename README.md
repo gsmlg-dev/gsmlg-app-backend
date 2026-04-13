@@ -40,6 +40,21 @@ This is an Elixir umbrella project consisting of multiple applications:
 - Administrative dashboard
 - Ash-based data management
 
+## Supported Languages
+
+| Locale | Language |
+|--------|----------|
+| `en` | English |
+| `zh-Hans` | Chinese (Simplified) |
+| `zh-Hant` | Chinese (Traditional) |
+| `fr` | French |
+| `es` | Spanish |
+| `de` | German |
+| `it` | Italian |
+| `ja` | Japanese |
+
+Default locale is `en`
+
 ## Prerequisites
 
 - Elixir 1.14+
