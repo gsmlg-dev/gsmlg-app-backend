@@ -27,5 +27,5 @@ node_modules
 package-lock.json
 
 # devenv
-/.devenv
-/.devenv.*
+.devenv
+.devenv.*

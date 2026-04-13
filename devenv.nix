@@ -42,6 +42,10 @@ in {
     export DATABASE_URL_TEST="ecto://gsmlg_app:gsmlg_app@localhost/gsmlg_app_admin_test"
   '';
 
+  processes.gsmlg-app-backend = {
+    exec = "mix phx.server";
+  };
+
   # services
   services.postgres = {
     enable = true;
