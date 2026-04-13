@@ -237,22 +237,31 @@
 <!-- Input Area -->
       <div class="p-4 bg-base-100 border-t border-base-300">
         <%= if @current_user do %>
-          <form phx-submit="send_message" class="flex gap-2 items-end">
-            <textarea
-              id="message-input"
-              name="message"
-              phx-change="update_input"
-              phx-hook="AutoResizeTextarea"
-              placeholder="Type your message... (Cmd+Enter or Ctrl+Enter to send)"
-              class="textarea textarea-bordered flex-1 min-h-[2.5rem] max-h-[12rem] resize-none overflow-y-auto"
-              disabled={@loading}
-              rows="1"
-              autofocus
-            ><%= @input %></textarea>
+          <div id="message-input" phx-hook="MarkdownInput" class="flex gap-2 items-end">
+            <div class="flex-1 border border-base-300 rounded-lg overflow-hidden bg-base-100">
+              <div class="tabs tabs-bordered px-2 pt-1">
+                <button type="button" data-tab="write" class="tab tab-sm tab-active">Write</button>
+                <button type="button" data-tab="preview" class="tab tab-sm">Preview</button>
+              </div>
+              <div data-pane="write">
+                <textarea
+                  id="message-textarea"
+                  placeholder="Type your message... (Cmd+Enter or Ctrl+Enter to send)"
+                  class="w-full p-3 min-h-[3rem] max-h-[12rem] resize-none overflow-y-auto bg-transparent outline-none"
+                  disabled={@loading}
+                  rows="2"
+                  phx-update="ignore"
+                ><%= @input %></textarea>
+              </div>
+              <div data-pane="preview" class="hidden p-3 min-h-[3rem] max-h-[12rem] overflow-y-auto prose prose-sm">
+              </div>
+            </div>
             <button
-              type="submit"
+              type="button"
               class="btn btn-primary"
               disabled={@loading || String.trim(@input) == ""}
+              phx-click="send_message"
+              phx-value-message={@input}
             >
               <%= if @loading do %>
                 <span class="loading loading-spinner loading-sm"></span>
@@ -260,7 +269,7 @@
                 <.dm_mdi name="send" class="w-5 h-5" />
               <% end %>
             </button>
-          </form>
+          </div>
         <% else %>
           <div class="alert alert-warning">
             <.dm_mdi name="alert" class="w-5 h-5" />

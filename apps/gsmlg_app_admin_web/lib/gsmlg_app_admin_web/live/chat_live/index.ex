@@ -288,6 +288,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
       |> assign(:streaming_start_time, System.monotonic_time(:millisecond))
       |> assign(:streaming_token_count, 0)
       |> update(:messages, fn messages -> messages ++ [user_message] end)
+      |> push_event("clear_input", %{})
       |> push_event("stream_start", %{})
 
     # Send to AI in background

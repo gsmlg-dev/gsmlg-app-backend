@@ -211,33 +211,67 @@ Hooks.ProviderSelection = {
   }
 }
 
-// Auto-resize textarea hook
-Hooks.AutoResizeTextarea = {
+// Markdown input hook for chat with write/preview tabs
+Hooks.MarkdownInput = {
   mounted() {
+    this.textarea = this.el.querySelector("textarea")
+    this.preview = this.el.querySelector("el-dm-markdown")
+    this.writeTab = this.el.querySelector("[data-tab='write']")
+    this.previewTab = this.el.querySelector("[data-tab='preview']")
+    this.writePane = this.el.querySelector("[data-pane='write']")
+    this.previewPane = this.el.querySelector("[data-pane='preview']")
+
+    this.writeTab.addEventListener("click", () => this.showTab("write"))
+    this.previewTab.addEventListener("click", () => this.showTab("preview"))
+
+    this.textarea.addEventListener("input", () => {
+      this.resize()
+      this.pushEvent("update_input", { message: this.textarea.value })
+    })
+    this.textarea.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        const value = this.textarea.value.trim()
+        if (value) {
+          this.pushEvent("send_message", { message: value })
+        }
+      }
+    })
+    this.handleEvent("clear_input", () => {
+      this.textarea.value = ""
+      this.resize()
+      this.showTab("write")
+    })
     this.resize()
-    this.el.addEventListener("input", () => this.resize())
-    this.el.addEventListener("keydown", (e) => this.handleKeydown(e))
   },
   updated() {
     this.resize()
   },
   resize() {
-    // Reset height to auto to get the correct scrollHeight
-    this.el.style.height = "auto"
-    // Set height to scrollHeight, but respect max-height from CSS
-    this.el.style.height = this.el.scrollHeight + "px"
+    this.textarea.style.height = "auto"
+    this.textarea.style.height = this.textarea.scrollHeight + "px"
   },
-  handleKeydown(e) {
-    // Cmd+Enter (Mac) or Ctrl+Enter (Windows/Linux) submits the form
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-      e.preventDefault()
-      const form = this.el.closest("form")
-      if (form) {
-        // Check if message is not empty
-        const message = this.el.value.trim()
-        if (message) {
-          form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }))
-        }
+  showTab(tab) {
+    if (tab === "write") {
+      this.writeTab.classList.add("tab-active")
+      this.previewTab.classList.remove("tab-active")
+      this.writePane.classList.remove("hidden")
+      this.previewPane.classList.add("hidden")
+      this.textarea.focus()
+    } else {
+      this.previewTab.classList.add("tab-active")
+      this.writeTab.classList.remove("tab-active")
+      this.previewPane.classList.remove("hidden")
+      this.writePane.classList.add("hidden")
+      const content = this.textarea.value || ""
+      if (content) {
+        this.previewPane.innerHTML = ""
+        const md = document.createElement("el-dm-markdown")
+        md.setAttribute("theme", "auto")
+        md.textContent = content
+        this.previewPane.appendChild(md)
+      } else {
+        this.previewPane.innerHTML = "<p class='text-base-content/50 italic'>Nothing to preview</p>"
       }
     }
   }
