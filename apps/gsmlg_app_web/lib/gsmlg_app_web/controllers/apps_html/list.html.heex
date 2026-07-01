@@ -79,8 +79,8 @@
         </div>
       </div>
     </div>
-    
-<!-- Apps Listing -->
+
+    <!-- Apps Listing -->
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
       <!-- CSS-only Filter Tabs -->
       <div class="css-tabs">
@@ -107,8 +107,8 @@
             <span>{dgettext("common", "Desktop")}</span>
           </label>
         </div>
-        
-<!-- All Apps Panel -->
+
+        <!-- All Apps Panel -->
         <div class="css-tab-panel" id="panel-all">
           <div class="space-y-5">
             <%= if Enum.empty?(@apps) do %>
@@ -128,8 +128,8 @@
             <% end %>
           </div>
         </div>
-        
-<!-- iOS Panel -->
+
+        <!-- iOS Panel -->
         <div class="css-tab-panel" id="panel-ios">
           <div class="space-y-5">
             <% ios_apps = Enum.filter(@apps, fn app -> "ios" in app.platforms end) %>
@@ -143,8 +143,8 @@
             <% end %>
           </div>
         </div>
-        
-<!-- Android Panel -->
+
+        <!-- Android Panel -->
         <div class="css-tab-panel" id="panel-android">
           <div class="space-y-5">
             <% android_apps = Enum.filter(@apps, fn app -> "android" in app.platforms end) %>
@@ -158,8 +158,8 @@
             <% end %>
           </div>
         </div>
-        
-<!-- Desktop Panel -->
+
+        <!-- Desktop Panel -->
         <div class="css-tab-panel" id="panel-desktop">
           <div class="space-y-5">
             <% desktop_apps =

@@ -54,7 +54,7 @@
             <.dm_mdi name="account-outline" class="w-4 h-4" /> My Profile
           </.link>
           <div class="border-t border-base-300/30 mt-1 pt-1">
-            <.link href="/sign-out" class="popover-menu-item text-error">
+            <.link href={~p"/sign-out"} method="delete" class="popover-menu-item text-error">
               <.dm_mdi name="logout" class="w-4 h-4" /> Sign Out
             </.link>
           </div>

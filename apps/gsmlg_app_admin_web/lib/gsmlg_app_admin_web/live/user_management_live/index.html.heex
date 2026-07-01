@@ -18,8 +18,8 @@
       </div>
     </div>
   </div>
-  
-<!-- Search and Filters -->
+
+  <!-- Search and Filters -->
   <div class="px-4 sm:px-6 lg:px-8">
     <div class="bg-white p-4 rounded-lg shadow">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -41,8 +41,8 @@
             </form>
           </div>
         </div>
-        
-<!-- Role Filter -->
+
+        <!-- Role Filter -->
         <div>
           <label for="role-filter" class="block text-sm font-medium leading-6 text-gray-900">
             Role
@@ -63,8 +63,8 @@
             </select>
           </div>
         </div>
-        
-<!-- Status Filter -->
+
+        <!-- Status Filter -->
         <div>
           <label for="status-filter" class="block text-sm font-medium leading-6 text-gray-900">
             Status
@@ -89,8 +89,8 @@
       </div>
     </div>
   </div>
-  
-<!-- Users Table -->
+
+  <!-- Users Table -->
   <div class="px-4 sm:px-6 lg:px-8">
     <div class="mt-8 flow-root">
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -182,7 +182,7 @@
                         navigate={~p"/users/#{user.id}/edit"}
                         class="text-indigo-600 hover:text-indigo-900"
                       >
-                        Edit<span class="sr-only">, <%= user.display_name || user.username %></span>
+                        Edit<span class="sr-only">, {user.display_name || user.username}</span>
                       </.link>
                     </td>
                   </tr>

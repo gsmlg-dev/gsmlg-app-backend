@@ -42,7 +42,7 @@ defmodule GsmlgAppAdminWeb.Integration.SessionSignOutTest do
       assert session_user != nil
 
       # Sign out
-      conn = get(recycle(conn), "/sign-out")
+      conn = delete(recycle(conn), "/sign-out")
 
       # Should redirect to sign-in page
       assert redirected_to(conn) == "/sign-in"
@@ -68,7 +68,7 @@ defmodule GsmlgAppAdminWeb.Integration.SessionSignOutTest do
       assert get_session(conn, "user") != nil
 
       # Sign out
-      conn = get(recycle(conn), "/sign-out")
+      conn = delete(recycle(conn), "/sign-out")
 
       # Access home page after sign-out
       conn2 = get(recycle(conn), "/")
@@ -100,7 +100,7 @@ defmodule GsmlgAppAdminWeb.Integration.SessionSignOutTest do
       assert after_signin_count > initial_count
 
       # Sign out
-      _conn = get(recycle(conn), "/sign-out")
+      _conn = delete(recycle(conn), "/sign-out")
 
       # Note: Plug.Session.ETS doesn't automatically delete the ETS record on clear_session
       # The session data is cleared from the map but the record may still exist
@@ -125,7 +125,7 @@ defmodule GsmlgAppAdminWeb.Integration.SessionSignOutTest do
       assert session_before != nil
 
       # Sign out
-      conn = get(recycle(conn), "/sign-out")
+      conn = delete(recycle(conn), "/sign-out")
 
       # Try to access a page
       conn2 = get(recycle(conn), "/")

@@ -186,8 +186,8 @@ defmodule GsmlgAppWeb.AppComponents do
             <% end %>
           </div>
         </div>
-        
-    <!-- Actions Column -->
+
+        <!-- Actions Column -->
         <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-3 sm:gap-4 shrink-0">
           <div class="flex items-center gap-2">
             <.platform_chips platforms={@app.platforms} />
@@ -210,8 +210,8 @@ defmodule GsmlgAppWeb.AppComponents do
           </.dm_dropdown>
         </div>
       </div>
-      
-    <!-- Store Links & Quick Actions -->
+
+      <!-- Store Links & Quick Actions -->
       <div class="mt-5 pt-5 border-t border-white/5 flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">
