@@ -7,6 +7,8 @@
 }: let
   pkgs-stable = import inputs.nixpkgs-stable {system = pkgs.stdenv.system;};
 in {
+  devenv.warnOnNewVersion = false;
+
   env.GREET = "GSMLG APP Backend";
   env.MIX_BUN_PATH = lib.getExe pkgs-stable.bun;
   env.MIX_TAILWIND_PATH = lib.getExe pkgs-stable.tailwindcss_4;
