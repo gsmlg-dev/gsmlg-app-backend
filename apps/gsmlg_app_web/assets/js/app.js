@@ -1,7 +1,4 @@
-import "../../../../deps/phoenix_html/priv/static/phoenix_html.js";
-
-// Register duskmoon custom elements
-import "@duskmoon-dev/elements/register";
+import "phoenix_html";
 
 // PageHeader scroll behavior (replaces phx-hook="PageHeader" which requires LiveSocket)
 // Shows fixed nav when header scrolls out of view using IntersectionObserver
@@ -29,4 +26,3 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }, { root: null, rootMargin: "0px", threshold: thresholds }).observe(header);
 });
-

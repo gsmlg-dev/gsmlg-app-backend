@@ -42,6 +42,7 @@ defmodule GsmlgApp.Umbrella.MixProject do
       # Required to run "mix format" on ~H/.heex files from the umbrella root
       {:phoenix_live_view, ">= 1.0.0"},
       {:idna, "~> 7.0"},
+      {:duskmoon_bundler, "~> 9.6"},
       # Code quality tools
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
@@ -50,8 +51,21 @@ defmodule GsmlgApp.Umbrella.MixProject do
 
   defp aliases do
     [
-      # run `mix setup` in all child apps
-      setup: ["cmd mix setup"],
+      setup: [
+        "deps.get",
+        "assets.setup",
+        "do --app gsmlg_app_admin cmd mix ecto.setup",
+        "assets.build"
+      ],
+      "assets.setup": ["npm.install"],
+      "assets.build": [
+        "do --app gsmlg_app_web cmd mix assets.build",
+        "do --app gsmlg_app_admin_web cmd mix assets.build"
+      ],
+      "assets.deploy": [
+        "do --app gsmlg_app_web cmd mix assets.deploy",
+        "do --app gsmlg_app_admin_web cmd mix assets.deploy"
+      ],
       lint: ["cmd mix lint"]
     ]
   end

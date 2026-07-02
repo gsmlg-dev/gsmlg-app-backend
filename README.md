@@ -22,8 +22,7 @@ This is an Elixir umbrella project consisting of multiple applications:
 - **Ash Framework** - Data modeling and management
 - **PostgreSQL** - Primary database (admin app)
 - **Bandit** - HTTP server
-- **Tailwind CSS** - Styling
-- **Bun** - JavaScript bundler
+- **DuskmoonBundler** - Frontend asset bundling and Tailwind compilation
 - **Swoosh** - Email library
 
 ## Features
@@ -60,8 +59,6 @@ Default locale is `en`
 - Elixir 1.14+
 - Erlang/OTP 25+
 - PostgreSQL 13+
-- Node.js 18+ (for assets)
-- Bun 1.2.5+
 
 ## Installation
 

@@ -43,9 +43,8 @@ defmodule GsmlgAppWeb.MixProject do
       {:phoenix_live_view, "~> 1.0"},
       {:phoenix_live_dashboard, "~> 0.8.0"},
       {:phoenix_duskmoon, "~> 9.0"},
-      {:floki, ">= 0.30.0", only: :test},
-      {:bun, "~> 2.0", runtime: Mix.env() == :dev},
-      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
+      {:duskmoon_bundler, "~> 9.6"},
+      {:floki, "~> 0.38"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~>0.26 or ~> 1.0"},
@@ -64,11 +63,12 @@ defmodule GsmlgAppWeb.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
-      "assets.setup": ["tailwind.install --if-missing"],
-      "assets.build": ["tailwind gsmlg_app_web", "bun run build"],
+      "assets.setup": ["cmd --cd ../.. mix npm.install"],
+      "assets.build": [
+        "cmd --cd ../.. mix duskmoon_bundler.build gsmlg_app_web --tailwind --no-hash --outdir apps/gsmlg_app_web/priv/static/assets"
+      ],
       "assets.deploy": [
-        "tailwind gsmlg_app_web --minify",
-        "bun run build:deploy",
+        "cmd --cd ../.. mix duskmoon_bundler.build gsmlg_app_web --tailwind --outdir apps/gsmlg_app_web/priv/static/assets",
         "phx.digest"
       ],
       lint: ["credo --strict", "dialyzer"]

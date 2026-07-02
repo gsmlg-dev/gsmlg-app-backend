@@ -1,29 +1,19 @@
 {
-  "name": "gsmlg-app-backend",
-  "version": "1.0.0",
-  "private": true,
+  "author": "Jonathan Gao",
   "description": "GSMLG App Backend - Umbrella Project",
+  "license": "ISC",
+  "name": "gsmlg-app-backend",
+  "private": true,
+  "scripts": {
+    "build": "mix assets.build",
+    "dev": "mix phx.server",
+    "format": "mix format",
+    "lint": "mix format --check-formatted",
+    "setup": "mix npm.install",
+    "test": "mix cmd mix test"
+  },
+  "version": "1.0.0",
   "workspaces": [
     "apps/*"
-  ],
-  "scripts": {
-    "setup": "bun run setup:web && bun run setup:admin",
-    "setup:web": "cd apps/gsmlg_app_web && bun install",
-    "setup:admin": "cd apps/gsmlg_app_admin_web && bun install",
-    "build": "bun run build:web && bun run build:admin",
-    "build:web": "cd apps/gsmlg_app_web && bun run build",
-    "build:admin": "cd apps/gsmlg_app_admin_web && bun run build",
-    "dev": "concurrently \"bun run dev:web\" \"bun run dev:admin\"",
-    "dev:web": "cd apps/gsmlg_app_web && bun run dev",
-    "dev:admin": "cd apps/gsmlg_app_admin_web && bun run dev",
-    "format": "mix format",
-    "test": "mix cmd mix test",
-    "lint": "mix format --check-formatted"
-  },
-  "author": "Jonathan Gao",
-  "license": "ISC",
-  "devDependencies": {
-    "concurrently": "^8.2.2"
-  },
-  "packageManager": "bun@1.1.0"
+  ]
 }

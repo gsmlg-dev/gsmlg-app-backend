@@ -1,0 +1,104 @@
+{
+  "lockfileVersion": 1,
+  "packages": {
+    "@duskmoon-dev/core": {
+      "dependencies": {},
+      "has_install_script": false,
+      "integrity": "sha512-217ZdHI3LdOBk/weWpJ0CX294693CpFdyeGUy7qO4C6MPEbjciyuA84lOWM258qE7P3yKVlAQQ9ni7kaU4wmIg==",
+      "optional_dependencies": {},
+      "tarball": "https://registry.npmjs.org/@duskmoon-dev/core/-/core-1.17.0.tgz",
+      "version": "1.17.0"
+    },
+    "@duskmoon-dev/el-base": {
+      "dependencies": {},
+      "has_install_script": false,
+      "integrity": "sha512-WSp8mlTsEUeasWFzHCX+BcwcXBy2st6iKKIZxnXLzSOEX1exJKkmGd4bTDmEPVPmLHa4JO1LIINHr7wX0YLm9g==",
+      "optional_dependencies": {},
+      "tarball": "https://registry.npmjs.org/@duskmoon-dev/el-base/-/el-base-1.5.3.tgz",
+      "version": "1.5.3"
+    },
+    "@duskmoon-dev/el-markdown": {
+      "dependencies": {
+        "@duskmoon-dev/core": "1.17.0",
+        "@duskmoon-dev/el-base": "1.5.3",
+        "highlight.js": "11.11.1",
+        "marked": "18.0.4",
+        "marked-highlight": "2.2.4"
+      },
+      "has_install_script": false,
+      "integrity": "sha512-bZ6M39P+9ScPUC/LrdVhiR3ylwVsoJl6htXAI2jhyV65R6adMLSQ7O2WLdtnGIKuep20qdRddGHi7yvjCYGlAg==",
+      "optional_dependencies": {},
+      "tarball": "https://registry.npmjs.org/@duskmoon-dev/el-markdown/-/el-markdown-1.5.5.tgz",
+      "version": "1.5.5"
+    },
+    "@tailwindcss/typography": {
+      "dependencies": {
+        "postcss-selector-parser": "6.0.10"
+      },
+      "has_install_script": false,
+      "integrity": "sha512-hwbzQuNUfcPvbegQFatVPl/MY/tcM9KLl963hQ5laJKPh81TEZ1+dNG9PirGvcaDBkp+BCshExAyKVPW91dozw==",
+      "optional_dependencies": {},
+      "tarball": "https://registry.npmjs.org/@tailwindcss/typography/-/typography-0.5.20.tgz",
+      "version": "0.5.20"
+    },
+    "cssesc": {
+      "dependencies": {},
+      "has_install_script": false,
+      "integrity": "sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==",
+      "optional_dependencies": {},
+      "tarball": "https://registry.npmjs.org/cssesc/-/cssesc-3.0.0.tgz",
+      "version": "3.0.0"
+    },
+    "highlight.js": {
+      "dependencies": {},
+      "has_install_script": false,
+      "integrity": "sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==",
+      "optional_dependencies": {},
+      "tarball": "https://registry.npmjs.org/highlight.js/-/highlight.js-11.11.1.tgz",
+      "version": "11.11.1"
+    },
+    "marked": {
+      "dependencies": {},
+      "has_install_script": false,
+      "integrity": "sha512-c/BTaKzg0G6ezQx97DAkYU7k0HM6ys0FqYeKBL6hlBByZwy+ycA1+f0vDdjMHKKeEjdgkx0GOv9Il6D+85cOqA==",
+      "optional_dependencies": {},
+      "tarball": "https://registry.npmjs.org/marked/-/marked-18.0.4.tgz",
+      "version": "18.0.4"
+    },
+    "marked-highlight": {
+      "dependencies": {},
+      "has_install_script": false,
+      "integrity": "sha512-PZxisNMJDduSjc0q6uvjsnqqHCXc9s0eyzxDO9sB1eNGJnd/H1/Fu+z6g/liC1dfJdFW4SftMwMlLvsBhUPrqQ==",
+      "optional_dependencies": {},
+      "tarball": "https://registry.npmjs.org/marked-highlight/-/marked-highlight-2.2.4.tgz",
+      "version": "2.2.4"
+    },
+    "postcss-selector-parser": {
+      "dependencies": {
+        "cssesc": "^3.0.0",
+        "util-deprecate": "^1.0.2"
+      },
+      "has_install_script": false,
+      "integrity": "sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==",
+      "optional_dependencies": {},
+      "tarball": "https://registry.npmjs.org/postcss-selector-parser/-/postcss-selector-parser-6.0.10.tgz",
+      "version": "6.0.10"
+    },
+    "util-deprecate": {
+      "dependencies": {},
+      "has_install_script": false,
+      "integrity": "sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==",
+      "optional_dependencies": {},
+      "tarball": "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz",
+      "version": "1.0.2"
+    }
+  },
+  "policy": {
+    "allow_registry_redirects": false,
+    "allowed_registries": [
+      "https://registry.npmjs.org"
+    ],
+    "block_exotic_subdeps": true,
+    "exotic_deps": []
+  }
+}

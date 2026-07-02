@@ -1,11 +1,7 @@
-import "../vendor/js/phoenix_html.js"
+import "phoenix_html"
 
-import { Socket } from "../vendor/js/phoenix.js"
-import { LiveSocket } from "../vendor/js/phoenix_live_view.js"
-
-// Import and register duskmoon custom elements
-import "@duskmoon-dev/elements/register"
-import "@duskmoon-dev/el-markdown/register"
+import { Socket } from "phoenix"
+import { LiveSocket } from "phoenix_live_view"
 
 // Import duskmoon LiveView hooks
 import * as DuskmoonHooks from "phoenix_duskmoon/hooks"
@@ -364,4 +360,3 @@ document.addEventListener("click", (e) => {
 document.addEventListener("phx:page-loading-stop", () => {
   applyTheme(localStorage.getItem("theme") || "sunshine")
 })
-

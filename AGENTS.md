@@ -41,7 +41,7 @@ If you run commands from an app subdirectory, use that app's `mix.exs`.
 - `mix ecto.setup` - Create, migrate, seed
 
 ### Assets (Web Apps)
-- `mix assets.setup` - Install Tailwind/Bun
+- `mix assets.setup` - Install frontend npm workspace dependencies
 - `mix assets.build` - Build assets for development
 - `mix assets.deploy` - Build/minify assets for production
 - `mix phx.digest` - Digest static assets (run by deploy)

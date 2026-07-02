@@ -29,6 +29,7 @@ defmodule GsmlgAppWeb.Endpoint do
     socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
     plug Phoenix.LiveReloader
     plug Phoenix.CodeReloader
+    plug DuskmoonBundler.DevServer, profile: :gsmlg_app_web
   end
 
   plug Phoenix.LiveDashboard.RequestLogger,

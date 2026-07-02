@@ -43,11 +43,10 @@ defmodule GsmlgAppAdminWeb.MixProject do
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 1.0"},
       {:phoenix_duskmoon, "~> 9.0"},
-      {:floki, ">= 0.30.0", only: :test},
+      {:duskmoon_bundler, "~> 9.6"},
+      {:floki, "~> 0.38"},
       {:lazy_html, ">= 0.1.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.2"},
-      {:bun, "~> 2.0", runtime: Mix.env() == :dev},
-      {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~>0.26 or ~> 1.0"},
@@ -71,11 +70,22 @@ defmodule GsmlgAppAdminWeb.MixProject do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["tailwind.install --if-missing"],
-      "assets.build": ["tailwind gsmlg_app_admin_web", "bun run build"],
+      "assets.setup": ["cmd --cd ../.. mix npm.install"],
+      "assets.vendor": [
+        "cmd mkdir -p priv/static/assets/vendor/duskmoon",
+        "cmd cp ../../node_modules/@duskmoon-dev/el-markdown/dist/esm/register.js priv/static/assets/vendor/duskmoon/el-markdown-register.js",
+        "cmd cp ../../node_modules/@duskmoon-dev/el-markdown/dist/esm/register.js.map priv/static/assets/vendor/duskmoon/el-markdown-register.js.map",
+        "cmd cp ../../node_modules/@duskmoon-dev/el-base/dist/esm/index.js priv/static/assets/vendor/duskmoon/el-base.js",
+        "cmd cp ../../node_modules/@duskmoon-dev/el-base/dist/esm/index.js.map priv/static/assets/vendor/duskmoon/el-base.js.map",
+        "cmd cp ../../node_modules/@duskmoon-dev/core/dist/esm/components/markdown-body.js priv/static/assets/vendor/duskmoon/markdown-body.js"
+      ],
+      "assets.build": [
+        "assets.vendor",
+        "cmd --cd ../.. mix duskmoon_bundler.build gsmlg_app_admin_web --tailwind --no-hash --outdir apps/gsmlg_app_admin_web/priv/static/assets"
+      ],
       "assets.deploy": [
-        "tailwind gsmlg_app_admin_web --minify",
-        "bun run build:deploy",
+        "assets.vendor",
+        "cmd --cd ../.. mix duskmoon_bundler.build gsmlg_app_admin_web --tailwind --outdir apps/gsmlg_app_admin_web/priv/static/assets",
         "phx.digest"
       ],
       lint: ["credo --strict", "dialyzer"]

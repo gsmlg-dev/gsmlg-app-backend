@@ -21,37 +21,6 @@
         elixir = beamPackages.elixir_1_18;
 
         version = "1.0.0";
-        tailwindVersion = "4.1.11";
-
-        # ---------------------------------------------------------------------------
-        # Tailwind CSS v4 standalone binary (fetched from GitHub releases as FOD)
-        #
-        # Fill hashes with:
-        #   nix-prefetch-url --type sha256 \
-        #     https://github.com/tailwindlabs/tailwindcss/releases/download/v4.1.11/tailwindcss-linux-x64
-        # ---------------------------------------------------------------------------
-        tailwindcssBin =
-          let
-            platforms = {
-              "x86_64-linux"  = { suffix = "linux-x64";    hash = lib.fakeHash; };
-              "aarch64-linux" = { suffix = "linux-arm64";   hash = lib.fakeHash; };
-              "x86_64-darwin" = { suffix = "macos-x64";     hash = lib.fakeHash; };
-              "aarch64-darwin"= { suffix = "macos-arm64";   hash = lib.fakeHash; };
-            };
-            p = platforms.${system} or (throw "Tailwind CSS unsupported on ${system}");
-          in
-          pkgs.stdenvNoCC.mkDerivation {
-            name = "tailwindcss-${tailwindVersion}";
-            src = pkgs.fetchurl {
-              url = "https://github.com/tailwindlabs/tailwindcss/releases/download/v${tailwindVersion}/tailwindcss-${p.suffix}";
-              hash = p.hash;
-              executable = true;
-            };
-            dontUnpack = true;
-            installPhase = ''
-              install -Dm755 $src $out/bin/tailwindcss
-            '';
-          };
 
         # ---------------------------------------------------------------------------
         # Hex / Mix dependencies (fetched once as a fixed-output derivation)
@@ -67,27 +36,30 @@
         };
 
         # ---------------------------------------------------------------------------
-        # JavaScript / Bun workspace dependencies (fetched once as a fixed-output derivation)
+        # JavaScript workspace dependencies (fetched once as a fixed-output derivation)
         #
         # Covers root workspace + apps/gsmlg_app_web + apps/gsmlg_app_admin_web.
         # Fill the hash after the first failed build:
         #   nix build .#packages.x86_64-linux.gsmlg-app-backend 2>&1 | grep -E "got:|expected:"
         # ---------------------------------------------------------------------------
-        bunFodDeps = pkgs.stdenv.mkDerivation {
-          name = "gsmlg-app-backend-bun-deps";
+        npmFodDeps = pkgs.stdenv.mkDerivation {
+          name = "gsmlg-app-backend-npm-deps";
           src = ./.;
-          nativeBuildInputs = [ pkgs.bun ];
+          nativeBuildInputs = [ elixir beamPackages.erlang ];
 
           buildPhase = ''
             export HOME=$TMPDIR
-            bun install --frozen-lockfile
+            export MIX_ENV=prod
+            mix local.hex --force
+            mix local.rebar --force
+            mix deps.get
+            mix npm.install --frozen
           '';
 
           installPhase = ''
             mkdir -p $out
-            # Root node_modules (shared workspace hoisted deps)
             cp -r node_modules $out/
-            # Per-workspace node_modules (if bun splits them)
+            cp npm.lock $out/npm.lock
             for app in apps/gsmlg_app_web apps/gsmlg_app_admin_web; do
               if [ -d "$app/node_modules" ]; then
                 mkdir -p "$out/$app"
@@ -113,58 +85,28 @@
             src = ./.;
             inherit mixFodDeps;
 
-            nativeBuildInputs = [ pkgs.bun tailwindcssBin ];
-
             # Runs at the start of buildPhase, after configurePhase has linked deps/.
             preBuild = ''
               export HOME=$TMPDIR
 
-              # ── Tailwind binary ──────────────────────────────────────────────────
-              # The `tailwind` hex mix task stores the binary at:
-              #   Mix.Project.build_path() <> "/tailwind-<version>"
-              # Place the nixpkgs binary there so it skips the download.
-              mkdir -p _build/prod
-              cp ${tailwindcssBin}/bin/tailwindcss _build/prod/tailwind-${tailwindVersion}
-              chmod +x _build/prod/tailwind-${tailwindVersion}
-
-              # ── Bun node_modules ────────────────────────────────────────────────
-              ln -sf ${bunFodDeps}/node_modules node_modules
+              # ── npm workspace dependencies ──────────────────────────────────────
+              ln -sf ${npmFodDeps}/node_modules node_modules
+              ln -sf ${npmFodDeps}/npm.lock npm.lock
 
               for app in ${lib.concatStringsSep " " webApps}; do
-                src_nm="${bunFodDeps}/apps/$app/node_modules"
+                src_nm="${npmFodDeps}/apps/$app/node_modules"
                 if [ -d "$src_nm" ]; then
                   mkdir -p "apps/$app"
                   ln -sf "$src_nm" "apps/$app/node_modules"
                 fi
               done
 
-              # ── Admin web vendor JS (copied from Mix deps) ───────────────────────
-              # The gsmlg_app_admin_web build script copies Phoenix JS bundles from
-              # ../../deps/ into assets/vendor/js/ before running bun build.
-              if printf '%s\n' ${lib.concatStringsSep " " webApps} | grep -qx gsmlg_app_admin_web; then
-                mkdir -p apps/gsmlg_app_admin_web/assets/vendor/js
-                cp deps/phoenix/priv/static/phoenix.mjs \
-                   apps/gsmlg_app_admin_web/assets/vendor/js/phoenix.js
-                cp deps/phoenix_html/priv/static/phoenix_html.js \
-                   apps/gsmlg_app_admin_web/assets/vendor/js/
-                cp deps/phoenix_live_view/priv/static/phoenix_live_view.esm.js \
-                   apps/gsmlg_app_admin_web/assets/vendor/js/phoenix_live_view.js
-              fi
-
-              # ── Build JS assets ───────────────────────────────────────────────────
+              # ── Build frontend assets with DuskmoonBundler ──────────────────────
               for app in ${lib.concatStringsSep " " webApps}; do
                 if [ -d "apps/$app/assets" ]; then
-                  (cd apps/$app && bun run build:deploy)
+                  (cd apps/$app && mix assets.deploy)
                 fi
               done
-
-              # ── Build CSS with Tailwind ───────────────────────────────────────────
-              for app in ${lib.concatStringsSep " " webApps}; do
-                mix tailwind $app --minify
-              done
-
-              # ── Digest static assets ──────────────────────────────────────────────
-              mix phx.digest
             '';
 
             # Override buildPhase to name the specific Mix release.
@@ -210,8 +152,6 @@
           packages = [
             elixir
             beamPackages.erlang
-            pkgs.bun
-            tailwindcssBin
             pkgs.git
           ] ++ lib.optionals pkgs.stdenv.isLinux [ pkgs.inotify-tools ];
 

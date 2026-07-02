@@ -6,8 +6,6 @@ This guide will help you set up a development environment for the GSMLG Platform
 
 - **Elixir 1.14+** with Erlang/OTP 25+
 - **PostgreSQL 13+**
-- **Node.js 18+** (for frontend assets)
-- **Bun 1.2.5+** (for JavaScript bundling)
 - **Git**
 
 ## Quick Start
@@ -197,10 +195,8 @@ kill -9 <PID>
 
 ```bash
 # Clean and reinstall frontend dependencies
-cd assets
-rm -rf node_modules
-bun install
-cd ..
+rm -rf node_modules npm.lock
+mix assets.setup
 mix assets.build
 ```
 

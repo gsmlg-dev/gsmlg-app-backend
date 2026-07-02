@@ -36,7 +36,7 @@ CI runs four parallel checks on every push: compile (warnings-as-errors), format
 - Elixir 1.18+ / Erlang/OTP 28 + Phoenix 1.8 + LiveView 1.1
 - Ash Framework 3.x with AshPostgres + AshAuthentication
 - PostgreSQL (UUID primary keys), Bandit HTTP server
-- Tailwind CSS 4.1.11 + @duskmoon-dev/core (CSS framework) + Bun 1.2.5 for frontend
+- DuskmoonBundler + Tailwind CSS + @duskmoon-dev/core for frontend assets
 - ETS for sessions, PostgreSQL for persistent data
 
 ## Ash Framework Domains

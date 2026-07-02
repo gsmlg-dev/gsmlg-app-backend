@@ -23,37 +23,52 @@ config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
   pubsub_server: GsmlgApp.PubSub,
   live_view: [signing_salt: "eNwXe6VH"]
 
-# Configure bun (the version is required)
-# Use system bun from Nix when available (avoids glibc issues with downloaded binary)
-config :bun,
-  version: "1.3.3",
-  gsmlg_app_web: [
-    args:
-      ~w(build assets/js/app.js --bundle --format=esm --target=browser --outdir=priv/static/assets --loader:.js=jsx --external:/fonts/* --external:/images/*),
-    cd: Path.expand("../apps/gsmlg_app_web", __DIR__)
+config :duskmoon_bundler, :gsmlg_app_web,
+  entry: "apps/gsmlg_app_web/assets/js/app.js",
+  root: "apps/gsmlg_app_web/assets",
+  outdir: "priv/static/assets",
+  target: :es2020,
+  format: :esm,
+  tailwind: [
+    css: "apps/gsmlg_app_web/assets/css/app.css",
+    sources: [
+      %{base: "apps/gsmlg_app_web/lib/", pattern: "**/*.{ex,heex,eex}"},
+      %{base: "apps/gsmlg_app_web/assets/", pattern: "**/*.{js,ts,jsx,tsx}"},
+      %{base: "apps/gsmlg_app_component/lib/", pattern: "**/*.{ex,heex,eex}"},
+      %{base: "deps/phoenix_duskmoon/lib/", pattern: "**/*.{ex,heex,eex}"}
+    ]
   ],
-  gsmlg_app_admin_web: [
-    args:
-      ~w(build assets/js/app.js --bundle --format=esm --target=browser --outdir=priv/static/assets --external:/fonts/* --external:/images/*),
-    cd: Path.expand("../apps/gsmlg_app_admin_web", __DIR__)
+  server: [
+    prefix: "/assets",
+    watch_dirs: [
+      "apps/gsmlg_app_web/lib/",
+      "apps/gsmlg_app_web/assets/",
+      "apps/gsmlg_app_component/lib/"
+    ]
   ]
 
-# Configure tailwind (the version is required)
-config :tailwind,
-  version: "4.1.18",
-  gsmlg_app_web: [
-    args: ~w(
-      --input=assets/css/app.css
-      --output=priv/static/assets/app.css
-    ),
-    cd: Path.expand("../apps/gsmlg_app_web", __DIR__)
+config :duskmoon_bundler, :gsmlg_app_admin_web,
+  entry: "apps/gsmlg_app_admin_web/assets/js/app.js",
+  root: "apps/gsmlg_app_admin_web/assets",
+  outdir: "priv/static/assets",
+  target: :es2020,
+  format: :esm,
+  tailwind: [
+    css: "apps/gsmlg_app_admin_web/assets/css/app.css",
+    sources: [
+      %{base: "apps/gsmlg_app_admin_web/lib/", pattern: "**/*.{ex,heex,eex}"},
+      %{base: "apps/gsmlg_app_admin_web/assets/", pattern: "**/*.{js,ts,jsx,tsx}"},
+      %{base: "apps/gsmlg_app_component/lib/", pattern: "**/*.{ex,heex,eex}"},
+      %{base: "deps/phoenix_duskmoon/lib/", pattern: "**/*.{ex,heex,eex}"}
+    ]
   ],
-  gsmlg_app_admin_web: [
-    args: ~w(
-      --input=assets/css/app.css
-      --output=priv/static/assets/app.css
-    ),
-    cd: Path.expand("../apps/gsmlg_app_admin_web", __DIR__)
+  server: [
+    prefix: "/assets",
+    watch_dirs: [
+      "apps/gsmlg_app_admin_web/lib/",
+      "apps/gsmlg_app_admin_web/assets/",
+      "apps/gsmlg_app_component/lib/"
+    ]
   ]
 
 ### Admin Part

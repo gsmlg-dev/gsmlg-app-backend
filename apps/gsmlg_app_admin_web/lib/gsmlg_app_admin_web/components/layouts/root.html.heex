@@ -7,8 +7,44 @@
     <.live_title suffix=" · GSMLG Admin">
       {assigns[:page_title] || "GSMLG Admin"}
     </.live_title>
-    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
-    <script defer phx-track-static type="module" src={~p"/assets/app.js"}>
+    <link
+      phx-track-static
+      rel="stylesheet"
+      href={
+        DuskmoonBundler.static_path(
+          GsmlgAppAdminWeb.Endpoint,
+          "/assets/css/app.css",
+          profile: :gsmlg_app_admin_web
+        )
+      }
+    />
+    <script type="importmap">
+      {
+        "imports": {
+          "@duskmoon-dev/el-base": "/assets/vendor/duskmoon/el-base.js",
+          "@duskmoon-dev/core/components/markdown-body": "/assets/vendor/duskmoon/markdown-body.js"
+        }
+      }
+    </script>
+    <script
+      defer
+      phx-track-static
+      type="module"
+      src="/assets/vendor/duskmoon/el-markdown-register.js"
+    >
+    </script>
+    <script
+      defer
+      phx-track-static
+      type="module"
+      src={
+        DuskmoonBundler.static_path(
+          GsmlgAppAdminWeb.Endpoint,
+          "/assets/js/app.js",
+          profile: :gsmlg_app_admin_web
+        )
+      }
+    >
     </script>
     <script>
       // Apply saved theme immediately to prevent flash

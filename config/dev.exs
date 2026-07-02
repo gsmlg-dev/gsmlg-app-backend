@@ -3,9 +3,6 @@ import Config
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
-# The watchers configuration can be used to run external
-# watchers to your application. For example, we use it
-# with Bun to bundle .js and .css sources.
 config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
@@ -17,8 +14,9 @@ config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
     System.get_env("SECRET_KEY_BASE_WEB") ||
       "++y7z5YOMi8AqMVyn3x941rXNBaD81/CtGtj+EY/4H37gKkVPbAJbrasc0sq94hW",
   watchers: [
-    bun: {Bun, :install_and_run, [:gsmlg_app_web, ~w(--watch)]},
-    tailwind: {Tailwind, :install_and_run, [:gsmlg_app_web, ~w(--watch)]}
+    duskmoon_bundler:
+      {Mix.Tasks.DuskmoonBundler.Dev, :run,
+       [~w(gsmlg_app_web --tailwind --tailwind-outdir apps/gsmlg_app_web/priv/static/assets/css)]}
   ]
 
 # Watch static and templates for browser reloading.
@@ -50,9 +48,6 @@ config :gsmlg_app_admin, GsmlgAppAdmin.Repo,
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
-# The watchers configuration can be used to run external
-# watchers to your application. For example, we use it
-# with Bun to bundle .js and .css sources.
 config :gsmlg_app_admin_web, GsmlgAppAdminWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
@@ -64,8 +59,11 @@ config :gsmlg_app_admin_web, GsmlgAppAdminWeb.Endpoint,
     System.get_env("SECRET_KEY_BASE_ADMIN") ||
       "1gdA/MEjjg9APn1rwyUsdBQ5FVA6iUIeIlUclRMFBT2i1cx3ONPx3DqxWXSDqi1w",
   watchers: [
-    bun: {Bun, :install_and_run, [:gsmlg_app_admin_web, ~w(--watch)]},
-    tailwind: {Tailwind, :install_and_run, [:gsmlg_app_admin_web, ~w(--watch)]}
+    duskmoon_bundler:
+      {Mix.Tasks.DuskmoonBundler.Dev, :run,
+       [
+         ~w(gsmlg_app_admin_web --tailwind --tailwind-outdir apps/gsmlg_app_admin_web/priv/static/assets/css)
+       ]}
   ]
 
 # Watch static and templates for browser reloading.

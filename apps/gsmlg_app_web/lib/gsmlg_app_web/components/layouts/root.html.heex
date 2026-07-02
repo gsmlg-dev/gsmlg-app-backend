@@ -8,8 +8,29 @@
       {assigns[:page_title] ||
         dgettext("navigation", "General Server Management Leading Governance")}
     </.live_title>
-    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
-    <script defer phx-track-static src={~p"/assets/app.js"}>
+    <link
+      phx-track-static
+      rel="stylesheet"
+      href={
+        DuskmoonBundler.static_path(
+          GsmlgAppWeb.Endpoint,
+          "/assets/css/app.css",
+          profile: :gsmlg_app_web
+        )
+      }
+    />
+    <script
+      defer
+      phx-track-static
+      type="module"
+      src={
+        DuskmoonBundler.static_path(
+          GsmlgAppWeb.Endpoint,
+          "/assets/js/app.js",
+          profile: :gsmlg_app_web
+        )
+      }
+    >
     </script>
   </head>
   <body class={[
