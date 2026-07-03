@@ -32,6 +32,16 @@ in {
 
   enterShell = ''
     hello
+
+    if [ -n "''${PGHOST:-}" ]; then
+      for socket in "''${PGHOST}"/.s.PGSQL.*; do
+        if [ -S "$socket" ]; then
+          export PGPORT="''${socket##*.}"
+          break
+        fi
+      done
+    fi
+
     export DATABASE_URL="ecto://gsmlg_app:gsmlg_app@localhost/gsmlg_app_admin_dev"
     export DATABASE_URL_TEST="ecto://gsmlg_app:gsmlg_app@localhost/gsmlg_app_admin_test"
   '';
