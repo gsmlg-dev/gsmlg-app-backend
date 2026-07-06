@@ -1,7 +1,7 @@
 <.ai_provider_layout current_path={@current_uri}>
-  <div class="p-6">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">API Keys</h1>
+  <div class="p-4 sm:p-6">
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <h1 class="text-3xl font-semibold leading-8 text-on-surface">API Keys</h1>
       <.link patch={~p"/ai-provider/api-keys/new"} class="btn btn-primary">
         New API Key
       </.link>
@@ -28,7 +28,7 @@
       <div class="alert alert-warning mb-6">
         <div>
           <p class="font-bold">Your API key (shown only once):</p>
-          <code class="block mt-2 p-2 bg-base-200 rounded select-all text-sm break-all">
+          <code class="mt-2 block select-all break-all rounded bg-surface-container-high p-2 text-sm text-on-surface">
             {@raw_key}
           </code>
           <p class="text-sm mt-2">Copy this key now. You won't be able to see it again.</p>

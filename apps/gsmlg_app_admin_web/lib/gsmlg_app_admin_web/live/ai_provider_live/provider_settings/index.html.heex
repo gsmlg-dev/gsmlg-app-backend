@@ -1,7 +1,7 @@
 <.ai_provider_layout current_path={@current_uri}>
-  <div class="p-6">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold">AI Provider Settings</h1>
+  <div class="p-4 sm:p-6">
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <h1 class="text-3xl font-semibold leading-8 text-on-surface">AI Provider Settings</h1>
       <.link navigate={~p"/ai-provider/providers/new"} class="btn btn-primary">
         <.dm_mdi name="plus" class="w-4 h-4 mr-2" /> Add Provider
       </.link>
@@ -9,9 +9,9 @@
 
     <div class="grid gap-4">
       <%= if Enum.empty?(@providers) do %>
-        <div class="card bg-base-200 p-8 text-center">
+        <div class="rounded-lg border border-outline-variant bg-surface-container p-8 text-center shadow-sm">
           <div class="flex flex-col items-center gap-4">
-            <.dm_mdi name="chip" class="w-16 h-16 text-base-content/50" />
+            <.dm_mdi name="chip" class="w-16 h-16 text-on-surface-variant" />
             <p class="text-lg">No AI providers configured yet.</p>
             <.link navigate={~p"/ai-provider/providers/new"} class="btn btn-primary">
               Add Your First Provider
@@ -20,69 +20,79 @@
         </div>
       <% else %>
         <%= for provider <- @providers do %>
-          <div id={"provider-#{provider.id}"} class="card bg-base-100 shadow-md">
-            <div class="card-body">
-              <div class="flex items-start justify-between">
-                <div class="flex-1">
-                  <div class="flex items-center gap-3">
-                    <.link
-                      navigate={~p"/ai-provider/providers/#{provider.id}"}
-                      class="text-lg font-semibold hover:text-primary"
-                    >
-                      {provider.name}
-                    </.link>
-                    <span class={"badge #{if provider.is_active, do: "badge-success", else: "badge-neutral"}"}>
-                      {if provider.is_active, do: "Active", else: "Inactive"}
-                    </span>
-                  </div>
-                  <p class="text-sm text-base-content/70 mt-1">
-                    <span class="font-mono">{provider.slug}</span> &bull;
-                    Model: {provider.model}
-                  </p>
-                  <p class="text-sm text-base-content/50 mt-2">
-                    API: {provider.api_base_url}
-                    <%= if provider.masked_api_key do %>
-                      &bull; Key: {provider.masked_api_key}
-                    <% end %>
-                  </p>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button
-                    phx-click="toggle_active"
-                    phx-value-id={provider.id}
-                    class="btn btn-ghost btn-sm"
-                    title={if provider.is_active, do: "Deactivate", else: "Activate"}
-                    disabled={@loading}
-                  >
-                    <%= if @loading do %>
-                      <span class="loading loading-spinner loading-xs"></span>
-                    <% else %>
-                      <.dm_mdi
-                        name={if provider.is_active, do: "pause", else: "play"}
-                        class="w-4 h-4"
-                      />
-                    <% end %>
-                  </button>
+          <div
+            id={"provider-#{provider.id}"}
+            class="rounded-lg border border-outline-variant bg-surface-container p-4 shadow-sm"
+          >
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-3">
                   <.link
-                    navigate={~p"/ai-provider/providers/#{provider.id}/edit"}
-                    class="btn btn-ghost btn-sm"
+                    navigate={~p"/ai-provider/providers/#{provider.id}"}
+                    class="text-lg font-semibold text-on-surface hover:text-primary"
                   >
-                    <.dm_mdi name="pencil" class="w-4 h-4" />
+                    {provider.name}
                   </.link>
-                  <button
-                    phx-click="delete"
-                    phx-value-id={provider.id}
-                    class="btn btn-ghost btn-sm text-error"
-                    data-confirm={"Are you sure you want to delete #{provider.name}?"}
-                    disabled={@loading}
-                  >
-                    <%= if @loading do %>
-                      <span class="loading loading-spinner loading-xs"></span>
-                    <% else %>
-                      <.dm_mdi name="delete" class="w-4 h-4" />
-                    <% end %>
-                  </button>
+                  <span class={[
+                    "inline-flex rounded-full px-2 text-xs font-semibold leading-5",
+                    if(provider.is_active,
+                      do: "bg-success text-success-content",
+                      else: "bg-surface-container-high text-on-surface"
+                    )
+                  ]}>
+                    {if provider.is_active, do: "Active", else: "Inactive"}
+                  </span>
                 </div>
+                <p class="mt-1 text-sm text-on-surface-variant">
+                  <span class="font-mono">{provider.slug}</span> &bull;
+                  Model: {provider.model}
+                </p>
+                <p class="mt-2 text-sm text-on-surface-variant">
+                  API: {provider.api_base_url}
+                  <%= if provider.masked_api_key do %>
+                    &bull; Key: {provider.masked_api_key}
+                  <% end %>
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button
+                  phx-click="toggle_active"
+                  phx-value-id={provider.id}
+                  class="btn btn-ghost btn-sm"
+                  title={if provider.is_active, do: "Deactivate", else: "Activate"}
+                  aria-label={"#{if provider.is_active, do: "Deactivate", else: "Activate"} #{provider.name}"}
+                  disabled={@loading}
+                >
+                  <%= if @loading do %>
+                    <span class="loading loading-spinner loading-xs"></span>
+                  <% else %>
+                    <.dm_mdi
+                      name={if provider.is_active, do: "pause", else: "play"}
+                      class="w-4 h-4"
+                    />
+                  <% end %>
+                </button>
+                <.link
+                  navigate={~p"/ai-provider/providers/#{provider.id}/edit"}
+                  class="btn btn-ghost btn-sm text-primary hover:text-secondary"
+                  aria-label={"Edit #{provider.name}"}
+                >
+                  <.dm_mdi name="pencil" class="w-4 h-4" />
+                </.link>
+                <button
+                  phx-click="delete"
+                  phx-value-id={provider.id}
+                  class="btn btn-ghost btn-sm text-error"
+                  data-confirm={"Are you sure you want to delete #{provider.name}?"}
+                  disabled={@loading}
+                  aria-label={"Delete #{provider.name}"}
+                >
+                  <%= if @loading do %>
+                    <span class="loading loading-spinner loading-xs"></span>
+                  <% else %>
+                    <.dm_mdi name="delete" class="w-4 h-4" />
+                  <% end %>
+                </button>
               </div>
             </div>
           </div>

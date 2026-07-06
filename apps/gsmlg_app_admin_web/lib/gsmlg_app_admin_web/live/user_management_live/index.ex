@@ -146,14 +146,14 @@ defmodule GsmlgAppAdminWeb.UserManagementLive.Index do
     DateTime.to_string(datetime)
   end
 
-  def status_badge_class(:active), do: "bg-green-100 text-green-800"
-  def status_badge_class(:inactive), do: "bg-gray-100 text-gray-800"
-  def status_badge_class(:suspended), do: "bg-red-100 text-red-800"
-  def status_badge_class(:pending), do: "bg-yellow-100 text-yellow-800"
+  def status_badge_class(:active), do: "bg-success text-success-content"
+  def status_badge_class(:inactive), do: "bg-surface-container-high text-on-surface"
+  def status_badge_class(:suspended), do: "bg-error text-error-content"
+  def status_badge_class(:pending), do: "bg-warning text-warning-content"
 
-  def role_badge_class(:admin), do: "bg-purple-100 text-purple-800"
-  def role_badge_class(:moderator), do: "bg-blue-100 text-blue-800"
-  def role_badge_class(:user), do: "bg-gray-100 text-gray-800"
+  def role_badge_class(:admin), do: "bg-primary text-primary-content"
+  def role_badge_class(:moderator), do: "bg-secondary text-secondary-content"
+  def role_badge_class(:user), do: "bg-tertiary text-tertiary-content"
 
   # Error handling functions
   defp fetch_users_with_error_handling do

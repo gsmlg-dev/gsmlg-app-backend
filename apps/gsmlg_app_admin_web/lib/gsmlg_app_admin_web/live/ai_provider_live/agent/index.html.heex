@@ -1,7 +1,7 @@
 <.ai_provider_layout current_path={@current_uri}>
-  <div class="p-6">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">Agents</h1>
+  <div class="p-4 sm:p-6">
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <h1 class="text-3xl font-semibold leading-8 text-on-surface">Agents</h1>
       <.link patch={~p"/ai-provider/agents/new"} class="btn btn-primary">New Agent</.link>
     </div>
 
@@ -22,11 +22,15 @@
     </.dm_modal>
 
     <div class="space-y-3">
-      <div :for={a <- @agents} id={"agent-#{a.id}"} class="card bg-base-100 shadow-sm p-4">
-        <div class="flex justify-between items-start">
-          <div class="flex-1">
+      <div
+        :for={a <- @agents}
+        id={"agent-#{a.id}"}
+        class="rounded-lg border border-outline-variant bg-surface-container p-4 shadow-sm"
+      >
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div class="min-w-0 flex-1">
             <h3 class="font-bold">{a.name}</h3>
-            <p class="text-sm opacity-70">
+            <p class="text-sm text-on-surface-variant">
               Slug: {a.slug} | Model: {a.model || "auto"} | Max iterations: {a.max_iterations}
             </p>
             <div class="flex gap-2 mt-1">
@@ -40,7 +44,7 @@
             </div>
             <p :if={a.description} class="text-sm mt-1">{a.description}</p>
           </div>
-          <div class="flex gap-2 ml-4">
+          <div class="flex gap-2 sm:ml-4">
             <.link patch={~p"/ai-provider/agents/#{a.id}/edit"} class="btn btn-sm btn-ghost">
               Edit
             </.link>

@@ -126,20 +126,20 @@ defmodule GsmlgAppAdminWeb.UserProfileLive.Index do
 
   defp role_badge_class(role) do
     case role do
-      :admin -> "bg-red-100 text-red-800"
-      :user -> "bg-gray-100 text-gray-800"
-      :moderator -> "bg-blue-100 text-blue-800"
-      _ -> "bg-gray-100 text-gray-800"
+      :admin -> "bg-primary text-primary-content"
+      :user -> "bg-tertiary text-tertiary-content"
+      :moderator -> "bg-secondary text-secondary-content"
+      _ -> "bg-surface-container-high text-on-surface"
     end
   end
 
   defp status_badge_class(status) do
     case status do
-      :active -> "bg-green-100 text-green-800"
-      :inactive -> "bg-gray-100 text-gray-800"
-      :suspended -> "bg-red-100 text-red-800"
-      :pending -> "bg-yellow-100 text-yellow-800"
-      _ -> "bg-gray-100 text-gray-800"
+      :active -> "bg-success text-success-content"
+      :inactive -> "bg-surface-container-high text-on-surface"
+      :suspended -> "bg-error text-error-content"
+      :pending -> "bg-warning text-warning-content"
+      _ -> "bg-surface-container-high text-on-surface"
     end
   end
 end

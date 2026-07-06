@@ -96,20 +96,20 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="container mx-auto px-4 py-8">
-      <div class="flex items-center justify-between mb-6">
+    <div class="w-full bg-surface px-4 py-6 text-on-surface sm:px-6 lg:px-8">
+      <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-center gap-4">
-          <h1 class="text-2xl font-bold">Apps Management</h1>
+          <h1 class="text-3xl font-semibold leading-8 text-on-surface">Apps Management</h1>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
           <label class="label cursor-pointer gap-2">
             <input
               type="checkbox"
-              class="toggle toggle-sm"
+              class="toggle toggle-primary toggle-sm"
               checked={@show_deleted}
               phx-click="toggle_deleted"
             />
-            <span class="label-text text-sm">Show deleted</span>
+            <span class="text-sm text-on-surface">Show deleted</span>
           </label>
           <.link navigate={~p"/apps/new"} class="btn btn-primary">
             <.dm_mdi name="plus" class="w-4 h-4 mr-2" /> Add App
@@ -119,9 +119,9 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Index do
 
       <div class="grid gap-4">
         <%= if Enum.empty?(@apps) do %>
-          <div class="card bg-base-200 p-8 text-center">
+          <div class="rounded-lg border border-outline-variant bg-surface-container p-8 text-center shadow-sm">
             <div class="flex flex-col items-center gap-4">
-              <.dm_mdi name="apps" class="w-16 h-16 text-base-content/50" />
+              <.dm_mdi name="apps" class="w-16 h-16 text-on-surface-variant" />
               <p class="text-lg">
                 <%= if @show_deleted do %>
                   No deleted apps found.
@@ -138,86 +138,104 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Index do
           </div>
         <% else %>
           <%= for app <- @apps do %>
-            <div class={"card bg-base-100 shadow-md #{unless app.is_active, do: "opacity-60"}"}>
-              <div class="card-body">
-                <div class="flex items-start justify-between">
-                  <div class="flex gap-4">
-                    <div class="flex-shrink-0 w-16 h-16 bg-base-200 rounded-lg flex items-center justify-center">
-                      <%= if app.icon_path && app.icon_path != "" do %>
-                        <img src={app.icon_path} alt={app.name} class="w-12 h-12 object-contain" />
-                      <% else %>
-                        <.dm_mdi name="application" class="w-8 h-8 text-base-content/50" />
-                      <% end %>
-                    </div>
-                    <div class="flex-1">
-                      <div class="flex items-center gap-3">
-                        <h2 class="text-lg font-semibold">{app.name}</h2>
-                        <span class={"badge #{if app.is_active, do: "badge-success", else: "badge-neutral"}"}>
-                          {if app.is_active, do: "Active", else: "Deleted"}
-                        </span>
-                        <span class="badge badge-outline">{app.category}</span>
-                      </div>
-                      <p class="text-sm text-base-content/70 mt-1">
-                        <span class="font-mono">{app.label}</span>
-                      </p>
-                      <p class="text-sm text-base-content/80 mt-2">{app.short_description}</p>
-                      <div class="flex flex-wrap gap-2 mt-2">
-                        <%= for platform <- app.platforms do %>
-                          <span class="badge badge-sm badge-outline">{platform_label(platform)}</span>
-                        <% end %>
-                      </div>
-                      <%= if length(app.store_links) > 0 do %>
-                        <div class="flex flex-wrap gap-2 mt-2">
-                          <%= for link <- app.store_links do %>
-                            <a
-                              href={link.url}
-                              target="_blank"
-                              class="badge badge-sm badge-primary gap-1"
-                            >
-                              <.dm_mdi name={store_icon(link.store_type)} class="w-3 h-3" />
-                              {store_label(link.store_type)}
-                            </a>
-                          <% end %>
-                        </div>
-                      <% end %>
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-1">
-                      <span class="text-sm text-base-content/60">Order:</span>
-                      <input
-                        type="number"
-                        value={app.display_order}
-                        phx-blur="update_order"
-                        phx-value-id={app.id}
-                        phx-value-order={app.display_order}
-                        class="input input-bordered input-sm w-16 text-center"
-                        min="0"
-                        onchange="this.dispatchEvent(new Event('blur', {bubbles: true})); this.setAttribute('phx-value-order', this.value)"
-                      />
-                    </div>
-                    <.link navigate={~p"/apps/#{app.id}/edit"} class="btn btn-ghost btn-sm">
-                      <.dm_mdi name="pencil" class="w-4 h-4" />
-                    </.link>
-                    <%= if app.is_active do %>
-                      <button
-                        phx-click="delete"
-                        phx-value-id={app.id}
-                        class="btn btn-ghost btn-sm text-error"
-                        data-confirm={"Are you sure you want to delete #{app.name}?"}
-                      >
-                        <.dm_mdi name="delete" class="w-4 h-4" />
-                      </button>
+            <div class={[
+              "rounded-lg border border-outline-variant bg-surface-container p-4 shadow-sm",
+              unless(app.is_active, do: "opacity-60")
+            ]}>
+              <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                <div class="flex min-w-0 gap-4">
+                  <div class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-surface-container-high">
+                    <%= if app.icon_path && app.icon_path != "" do %>
+                      <img src={app.icon_path} alt={app.name} class="h-12 w-12 object-contain" />
                     <% else %>
-                      <button
-                        phx-click="restore"
-                        phx-value-id={app.id}
-                        class="btn btn-ghost btn-sm text-success"
-                      >
-                        <.dm_mdi name="restore" class="w-4 h-4" />
-                      </button>
+                      <.dm_mdi name="application" class="h-8 w-8 text-on-surface-variant" />
                     <% end %>
                   </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-center gap-3">
+                      <h2 class="text-lg font-semibold text-on-surface">{app.name}</h2>
+                      <span class={[
+                        "inline-flex rounded-full px-2 text-xs font-semibold leading-5",
+                        if(app.is_active,
+                          do: "bg-success text-success-content",
+                          else: "bg-surface-container-high text-on-surface"
+                        )
+                      ]}>
+                        {if app.is_active, do: "Active", else: "Deleted"}
+                      </span>
+                      <span class="inline-flex rounded-full border border-outline px-2 text-xs font-semibold leading-5 text-on-surface-variant">
+                        {app.category}
+                      </span>
+                    </div>
+                    <p class="mt-1 text-sm text-on-surface-variant">
+                      <span class="font-mono">{app.label}</span>
+                    </p>
+                    <p class="mt-2 text-sm text-on-surface">{app.short_description}</p>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                      <%= for platform <- app.platforms do %>
+                        <span class="inline-flex rounded-full border border-outline px-2 text-xs font-medium text-on-surface-variant">
+                          {platform_label(platform)}
+                        </span>
+                      <% end %>
+                    </div>
+                    <%= if length(app.store_links) > 0 do %>
+                      <div class="mt-2 flex flex-wrap gap-2">
+                        <%= for link <- app.store_links do %>
+                          <a
+                            href={link.url}
+                            target="_blank"
+                            class="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-content"
+                          >
+                            <.dm_mdi name={store_icon(link.store_type)} class="h-3 w-3" />
+                            {store_label(link.store_type)}
+                          </a>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 lg:flex-nowrap">
+                  <div class="flex items-center gap-1">
+                    <span class="text-sm text-on-surface-variant">Order:</span>
+                    <input
+                      type="number"
+                      value={app.display_order}
+                      phx-blur="update_order"
+                      phx-value-id={app.id}
+                      phx-value-order={app.display_order}
+                      class="input input-bordered input-sm w-16 text-center"
+                      min="0"
+                      aria-label={"Display order for #{app.name}"}
+                      onchange="this.dispatchEvent(new Event('blur', {bubbles: true})); this.setAttribute('phx-value-order', this.value)"
+                    />
+                  </div>
+                  <.link
+                    navigate={~p"/apps/#{app.id}/edit"}
+                    class="btn btn-ghost btn-sm text-primary hover:text-secondary"
+                    aria-label={"Edit #{app.name}"}
+                  >
+                    <.dm_mdi name="pencil" class="h-4 w-4" />
+                  </.link>
+                  <%= if app.is_active do %>
+                    <button
+                      phx-click="delete"
+                      phx-value-id={app.id}
+                      class="btn btn-ghost btn-sm text-error"
+                      data-confirm={"Are you sure you want to delete #{app.name}?"}
+                      aria-label={"Delete #{app.name}"}
+                    >
+                      <.dm_mdi name="delete" class="h-4 w-4" />
+                    </button>
+                  <% else %>
+                    <button
+                      phx-click="restore"
+                      phx-value-id={app.id}
+                      class="btn btn-ghost btn-sm text-success"
+                      aria-label={"Restore #{app.name}"}
+                    >
+                      <.dm_mdi name="restore" class="h-4 w-4" />
+                    </button>
+                  <% end %>
                 </div>
               </div>
             </div>

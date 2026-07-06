@@ -1,17 +1,17 @@
-<div class="w-full space-y-6">
+<div class="w-full bg-surface px-4 py-6 text-on-surface sm:px-6 lg:px-8">
   <!-- Header -->
-  <div class="px-4 sm:px-6 lg:px-8">
-    <div class="sm:flex sm:items-center">
+  <div>
+    <div class="gap-4 sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-2xl font-semibold leading-6 text-gray-900">User Management</h1>
-        <p class="mt-2 text-sm text-gray-700">
+        <h1 class="text-3xl font-semibold leading-8 text-on-surface">User Management</h1>
+        <p class="mt-2 text-sm text-on-surface-variant">
           A list of all users in your system including their name, email, role, and status.
         </p>
       </div>
       <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
         <.link
           navigate={~p"/users/new"}
-          class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          class="btn btn-primary inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-semibold"
         >
           Add user
         </.link>
@@ -20,12 +20,12 @@
   </div>
 
   <!-- Search and Filters -->
-  <div class="px-4 sm:px-6 lg:px-8">
-    <div class="bg-white p-4 rounded-lg shadow">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+  <div class="mt-6">
+    <div class="rounded-lg border border-outline-variant bg-surface-container p-4 shadow-sm">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         <!-- Search -->
         <div>
-          <label for="search" class="block text-sm font-medium leading-6 text-gray-900">
+          <label for="search-query" class="block text-sm font-medium leading-6 text-on-surface">
             Search
           </label>
           <div class="mt-2">
@@ -36,7 +36,7 @@
                 id="search-query"
                 value={@search_query}
                 placeholder="Search by name, email, or username..."
-                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                class="input w-full border border-outline bg-surface text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:outline-none sm:text-sm"
               />
             </form>
           </div>
@@ -44,7 +44,7 @@
 
         <!-- Role Filter -->
         <div>
-          <label for="role-filter" class="block text-sm font-medium leading-6 text-gray-900">
+          <label for="role-filter" class="block text-sm font-medium leading-6 text-on-surface">
             Role
           </label>
           <div class="mt-2">
@@ -52,7 +52,7 @@
               id="role-filter"
               name="role"
               phx-change="filter_role"
-              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+              class="select w-full border border-outline bg-surface text-on-surface focus:border-primary focus:outline-none sm:max-w-xs sm:text-sm"
             >
               <option value="all" selected={@selected_role == "all"}>All Roles</option>
               <option value="admin" selected={@selected_role == "admin"}>Admin</option>
@@ -66,7 +66,7 @@
 
         <!-- Status Filter -->
         <div>
-          <label for="status-filter" class="block text-sm font-medium leading-6 text-gray-900">
+          <label for="status-filter" class="block text-sm font-medium leading-6 text-on-surface">
             Status
           </label>
           <div class="mt-2">
@@ -74,7 +74,7 @@
               id="status-filter"
               name="status"
               phx-change="filter_status"
-              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+              class="select w-full border border-outline bg-surface text-on-surface focus:border-primary focus:outline-none sm:max-w-xs sm:text-sm"
             >
               <option value="all" selected={@selected_status == "all"}>All Statuses</option>
               <option value="active" selected={@selected_status == "active"}>Active</option>
@@ -91,41 +91,41 @@
   </div>
 
   <!-- Users Table -->
-  <div class="px-4 sm:px-6 lg:px-8">
+  <div>
     <div class="mt-8 flow-root">
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-            <table class="min-w-full divide-y divide-gray-300">
-              <thead class="bg-gray-50">
+          <div class="overflow-hidden rounded-lg border border-outline-variant bg-surface-container shadow-sm">
+            <table class="min-w-full divide-y divide-outline-variant">
+              <thead class="bg-surface-container-high">
                 <tr>
                   <th
                     scope="col"
-                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-on-surface sm:pl-6"
                   >
                     User
                   </th>
                   <th
                     scope="col"
-                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    class="px-3 py-3.5 text-left text-sm font-semibold text-on-surface"
                   >
                     Email
                   </th>
                   <th
                     scope="col"
-                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    class="px-3 py-3.5 text-left text-sm font-semibold text-on-surface"
                   >
                     Role
                   </th>
                   <th
                     scope="col"
-                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    class="px-3 py-3.5 text-left text-sm font-semibold text-on-surface"
                   >
                     Status
                   </th>
                   <th
                     scope="col"
-                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    class="px-3 py-3.5 text-left text-sm font-semibold text-on-surface"
                   >
                     Last Login
                   </th>
@@ -134,14 +134,14 @@
                   </th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-200 bg-white">
+              <tbody class="divide-y divide-outline-variant bg-surface-container">
                 <%= for user <- @users do %>
                   <tr>
                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                       <div class="flex items-center">
                         <div class="h-10 w-10 flex-shrink-0">
-                          <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                            <span class="text-sm font-medium text-gray-700">
+                          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-container text-on-primary-container">
+                            <span class="text-sm font-medium">
                               {String.first(user.first_name || "")}{String.first(
                                 user.last_name || ""
                               )}
@@ -149,19 +149,21 @@
                           </div>
                         </div>
                         <div class="ml-4">
-                          <div class="font-medium text-gray-900">
+                          <div class="font-medium text-on-surface">
                             {user.display_name || user.username || "Unknown"}
                           </div>
-                          <div class="text-gray-500">@{user.username || "no-username"}</div>
+                          <div class="text-on-surface-variant">
+                            @{user.username || "no-username"}
+                          </div>
                         </div>
                       </div>
                     </td>
-                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <div class="text-gray-900">{user.email}</div>
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-on-surface-variant">
+                      <div class="text-on-surface">{user.email}</div>
                       <%= if user.email_verified do %>
-                        <div class="text-green-600">✓ Verified</div>
+                        <div class="text-success">✓ Verified</div>
                       <% else %>
-                        <div class="text-yellow-600">✗ Not verified</div>
+                        <div class="text-warning">✗ Not verified</div>
                       <% end %>
                     </td>
                     <td class="whitespace-nowrap px-3 py-4 text-sm">
@@ -174,13 +176,13 @@
                         {String.capitalize(Atom.to_string(user.status))}
                       </span>
                     </td>
-                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-on-surface-variant">
                       {format_datetime(user.last_login_at)}
                     </td>
                     <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       <.link
                         navigate={~p"/users/#{user.id}/edit"}
-                        class="text-indigo-600 hover:text-indigo-900"
+                        class="text-primary hover:text-secondary"
                       >
                         Edit<span class="sr-only">, {user.display_name || user.username}</span>
                       </.link>
@@ -192,11 +194,11 @@
 
             <%= if @users == [] do %>
               <div class="text-center py-12">
-                <div class="text-gray-500">No users found</div>
-                <p class="mt-2 text-sm text-gray-400">
+                <div class="text-on-surface-variant">No users found</div>
+                <p class="mt-2 text-sm text-on-surface-variant">
                   Try adjusting your search criteria or <.link
                     navigate={~p"/users/new"}
-                    class="text-indigo-600 hover:text-indigo-500"
+                    class="text-primary hover:text-secondary"
                   >add a new user</.link>.
                 </p>
               </div>

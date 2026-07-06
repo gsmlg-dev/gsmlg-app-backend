@@ -24,7 +24,7 @@
     <.dm_mdi name="chat" class="w-4 h-4 mr-1 inline" /> Chat
   </:menu>
   <:user_profile>
-    <button class="theme-switcher btn btn-ghost btn-sm self-center">
+    <button class="theme-switcher btn btn-ghost btn-sm self-center" aria-label="Toggle theme">
       <.dm_mdi name="weather-sunny" class="w-5 h-5 theme-icon-light" />
       <.dm_mdi name="weather-night" class="w-5 h-5 theme-icon-dark hidden" />
     </button>
@@ -41,19 +41,19 @@
           </div>
         </:trigger>
         <:content>
-          <div class="px-4 py-3 border-b border-base-300/30">
-            <p class="text-sm font-semibold text-base-content">
+          <div class="border-b border-outline-variant px-4 py-3">
+            <p class="text-sm font-semibold text-on-surface">
               {@current_user.display_name || @current_user.email}
             </p>
-            <p class="text-xs text-base-content/50 mt-0.5">{@current_user.email}</p>
-            <span class="inline-block mt-1.5 text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-primary/15 text-primary">
+            <p class="mt-0.5 text-xs text-on-surface-variant">{@current_user.email}</p>
+            <span class="mt-1.5 inline-block rounded-full bg-primary-container px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-on-primary-container">
               {if @current_user.role, do: @current_user.role, else: "user"}
             </span>
           </div>
           <.link navigate={~p"/profile"} class="popover-menu-item">
             <.dm_mdi name="account-outline" class="w-4 h-4" /> My Profile
           </.link>
-          <div class="border-t border-base-300/30 mt-1 pt-1">
+          <div class="mt-1 border-t border-outline-variant pt-1">
             <.link href={~p"/sign-out"} method="delete" class="popover-menu-item text-error">
               <.dm_mdi name="logout" class="w-4 h-4" /> Sign Out
             </.link>
@@ -67,7 +67,7 @@
     <% end %>
   </:user_profile>
 </.dm_simple_appbar>
-<.dm_flash_group flash={@flash} />
+<.accessible_flash_group flash={@flash} />
 <main class="flex w-full min-h-[calc(100vh-3.5rem)]">
   {@inner_content}
 </main>

@@ -90,246 +90,265 @@ defmodule GsmlgAppAdminWeb.AppsManagementLive.Form do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="container mx-auto px-4 py-8 max-w-2xl">
-      <div class="flex items-center gap-4 mb-6">
-        <.link navigate={~p"/apps"} class="btn btn-ghost btn-sm">
-          <.dm_mdi name="arrow-left" class="w-4 h-4" />
-        </.link>
-        <h1 class="text-2xl font-bold">{@page_title}</h1>
-      </div>
+    <div class="w-full bg-surface px-4 py-6 text-on-surface sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-2xl">
+        <div class="mb-6 flex items-center gap-4">
+          <.link
+            navigate={~p"/apps"}
+            class="btn btn-ghost btn-sm text-on-surface-variant hover:text-primary"
+            aria-label="Back to apps"
+          >
+            <.dm_mdi name="arrow-left" class="w-4 h-4" />
+          </.link>
+          <h1 class="text-3xl font-semibold leading-8 text-on-surface">{@page_title}</h1>
+        </div>
 
-      <div class="card bg-base-100 shadow-md">
-        <div class="card-body">
-          <.form for={@form} id="app-form" phx-change="validate" phx-submit="save">
-            <div class="space-y-4">
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">Name *</span>
-                </label>
-                <input
-                  type="text"
-                  name={@form[:name].name}
-                  value={@form[:name].value}
-                  placeholder="My App"
-                  class={"input input-bordered w-full #{if @form[:name].errors != [], do: "input-error"}"}
-                  required
-                  maxlength="100"
-                />
-                <%= if @form[:name].errors != [] do %>
-                  <label class="label">
-                    <span class="label-text-alt text-error">
-                      {format_errors(@form[:name].errors)}
-                    </span>
+        <div class="rounded-lg border border-outline-variant bg-surface-container shadow-sm">
+          <div class="p-4 sm:p-6">
+            <.form for={@form} id="app-form" phx-change="validate" phx-submit="save">
+              <div class="space-y-4">
+                <div class="form-control">
+                  <label class="label" for="app-name">
+                    <span class="label-text font-semibold text-on-surface">Name *</span>
                   </label>
-                <% end %>
-              </div>
-
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">Label *</span>
-                </label>
-                <input
-                  type="text"
-                  name={@form[:label].name}
-                  value={@form[:label].value}
-                  placeholder="my_app"
-                  class={"input input-bordered w-full #{if @form[:label].errors != [], do: "input-error"}"}
-                  required
-                  maxlength="50"
-                  pattern="[a-z0-9_]+"
-                />
-                <label class="label">
-                  <span class="label-text-alt">
-                    URL-friendly identifier (lowercase letters, numbers, underscores only)
-                  </span>
-                </label>
-                <%= if @form[:label].errors != [] do %>
-                  <label class="label">
-                    <span class="label-text-alt text-error">
-                      {format_errors(@form[:label].errors)}
-                    </span>
-                  </label>
-                <% end %>
-              </div>
-
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">Short Description *</span>
-                </label>
-                <input
-                  type="text"
-                  name={@form[:short_description].name}
-                  value={@form[:short_description].value}
-                  placeholder="Brief tagline for the app"
-                  class={"input input-bordered w-full #{if @form[:short_description].errors != [], do: "input-error"}"}
-                  required
-                  maxlength="200"
-                />
-                <%= if @form[:short_description].errors != [] do %>
-                  <label class="label">
-                    <span class="label-text-alt text-error">
-                      {format_errors(@form[:short_description].errors)}
-                    </span>
-                  </label>
-                <% end %>
-              </div>
-
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">Long Description</span>
-                </label>
-                <textarea
-                  name={@form[:long_description].name}
-                  placeholder="Detailed description of the app"
-                  class="textarea textarea-bordered w-full"
-                  rows="3"
-                >{@form[:long_description].value}</textarea>
-              </div>
-
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">Icon Path *</span>
-                </label>
-                <input
-                  type="text"
-                  name={@form[:icon_path].name}
-                  value={@form[:icon_path].value}
-                  placeholder="/images/icons/app.png"
-                  class={"input input-bordered w-full #{if @form[:icon_path].errors != [], do: "input-error"}"}
-                  required
-                />
-                <label class="label">
-                  <span class="label-text-alt">Path to the icon image file</span>
-                </label>
-                <%= if @form[:icon_path].errors != [] do %>
-                  <label class="label">
-                    <span class="label-text-alt text-error">
-                      {format_errors(@form[:icon_path].errors)}
-                    </span>
-                  </label>
-                <% end %>
-              </div>
-
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">Platforms *</span>
-                </label>
-                <div class="flex flex-wrap gap-3">
-                  <%= for {label, value} <- @platforms do %>
-                    <label class="label cursor-pointer gap-2">
-                      <input
-                        type="checkbox"
-                        name="app[platforms][]"
-                        value={value}
-                        checked={value in @selected_platforms}
-                        class="checkbox checkbox-sm checkbox-primary"
-                      />
-                      <span class="label-text">{label}</span>
+                  <input
+                    id="app-name"
+                    type="text"
+                    name={@form[:name].name}
+                    value={@form[:name].value}
+                    placeholder="My App"
+                    class={"input input-bordered w-full #{if @form[:name].errors != [], do: "input-error"}"}
+                    required
+                    maxlength="100"
+                  />
+                  <%= if @form[:name].errors != [] do %>
+                    <label class="label">
+                      <span class="label-text-alt text-error">
+                        {format_errors(@form[:name].errors)}
+                      </span>
                     </label>
                   <% end %>
                 </div>
-                <%= if @form[:platforms].errors != [] do %>
-                  <label class="label">
-                    <span class="label-text-alt text-error">
-                      {format_errors(@form[:platforms].errors)}
-                    </span>
-                  </label>
-                <% end %>
-              </div>
 
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">Category *</span>
-                </label>
-                <select
-                  name={@form[:category].name}
-                  class={"select select-bordered w-full #{if @form[:category].errors != [], do: "select-error"}"}
-                  required
-                >
-                  <option value="" disabled selected={is_nil(@form[:category].value)}>
-                    Select a category
-                  </option>
-                  <%= for {label, value} <- @categories do %>
-                    <option value={value} selected={@form[:category].value == value}>
-                      {label}
-                    </option>
+                <div class="form-control">
+                  <label class="label" for="app-label">
+                    <span class="label-text font-semibold text-on-surface">Label *</span>
+                  </label>
+                  <input
+                    id="app-label"
+                    type="text"
+                    name={@form[:label].name}
+                    value={@form[:label].value}
+                    placeholder="my_app"
+                    class={"input input-bordered w-full #{if @form[:label].errors != [], do: "input-error"}"}
+                    required
+                    maxlength="50"
+                    pattern="[a-z0-9_]+"
+                    aria-describedby="app-label-helper"
+                  />
+                  <p id="app-label-helper" class="mt-1 text-xs text-on-surface-variant">
+                    URL-friendly identifier (lowercase letters, numbers, underscores only)
+                  </p>
+                  <%= if @form[:label].errors != [] do %>
+                    <label class="label">
+                      <span class="label-text-alt text-error">
+                        {format_errors(@form[:label].errors)}
+                      </span>
+                    </label>
                   <% end %>
-                </select>
-                <%= if @form[:category].errors != [] do %>
-                  <label class="label">
-                    <span class="label-text-alt text-error">
-                      {format_errors(@form[:category].errors)}
-                    </span>
+                </div>
+
+                <div class="form-control">
+                  <label class="label" for="app-short-description">
+                    <span class="label-text font-semibold text-on-surface">Short Description *</span>
                   </label>
-                <% end %>
-              </div>
+                  <input
+                    id="app-short-description"
+                    type="text"
+                    name={@form[:short_description].name}
+                    value={@form[:short_description].value}
+                    placeholder="Brief tagline for the app"
+                    class={"input input-bordered w-full #{if @form[:short_description].errors != [], do: "input-error"}"}
+                    required
+                    maxlength="200"
+                  />
+                  <%= if @form[:short_description].errors != [] do %>
+                    <label class="label">
+                      <span class="label-text-alt text-error">
+                        {format_errors(@form[:short_description].errors)}
+                      </span>
+                    </label>
+                  <% end %>
+                </div>
 
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">Display Order</span>
-                </label>
-                <input
-                  type="number"
-                  name={@form[:display_order].name}
-                  value={@form[:display_order].value || 0}
-                  class="input input-bordered w-full"
-                  min="0"
-                />
-                <label class="label">
-                  <span class="label-text-alt">Lower numbers appear first</span>
-                </label>
-              </div>
+                <div class="form-control">
+                  <label class="label" for="app-long-description">
+                    <span class="label-text font-semibold text-on-surface">Long Description</span>
+                  </label>
+                  <textarea
+                    id="app-long-description"
+                    name={@form[:long_description].name}
+                    placeholder="Detailed description of the app"
+                    class="textarea textarea-bordered w-full"
+                    rows="3"
+                  >{@form[:long_description].value}</textarea>
+                </div>
 
-              <div class="divider">Store Links</div>
+                <div class="form-control">
+                  <label class="label" for="app-icon-path">
+                    <span class="label-text font-semibold text-on-surface">Icon Path *</span>
+                  </label>
+                  <input
+                    id="app-icon-path"
+                    type="text"
+                    name={@form[:icon_path].name}
+                    value={@form[:icon_path].value}
+                    placeholder="/images/icons/app.png"
+                    class={"input input-bordered w-full #{if @form[:icon_path].errors != [], do: "input-error"}"}
+                    required
+                    aria-describedby="app-icon-path-helper"
+                  />
+                  <p id="app-icon-path-helper" class="mt-1 text-xs text-on-surface-variant">
+                    Path to the icon image file
+                  </p>
+                  <%= if @form[:icon_path].errors != [] do %>
+                    <label class="label">
+                      <span class="label-text-alt text-error">
+                        {format_errors(@form[:icon_path].errors)}
+                      </span>
+                    </label>
+                  <% end %>
+                </div>
 
-              <div class="space-y-3">
-                <%= for {link, index} <- Enum.with_index(@store_links) do %>
-                  <div class="flex gap-2 items-start">
-                    <select
-                      name={"store_links[#{index}][store_type]"}
-                      class="select select-bordered select-sm flex-shrink-0 w-32"
-                    >
-                      <%= for {label, value} <- @store_types do %>
-                        <option value={value} selected={link.store_type == value}>
-                          {label}
-                        </option>
-                      <% end %>
-                    </select>
-                    <input
-                      type="url"
-                      name={"store_links[#{index}][url]"}
-                      value={link.url}
-                      placeholder="https://..."
-                      class="input input-bordered input-sm flex-1"
-                      required
-                    />
-                    <button
-                      type="button"
-                      phx-click="remove_store_link"
-                      phx-value-index={index}
-                      class="btn btn-ghost btn-sm text-error"
-                    >
-                      <.dm_mdi name="close" class="w-4 h-4" />
-                    </button>
+                <div class="form-control">
+                  <span class="label">
+                    <span class="label-text font-semibold text-on-surface">Platforms *</span>
+                  </span>
+                  <div class="flex flex-wrap gap-3" role="group" aria-label="Platforms">
+                    <%= for {label, value} <- @platforms do %>
+                      <label class="label cursor-pointer gap-2">
+                        <input
+                          type="checkbox"
+                          name="app[platforms][]"
+                          value={value}
+                          checked={value in @selected_platforms}
+                          class="checkbox checkbox-sm checkbox-primary"
+                        />
+                        <span class="label-text text-on-surface">{label}</span>
+                      </label>
+                    <% end %>
                   </div>
-                <% end %>
-                <button
-                  type="button"
-                  phx-click="add_store_link"
-                  class="btn btn-outline btn-sm"
-                >
-                  <.dm_mdi name="plus" class="w-4 h-4 mr-1" /> Add Store Link
+                  <%= if @form[:platforms].errors != [] do %>
+                    <label class="label">
+                      <span class="label-text-alt text-error">
+                        {format_errors(@form[:platforms].errors)}
+                      </span>
+                    </label>
+                  <% end %>
+                </div>
+
+                <div class="form-control">
+                  <label class="label" for="app-category">
+                    <span class="label-text font-semibold text-on-surface">Category *</span>
+                  </label>
+                  <select
+                    id="app-category"
+                    name={@form[:category].name}
+                    class={"select select-bordered w-full #{if @form[:category].errors != [], do: "select-error"}"}
+                    required
+                  >
+                    <option value="" disabled selected={is_nil(@form[:category].value)}>
+                      Select a category
+                    </option>
+                    <%= for {label, value} <- @categories do %>
+                      <option value={value} selected={@form[:category].value == value}>
+                        {label}
+                      </option>
+                    <% end %>
+                  </select>
+                  <%= if @form[:category].errors != [] do %>
+                    <label class="label">
+                      <span class="label-text-alt text-error">
+                        {format_errors(@form[:category].errors)}
+                      </span>
+                    </label>
+                  <% end %>
+                </div>
+
+                <div class="form-control">
+                  <label class="label" for="app-display-order">
+                    <span class="label-text font-semibold text-on-surface">Display Order</span>
+                  </label>
+                  <input
+                    id="app-display-order"
+                    type="number"
+                    name={@form[:display_order].name}
+                    value={@form[:display_order].value || 0}
+                    class="input input-bordered w-full"
+                    min="0"
+                    aria-describedby="app-display-order-helper"
+                  />
+                  <p id="app-display-order-helper" class="mt-1 text-xs text-on-surface-variant">
+                    Lower numbers appear first
+                  </p>
+                </div>
+
+                <div class="divider">Store Links</div>
+
+                <div class="space-y-3">
+                  <%= for {link, index} <- Enum.with_index(@store_links) do %>
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-start">
+                      <label for={"store-link-type-#{index}"} class="sr-only">Store type</label>
+                      <select
+                        id={"store-link-type-#{index}"}
+                        name={"store_links[#{index}][store_type]"}
+                        class="select select-bordered select-sm flex-shrink-0 w-32"
+                      >
+                        <%= for {label, value} <- @store_types do %>
+                          <option value={value} selected={link.store_type == value}>
+                            {label}
+                          </option>
+                        <% end %>
+                      </select>
+                      <label for={"store-link-url-#{index}"} class="sr-only">Store link URL</label>
+                      <input
+                        id={"store-link-url-#{index}"}
+                        type="url"
+                        name={"store_links[#{index}][url]"}
+                        value={link.url}
+                        placeholder="https://..."
+                        class="input input-bordered input-sm flex-1"
+                        required
+                      />
+                      <button
+                        type="button"
+                        phx-click="remove_store_link"
+                        phx-value-index={index}
+                        class="btn btn-ghost btn-sm text-error"
+                        aria-label={"Remove store link #{index + 1}"}
+                      >
+                        <.dm_mdi name="close" class="w-4 h-4" />
+                      </button>
+                    </div>
+                  <% end %>
+                  <button
+                    type="button"
+                    phx-click="add_store_link"
+                    class="btn btn-outline btn-sm"
+                  >
+                    <.dm_mdi name="plus" class="w-4 h-4 mr-1" /> Add Store Link
+                  </button>
+                </div>
+              </div>
+
+              <div class="mt-6 flex justify-end gap-3 border-t border-outline-variant pt-4">
+                <.link navigate={~p"/apps"} class="btn btn-ghost">Cancel</.link>
+                <button type="submit" class="btn btn-primary" phx-disable-with="Saving...">
+                  {if @live_action == :new, do: "Create App", else: "Update App"}
                 </button>
               </div>
-            </div>
-
-            <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
-              <.link navigate={~p"/apps"} class="btn btn-ghost">Cancel</.link>
-              <button type="submit" class="btn btn-primary" phx-disable-with="Saving...">
-                {if @live_action == :new, do: "Create App", else: "Update App"}
-              </button>
-            </div>
-          </.form>
+            </.form>
+          </div>
         </div>
       </div>
     </div>
