@@ -12,6 +12,26 @@
 @import "@duskmoon-dev/core/themes/moonlight";
 @import "@duskmoon-dev/core/components";
 
+/* Responsive display utilities used by PhoenixDuskmoon dependency templates. */
+@media (width >= 40rem) {
+  .sm\:flex { display: flex; }
+  .sm\:inline { display: inline; }
+  .sm\:inline-flex { display: inline-flex; }
+}
+
+@media (width >= 48rem) {
+  .md\:flex { display: flex; }
+  .md\:hidden { display: none; }
+  .md\:inline-flex { display: inline-flex; }
+}
+
+@media (width >= 64rem) {
+  .lg\:flex { display: flex; }
+  .lg\:hidden { display: none; }
+  .lg\:inline { display: inline; }
+  .lg\:inline-flex { display: inline-flex; }
+}
+
 /* Register daisyUI-compat color tokens from @duskmoon-dev/core themes */
 @theme {
   --color-primary-content: var(--color-primary-content);

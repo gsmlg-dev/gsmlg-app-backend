@@ -73,11 +73,15 @@ defmodule GsmlgAppAdminWeb.MixProject do
       "assets.setup": ["cmd --cd ../.. mix npm.install"],
       "assets.vendor": [
         "cmd mkdir -p priv/static/assets/vendor/duskmoon",
+        "cmd mkdir -p priv/static/assets/vendor/phoenix",
         "cmd cp ../../node_modules/@duskmoon-dev/el-markdown/dist/esm/register.js priv/static/assets/vendor/duskmoon/el-markdown-register.js",
         "cmd cp ../../node_modules/@duskmoon-dev/el-markdown/dist/esm/register.js.map priv/static/assets/vendor/duskmoon/el-markdown-register.js.map",
         "cmd cp ../../node_modules/@duskmoon-dev/el-base/dist/esm/index.js priv/static/assets/vendor/duskmoon/el-base.js",
         "cmd cp ../../node_modules/@duskmoon-dev/el-base/dist/esm/index.js.map priv/static/assets/vendor/duskmoon/el-base.js.map",
-        "cmd cp ../../node_modules/@duskmoon-dev/core/dist/esm/components/markdown-body.js priv/static/assets/vendor/duskmoon/markdown-body.js"
+        "cmd cp ../../node_modules/@duskmoon-dev/core/dist/esm/components/markdown-body.js priv/static/assets/vendor/duskmoon/markdown-body.js",
+        "cmd cp ../../deps/phoenix/priv/static/phoenix.mjs priv/static/assets/vendor/phoenix/phoenix.mjs",
+        "cmd cp ../../deps/phoenix_html/priv/static/phoenix_html.js priv/static/assets/vendor/phoenix/phoenix_html.js",
+        "cmd cp ../../deps/phoenix_live_view/priv/static/phoenix_live_view.esm.js priv/static/assets/vendor/phoenix/phoenix_live_view.esm.js"
       ],
       "assets.build": [
         "assets.vendor",

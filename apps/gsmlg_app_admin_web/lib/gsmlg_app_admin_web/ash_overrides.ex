@@ -9,11 +9,11 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
   alias AshAuthentication.Phoenix.{Components, ResetLive, SignInLive}
 
   override SignInLive do
-    set(:root_class, "grid h-screen place-items-center dark:bg-gray-900")
+    set(:root_class, "grid min-h-screen place-items-center bg-surface text-on-surface px-4 py-10")
   end
 
   override ResetLive do
-    set(:root_class, "grid h-screen place-items-center dark:bg-gray-900")
+    set(:root_class, "grid min-h-screen place-items-center bg-surface text-on-surface px-4 py-10")
   end
 
   override Components.Reset do
@@ -27,7 +27,7 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
 
   override Components.Reset.Form do
     set(:root_class, nil)
-    set(:label_class, "mt-2 mb-4 text-2xl tracking-tight font-bold text-gray-900 dark:text-white")
+    set(:label_class, "mt-2 mb-4 text-2xl tracking-tight font-bold text-on-surface")
     set(:form_class, nil)
     set(:spacer_class, "py-1")
     set(:button_text, "Change Password")
@@ -36,13 +36,15 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
 
   override Components.SignIn do
     set(:root_class, """
-    flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none
-    lg:px-20 xl:px-24
+    w-full flex flex-col justify-center
     """)
 
-    set(:strategy_class, "mx-auth w-full max-w-sm lg:w-96")
+    set(:strategy_class, """
+    mx-auth w-full max-w-md rounded-2xl border border-outline-variant
+    bg-surface-container p-6 shadow-lg
+    """)
 
-    set(:authentication_error_container_class, "text-black dark:text-white text-center")
+    set(:authentication_error_container_class, "text-error text-center")
     set(:authentication_error_text_class, "")
   end
 
@@ -54,19 +56,19 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
     set(:dark_image_class, "hidden dark:block")
     set(:image_url, nil)
     set(:dark_image_url, nil)
-    set(:text_class, "text-4xl tracking-tight font-bold text-gray-900 dark:text-white")
-    set(:text, "GSMLG APP Admin")
+    set(:text_class, "text-3xl tracking-tight font-bold text-on-surface")
+    set(:text, "GSMLG Admin")
   end
 
   override Components.HorizontalRule do
     set(:root_class, "relative my-2")
     set(:hr_outer_class, "absolute inset-0 flex items-center")
-    set(:hr_inner_class, "w-full border-t border-gray-300 dark:border-gray-700")
+    set(:hr_inner_class, "w-full border-t border-outline-variant")
     set(:text_outer_class, "relative flex justify-center text-sm")
 
     set(
       :text_inner_class,
-      "px-2 bg-white text-gray-400 font-medium dark:bg-gray-900 dark:text-gray-500"
+      "px-2 bg-surface-container text-on-surface-variant font-medium"
     )
 
     set(:text, "or")
@@ -74,7 +76,7 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
 
   override Components.MagicLink do
     set(:root_class, "mt-4 mb-4")
-    set(:label_class, "mt-2 mb-4 text-2xl tracking-tight font-bold text-gray-900 dark:text-white")
+    set(:label_class, "mt-2 mb-4 text-2xl tracking-tight font-bold text-on-surface")
     set(:form_class, nil)
 
     set(
@@ -89,7 +91,7 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
   override Components.Password do
     set(:root_class, "mt-4 mb-4")
     set(:interstitial_class, "flex flex-row justify-between content-between text-sm font-medium")
-    set(:toggler_class, "flex-none text-blue-500 hover:text-blue-600 px-2 first:pl-0 last:pr-0")
+    set(:toggler_class, "flex-none text-primary hover:text-secondary px-2 first:pl-0 last:pr-0")
     set(:sign_in_toggle_text, "Already have an account?")
     set(:register_toggle_text, "Need an account?")
     set(:reset_toggle_text, "Forgot your password?")
@@ -99,7 +101,7 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
 
   override Components.Password.SignInForm do
     set(:root_class, nil)
-    set(:label_class, "mt-2 mb-4 text-2xl tracking-tight font-bold text-gray-900 dark:text-white")
+    set(:label_class, "mt-2 mb-4 text-2xl tracking-tight font-bold text-on-surface")
     set(:form_class, nil)
     set(:slot_class, "my-4")
     set(:button_text, "Sign In")
@@ -108,7 +110,7 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
 
   override Components.Password.RegisterForm do
     set(:root_class, nil)
-    set(:label_class, "mt-2 mb-4 text-2xl tracking-tight font-bold text-gray-900 dark:text-white")
+    set(:label_class, "mt-2 mb-4 text-2xl tracking-tight font-bold text-on-surface")
     set(:form_class, nil)
     set(:slot_class, "my-4")
     set(:button_text, "Register")
@@ -117,7 +119,7 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
 
   override Components.Password.ResetForm do
     set(:root_class, nil)
-    set(:label_class, "mt-2 mb-4 text-2xl tracking-tight font-bold text-gray-900 dark:text-white")
+    set(:label_class, "mt-2 mb-4 text-2xl tracking-tight font-bold text-on-surface")
     set(:form_class, nil)
     set(:slot_class, "my-4")
 
@@ -131,27 +133,32 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
   end
 
   override Components.Password.Input do
-    set(:field_class, "mt-2 mb-2 dark:text-white")
-    set(:label_class, "block text-sm font-medium text-gray-700 mb-1 dark:text-white")
+    set(:field_class, "mt-2 mb-2")
+    set(:label_class, "block text-sm font-medium text-on-surface mb-1")
 
     set(:input_class, """
-    appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md
-    shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-pale-500
-    focus:border-blue-pale-500 sm:text-sm dark:bg-gray-800 dark:text-white dark:border-gray-600
-    dark:placeholder-gray-400
+    input w-full bg-surface text-on-surface border border-outline
+    placeholder:text-on-surface-variant focus:outline-none focus:border-primary sm:text-sm
     """)
 
     set(:input_class_with_error, """
-    appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md
-    shadow-sm placeholder-gray-400 focus:outline-none border-red-400 sm:text-sm
-    dark:bg-gray-800 dark:text-white dark:border-red-600 dark:placeholder-gray-400
+    input w-full bg-surface text-on-surface border border-error
+    placeholder:text-on-surface-variant focus:outline-none focus:border-error sm:text-sm
     """)
 
     set(:submit_class, """
-    btn btn-primary w-full mt-4 mb-4 text-white
+    btn btn-primary w-full mt-4 mb-4
     """)
 
-    set(:error_ul, "text-red-400 font-light my-3 italic text-sm")
+    set(:identity_input_label, "Email")
+    set(:identity_input_placeholder, "admin@example.com")
+    set(:password_input_label, "Password")
+    set(:password_confirmation_input_label, "Password confirmation")
+    set(:remember_me_input_label, "Remember me")
+    set(:remember_me_class, "flex items-center gap-2 mt-2 mb-2")
+    set(:checkbox_class, "checkbox checkbox-primary")
+    set(:checkbox_label_class, "text-sm font-medium text-on-surface")
+    set(:error_ul, "text-error font-light my-3 italic text-sm")
     set(:error_li, nil)
     set(:input_debounce, 350)
   end
@@ -160,7 +167,7 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
     set(:root_class, "w-full mt-2 mb-4")
 
     set(:link_class, """
-    btn btn-outline w-full inline-flex items-center justify-center dark:border-gray-600 dark:text-white dark:hover:bg-gray-800
+    btn btn-outline w-full inline-flex items-center justify-center
     """)
 
     set(:icon_class, "-ml-0.4 mr-2 h-4 w-4")

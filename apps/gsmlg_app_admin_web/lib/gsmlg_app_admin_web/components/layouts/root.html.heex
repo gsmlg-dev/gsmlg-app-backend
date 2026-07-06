@@ -21,6 +21,9 @@
     <script type="importmap">
       {
         "imports": {
+          "phoenix": "/assets/vendor/phoenix/phoenix.mjs",
+          "phoenix_html": "/assets/vendor/phoenix/phoenix_html.js",
+          "phoenix_live_view": "/assets/vendor/phoenix/phoenix_live_view.esm.js",
           "@duskmoon-dev/el-base": "/assets/vendor/duskmoon/el-base.js",
           "@duskmoon-dev/core/components/markdown-body": "/assets/vendor/duskmoon/markdown-body.js"
         }
@@ -54,7 +57,7 @@
       })();
     </script>
   </head>
-  <body class="relative flex flex-col">
+  <body class="relative flex min-h-screen flex-col bg-surface text-on-surface">
     {@inner_content}
   </body>
 </html>
