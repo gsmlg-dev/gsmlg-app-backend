@@ -9,7 +9,7 @@
       background="/images/explosion.png"
       icon="headset"
     >
-      <div class="flex items-center justify-center gap-2 text-gray-300 animate-fade-in animation-delay-400">
+      <div class="flex items-center justify-center gap-2 text-on-surface animate-fade-in animation-delay-400">
         <.dm_mdi name="headset" class="w-5 h-5" />
         <span class="text-lg">{dgettext("navigation", "24/7 Community Support")}</span>
       </div>
@@ -18,20 +18,20 @@
 
   <div
     id="page"
-    class="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black py-8 sm:py-12"
+    class="min-h-screen bg-surface text-on-surface py-8 sm:py-12"
   >
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 space-y-12 sm:space-y-16">
       <!-- Contact Methods Section -->
       <div class="text-center">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-4">
           {dgettext("navigation", "Get in Touch")}
         </h2>
-        <p class="text-lg sm:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+        <p class="text-lg sm:text-xl text-on-surface mb-12 max-w-3xl mx-auto">
           {dgettext("user", "Multiple ways to reach us for different types of support")}
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          <.dm_card class="bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <.dm_card class="bg-surface-container backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <div class="card-body text-center">
               <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <.dm_mdi name="email" class="w-8 h-8 text-primary" />
@@ -39,10 +39,10 @@
               <h3 class="card-title text-lg font-bold text-primary mb-3">
                 {dgettext("navigation", "Email Support")}
               </h3>
-              <p class="text-sm text-gray-300 mb-4">
+              <p class="text-sm text-on-surface mb-4">
                 {dgettext("user", "Direct support for technical issues and inquiries")}
               </p>
-              <div class="text-xs text-gray-400 mb-4">
+              <div class="text-xs text-on-surface-variant mb-4">
                 {dgettext("user", "Response time: 24-48 hours")}
               </div>
               <.dm_btn variant="primary" size="sm">
@@ -53,7 +53,7 @@
             </div>
           </.dm_card>
 
-          <.dm_card class="bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <.dm_card class="bg-surface-container backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <div class="card-body text-center">
               <div class="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <.dm_mdi name="github" class="w-8 h-8 text-secondary" />
@@ -61,10 +61,10 @@
               <h3 class="card-title text-lg font-bold text-secondary mb-3">
                 {dgettext("common", "GitHub Issues")}
               </h3>
-              <p class="text-sm text-gray-300 mb-4">
+              <p class="text-sm text-on-surface mb-4">
                 {dgettext("user", "Report bugs and request features for our projects")}
               </p>
-              <div class="text-xs text-gray-400 mb-4">
+              <div class="text-xs text-on-surface-variant mb-4">
                 {dgettext("user", "Community-driven support")}
               </div>
               <.dm_btn variant="secondary" size="sm">
@@ -75,18 +75,18 @@
             </div>
           </.dm_card>
 
-          <.dm_card class="bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <.dm_card class="bg-surface-container backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <div class="card-body text-center">
-              <div class="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <.dm_mdi name="forum" class="w-8 h-8 text-accent" />
+              <div class="w-16 h-16 bg-tertiary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <.dm_mdi name="forum" class="w-8 h-8 text-tertiary" />
               </div>
-              <h3 class="card-title text-lg font-bold text-accent mb-3">
+              <h3 class="card-title text-lg font-bold text-tertiary mb-3">
                 {dgettext("navigation", "Community Forum")}
               </h3>
-              <p class="text-sm text-gray-300 mb-4">
+              <p class="text-sm text-on-surface mb-4">
                 {dgettext("user", "Connect with other users and share knowledge")}
               </p>
-              <div class="text-xs text-gray-400 mb-4">
+              <div class="text-xs text-on-surface-variant mb-4">
                 {dgettext("user", "Peer-to-peer support")}
               </div>
               <.dm_btn variant="accent" size="sm">
@@ -107,17 +107,17 @@
       </div>
 
       <!-- Support Hours Section -->
-      <.dm_card class="card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
+      <.dm_card class="card-side bg-surface-container backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
         <figure class="lg:w-1/2 relative overflow-hidden max-h-96 lg:max-h-none">
           <img
             src="/images/space-earth-light.jpg"
             alt="Support Hours"
             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           </div>
         </figure>
-        <div class="card-body lg:w-1/2 bg-gradient-to-br from-gray-900 to-black text-neutral-300 p-4 sm:p-6">
+        <div class="card-body lg:w-1/2 bg-gradient-to-br from-surface-container-high to-surface-container-highest text-on-surface p-4 sm:p-6">
           <div class="flex items-center gap-3 mb-4">
             <div class="w-3 h-3 bg-info rounded-full animate-pulse"></div>
             <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-info to-cyan-400 bg-clip-text text-transparent">
@@ -147,17 +147,17 @@
 
       <!-- FAQ Section using dm_accordion -->
       <div class="text-center">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-4">
           {dgettext("navigation", "Frequently Asked Questions")}
         </h2>
-        <p class="text-lg sm:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+        <p class="text-lg sm:text-xl text-on-surface mb-12 max-w-3xl mx-auto">
           {dgettext("user", "Quick answers to common questions about our software and services")}
         </p>
 
         <div class="max-w-4xl mx-auto">
           <.dm_accordion value="faq1" class="space-y-4">
             <:item value="faq1" header={dgettext("user", "What software does GSMLG develop?")}>
-              <p class="text-gray-300 text-left">
+              <p class="text-on-surface text-left">
                 {dgettext(
                   "user",
                   "GSMLG develops a range of open source software tools including network utilities, DevOps tools, and mobile-optimized applications. Our focus is on creating professional tools for developers, system administrators, and IT professionals."
@@ -165,7 +165,7 @@
               </p>
             </:item>
             <:item value="faq2" header={dgettext("user", "Is your software really free to use?")}>
-              <p class="text-gray-300 text-left">
+              <p class="text-on-surface text-left">
                 {dgettext(
                   "user",
                   "Yes! All our software is open source and free to use under permissive licenses. We believe in the power of open source and community collaboration to create better tools for everyone."
@@ -176,7 +176,7 @@
               value="faq3"
               header={dgettext("user", "How can I contribute to your projects?")}
             >
-              <p class="text-gray-300 text-left">
+              <p class="text-on-surface text-left">
                 {dgettext(
                   "user",
                   "We welcome contributions! You can contribute by reporting bugs, suggesting features, submitting pull requests on GitHub, or helping other users in our community forum. Every contribution helps make our software better."
@@ -184,7 +184,7 @@
               </p>
             </:item>
             <:item value="faq4" header={dgettext("user", "Do you offer commercial support?")}>
-              <p class="text-gray-300 text-left">
+              <p class="text-on-surface text-left">
                 {dgettext(
                   "user",
                   "While our software is free and community-supported, we do offer priority commercial support for enterprise customers. Contact us at contact@gsmlg.dev for more information about commercial support packages."
@@ -192,7 +192,7 @@
               </p>
             </:item>
             <:item value="faq5" header={dgettext("user", "What platforms do you support?")}>
-              <p class="text-gray-300 text-left">
+              <p class="text-on-surface text-left">
                 {dgettext(
                   "user",
                   "Our tools are designed to work across multiple platforms including iOS, Android, macOS, Windows, and Linux. We believe in providing consistent professional tools across all your devices."
@@ -205,10 +205,10 @@
 
       <!-- Bug Reporting Guidelines -->
       <div class="text-center py-12">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-4">
           {dgettext("navigation", "Bug Reporting Guidelines")}
         </h2>
-        <p class="text-lg sm:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+        <p class="text-lg sm:text-xl text-on-surface mb-12 max-w-3xl mx-auto">
           {dgettext(
             "user",
             "Help us help you by providing detailed information when reporting issues"
@@ -223,7 +223,7 @@
             <h3 class="text-xl font-bold text-success mb-3">
               {dgettext("navigation", "What to Include")}
             </h3>
-            <ul class="text-left text-gray-300 space-y-2">
+            <ul class="text-left text-on-surface space-y-2">
               <li class="flex items-start">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2 mt-1 flex-shrink-0" />
                 <span>{dgettext("user", "Software version and platform")}</span>
@@ -254,7 +254,7 @@
             <h3 class="text-xl font-bold text-info mb-3">
               {dgettext("navigation", "Best Practices")}
             </h3>
-            <ul class="text-left text-gray-300 space-y-2">
+            <ul class="text-left text-on-surface space-y-2">
               <li class="flex items-start">
                 <.dm_mdi name="check" class="w-4 h-4 text-info mr-2 mt-1 flex-shrink-0" />
                 <span>{dgettext("user", "Search existing issues first")}</span>
@@ -281,20 +281,20 @@
       </div>
 
       <!-- Community Support Section -->
-      <.dm_card class="card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
+      <.dm_card class="card-side bg-surface-container backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
         <figure class="lg:w-1/2 lg:order-last relative overflow-hidden max-h-96 lg:max-h-none">
           <img
             src="/images/people-in-skyscraper.jpg"
             alt="Community Support"
             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           </div>
         </figure>
-        <div class="card-body lg:w-1/2 bg-gradient-to-br from-gray-900 to-black text-neutral-300 p-4 sm:p-6">
+        <div class="card-body lg:w-1/2 bg-gradient-to-br from-surface-container-high to-surface-container-highest text-on-surface p-4 sm:p-6">
           <div class="flex items-center gap-3 mb-4">
             <div class="w-3 h-3 bg-warning rounded-full animate-pulse"></div>
-            <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-warning to-orange-400 bg-clip-text text-transparent">
+            <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl text-warning">
               {dgettext("navigation", "Community Support")}
             </h2>
           </div>
@@ -331,10 +331,10 @@
 
       <!-- Contact CTA Section -->
       <div class="text-center py-16 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-4">
           {dgettext("navigation", "Still Need Help?")}
         </h2>
-        <p class="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+        <p class="text-lg sm:text-xl text-on-surface mb-8 max-w-2xl mx-auto">
           {dgettext(
             "user",
             "Our team is here to support you. Don't hesitate to reach out with any questions or concerns."
@@ -349,14 +349,14 @@
           <.dm_btn
             variant="outline"
             size="lg"
-            class="border-white text-white hover:bg-white hover:text-black"
+            class="border-outline text-on-surface hover:bg-surface-container-highest hover:text-on-surface"
           >
             <a href="https://github.com/gsmlg" target="_blank" class="flex items-center gap-2">
               <.dm_mdi name="github" class="w-5 h-5" /> {dgettext("navigation", "Visit GitHub")}
             </a>
           </.dm_btn>
         </div>
-        <div class="mt-8 flex items-center justify-center gap-6 text-gray-400">
+        <div class="mt-8 flex items-center justify-center gap-6 text-on-surface-variant">
           <div class="flex items-center gap-2">
             <.dm_mdi name="map-marker" class="w-4 h-4" />
             <span>{dgettext("common", "Hong Kong")}</span>

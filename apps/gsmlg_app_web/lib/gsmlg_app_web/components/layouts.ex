@@ -20,13 +20,12 @@ defmodule GsmlgAppWeb.Layouts do
     ~H"""
     <.dm_page_header
       class={[
-        "bg-gradient-to-br from-slate-700 to-neutral-700",
-        "text-slate-400",
+        "bg-primary text-primary-content",
         "h-fit",
         @header_class,
         @extra_header_class
       ]}
-      nav_class="bg-black text-slate-400 z-50"
+      nav_class="bg-primary text-primary-content z-50"
     >
       <:menu class={menu_active_class("home", @current_page)} to="/">
         {dgettext("navigation", "Home")}
@@ -46,7 +45,7 @@ defmodule GsmlgAppWeb.Layouts do
     <main class={["flex flex-col min-h-[calc(100vh-50%)] w-full", @main_class]}>
       <div class="w-full min-w-full min-h-full mx-auto flex flex-col items-center">
         <.accessible_flash_group flash={@flash} />
-        <a name="page"></a>
+        <span id="main-content" class="sr-only" aria-hidden="true"></span>
         {render_slot(@inner_block)}
       </div>
     </main>
@@ -55,7 +54,7 @@ defmodule GsmlgAppWeb.Layouts do
   end
 
   defp menu_active_class(page, current_page) when page == current_page,
-    do: "border-b-2 text-slate-200 border-slate-200 uppercase"
+    do: "border-b-2 text-primary-content border-primary-content uppercase"
 
   defp menu_active_class(_page, _current_page),
     do: "uppercase"

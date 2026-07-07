@@ -1,11 +1,11 @@
 <div
-  class="flex w-full h-[calc(100vh-3.5rem)] bg-base-200"
+  class="flex w-full min-h-[calc(100vh-3.5rem)] flex-col bg-surface text-on-surface md:h-[calc(100vh-3.5rem)] md:flex-row"
   id="chat-page"
   phx-hook="ProviderSelection"
 >
   <!-- Sidebar -->
-  <div class="w-64 bg-base-100 border-r border-base-300 flex flex-col">
-    <div class="p-4 border-b border-base-300">
+  <aside class="flex w-full flex-col border-b border-outline-variant bg-surface-container-high md:w-72 md:shrink-0 md:border-b-0 md:border-r">
+    <div class="p-4 border-b border-outline-variant">
       <button
         phx-click="new_conversation"
         class="btn btn-primary btn-block"
@@ -15,12 +15,13 @@
     </div>
 
     <!-- Provider Selection -->
-    <div class="p-4 border-b border-base-300">
-      <label class="label">
+    <div class="p-4 border-b border-outline-variant">
+      <label class="label" for="chat-provider-model-sidebar">
         <span class="label-text font-semibold">AI Provider</span>
       </label>
       <form phx-change="select_provider">
         <select
+          id="chat-provider-model-sidebar"
           class="select select-bordered w-full"
           name="provider_model"
         >
@@ -44,25 +45,25 @@
     </div>
 
     <!-- Conversations List -->
-    <div class="flex-1 overflow-y-auto">
+    <div class="max-h-72 flex-1 overflow-y-auto md:max-h-none">
       <%= for conversation <- @conversations do %>
-        <div class="p-3 hover:bg-base-200 cursor-pointer border-b border-base-300 group">
+        <div class="group border-b border-outline-variant p-3 hover:bg-surface-container">
           <div class="flex items-center justify-between">
-            <div
-              phx-click={JS.patch(~p"/chat/#{conversation.id}")}
-              class="flex-1"
+            <.link
+              patch={~p"/chat/#{conversation.id}"}
+              class="block flex-1 min-w-0 no-underline"
             >
-              <p class="text-sm font-medium truncate">{conversation.title}</p>
-              <p class="text-xs text-base-content/60">
+              <p class="text-sm font-medium truncate text-on-surface">{conversation.title}</p>
+              <p class="text-xs text-on-surface-variant">
                 {Calendar.strftime(conversation.updated_at, "%b %d, %Y")}
               </p>
-            </div>
+            </.link>
             <div class="flex gap-1 opacity-0 group-hover:opacity-100">
               <button
                 phx-click="edit_conversation_title"
                 phx-value-id={conversation.id}
                 class="btn btn-ghost btn-xs"
-                title="Edit title"
+                aria-label={"Edit title for #{conversation.title}"}
               >
                 <.dm_mdi name="pencil" class="w-4 h-4" />
               </button>
@@ -71,7 +72,7 @@
                 phx-value-id={conversation.id}
                 class="btn btn-ghost btn-xs"
                 data-confirm="Delete this conversation?"
-                title="Delete conversation"
+                aria-label={"Delete conversation #{conversation.title}"}
               >
                 <.dm_mdi name="delete" class="w-4 h-4" />
               </button>
@@ -82,22 +83,22 @@
     </div>
 
     <!-- Settings Link -->
-    <div class="p-4 border-t border-base-300">
+    <div class="p-4 border-t border-outline-variant">
       <.link navigate={~p"/ai-provider/providers"} class="btn btn-ghost btn-block justify-start">
         <.dm_mdi name="cog" class="w-5 h-5" /> Settings
       </.link>
     </div>
-  </div>
+  </aside>
 
   <!-- Main Chat Area -->
-  <div class="flex-1 flex flex-col">
+  <section class="flex min-w-0 flex-1 flex-col">
     <%= if Enum.empty?(@providers) do %>
       <!-- No Provider Configured -->
       <div class="flex-1 flex items-center justify-center">
         <div class="text-center p-8 max-w-md">
-          <.dm_mdi name="robot" class="w-20 h-20 mx-auto mb-4 text-base-content/30" />
+          <.dm_mdi name="robot" class="w-20 h-20 mx-auto mb-4 text-on-surface-variant" />
           <h2 class="text-2xl font-bold mb-2">No AI Provider Configured</h2>
-          <p class="text-base-content/60 mb-6">
+          <p class="text-on-surface-variant mb-6">
             To start chatting, you need to configure at least one AI provider.
           </p>
           <.link navigate={~p"/ai-provider/providers"} class="btn btn-primary">
@@ -107,15 +108,18 @@
       </div>
     <% else %>
       <!-- Chat Header -->
-      <div class="p-4 bg-base-100 border-b border-base-300">
-        <div class="flex items-center justify-between">
+      <div class="p-4 bg-surface-container border-b border-outline-variant">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h1 class="text-2xl font-bold">
             {(@current_conversation && @current_conversation.title) || "AI Chat"}
           </h1>
           <!-- Model Selector in Header -->
           <form phx-change="select_provider" class="flex items-center gap-2">
-            <span class="text-sm text-base-content/60">Model:</span>
+            <label for="chat-provider-model-header" class="text-sm text-on-surface-variant">
+              Model:
+            </label>
             <select
+              id="chat-provider-model-header"
               class="select select-bordered select-sm"
               name="provider_model"
             >
@@ -235,15 +239,16 @@
       </div>
 
       <!-- Input Area -->
-      <div class="p-4 bg-base-100 border-t border-base-300">
+      <div class="p-4 bg-surface-container border-t border-outline-variant">
         <%= if @current_user do %>
           <div id="message-input" phx-hook="MarkdownInput" class="flex gap-2 items-end">
-            <div class="flex-1 border border-base-300 rounded-lg overflow-hidden bg-base-100">
+            <div class="flex-1 border border-outline rounded-lg overflow-hidden bg-surface">
               <div class="tabs tabs-bordered px-2 pt-1">
                 <button type="button" data-tab="write" class="tab tab-sm tab-active">Write</button>
                 <button type="button" data-tab="preview" class="tab tab-sm">Preview</button>
               </div>
               <div data-pane="write">
+                <label for="message-textarea" class="sr-only">Message</label>
                 <textarea
                   id="message-textarea"
                   placeholder="Type your message... (Cmd+Enter or Ctrl+Enter to send)"
@@ -265,6 +270,7 @@
               disabled={@loading || String.trim(@input) == ""}
               phx-click="send_message"
               phx-value-message={@input}
+              aria-label="Send message"
             >
               <%= if @loading do %>
                 <span class="loading loading-spinner loading-sm"></span>
@@ -284,7 +290,7 @@
         <% end %>
       </div>
     <% end %>
-  </div>
+  </section>
 
   <!-- Edit Title Modal -->
   <%= if @editing_conversation do %>
@@ -292,7 +298,11 @@
       <div class="modal-box">
         <h3 class="font-bold text-lg">Edit Conversation Title</h3>
         <form phx-submit="save_conversation_title" class="mt-4">
+          <label for="conversation-title" class="label">
+            <span class="label-text">Conversation title</span>
+          </label>
           <input
+            id="conversation-title"
             type="text"
             name="title"
             value={@edit_title}

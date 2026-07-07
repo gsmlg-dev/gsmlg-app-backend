@@ -98,6 +98,86 @@
   }
 }
 
+@layer components {
+  .admin-auth-page {
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in oklch, var(--color-outline-variant) 28%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in oklch, var(--color-outline-variant) 22%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        135deg,
+        var(--color-surface),
+        color-mix(in oklch, var(--color-tertiary-container) 34%, var(--color-surface) 66%)
+      );
+    background-size: 56px 56px, 56px 56px, auto;
+  }
+
+  .admin-auth-brand {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in oklch, var(--color-primary-container) 86%, var(--color-surface) 14%),
+        color-mix(in oklch, var(--color-tertiary-container) 78%, var(--color-surface) 22%)
+      );
+    color: var(--color-on-primary-container);
+    border: 1px solid color-mix(in oklch, var(--color-outline-variant) 82%, transparent);
+  }
+
+  .admin-auth-brand::before {
+    content: "";
+    position: absolute;
+    inset: 1.25rem 1.25rem auto auto;
+    z-index: -1;
+    width: min(52%, 22rem);
+    height: 44%;
+    border: 1px solid color-mix(in oklch, var(--color-on-primary-container) 16%, transparent);
+    border-radius: 0.5rem;
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--color-surface) 34%, transparent),
+      transparent
+    );
+    transform: skewY(-8deg);
+  }
+
+  .admin-auth-brand::after {
+    content: "";
+    position: absolute;
+    right: 2rem;
+    bottom: 2rem;
+    left: 2rem;
+    z-index: -1;
+    height: 6rem;
+    border-block: 1px solid color-mix(in oklch, var(--color-on-primary-container) 16%, transparent);
+    background: repeating-linear-gradient(
+      90deg,
+      color-mix(in oklch, var(--color-on-primary-container) 12%, transparent) 0 1px,
+      transparent 1px 3rem
+    );
+    opacity: 0.7;
+  }
+
+  .admin-auth-brand-title {
+    color: var(--color-on-primary-container);
+    text-wrap: balance;
+  }
+
+  .admin-auth-card {
+    background: color-mix(in oklch, var(--color-surface-container) 96%, transparent);
+    box-shadow: 0 1rem 2.5rem color-mix(in oklch, var(--color-on-surface) 12%, transparent);
+  }
+}
+
 body {
   min-height: 100svh;
 }

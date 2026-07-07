@@ -1,5 +1,5 @@
 <script defer phx-track-static src={~p"/assets/geomap.js"} />
-<div class="w-full h-full min-h-[300px] bg-[rgb(66,66,66)] flex justify-center items-center">
+<div class="w-full h-full min-h-[300px] bg-surface-container-high flex justify-center items-center">
   <d3-world-map
     class="w-full h-[300px] max-w-[600px]"
     points={Jason.encode!([[@longitude, @latitude]])}
@@ -9,6 +9,6 @@
 </div>
 <style>
   html,body {
-      background-color: rgb(66,66,66);
+      background-color: var(--color-surface-container-high);
   }
 </style>

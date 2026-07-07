@@ -12,7 +12,7 @@
       background="/images/montian-lake.jpg"
       icon="map-marker"
     >
-      <div class="flex items-center justify-center gap-2 text-gray-300 animate-fade-in animation-delay-400">
+      <div class="flex items-center justify-center gap-2 text-on-surface animate-fade-in animation-delay-400">
         <.dm_mdi name="map-marker" class="w-5 h-5" />
         <span class="text-lg">{dgettext("common", "Hong Kong")}</span>
       </div>
@@ -21,35 +21,35 @@
 
   <div
     id="page"
-    class="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black py-8 sm:py-12"
+    class="min-h-screen bg-surface text-on-surface py-8 sm:py-12"
   >
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 space-y-12 sm:space-y-16">
       <!-- Our Story Section -->
       <div class="text-center">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-4">
           {dgettext("navigation", "Our Story")}
         </h2>
-        <p class="text-lg sm:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+        <p class="text-lg sm:text-xl text-on-surface mb-12 max-w-3xl mx-auto">
           {dgettext(
             "user",
             "Founded in the vibrant tech hub of Hong Kong, GSMLG emerged from a shared passion for open source software development"
           )}
         </p>
 
-        <.dm_card class="card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
+        <.dm_card class="card-side bg-surface-container backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
           <figure class="lg:w-1/2 relative overflow-hidden max-h-96 lg:max-h-none">
             <img
               src="/images/people-in-skyscraper.jpg"
               alt="Hong Kong Skyline"
               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             </div>
           </figure>
-          <div class="card-body lg:w-1/2 bg-gradient-to-br from-gray-900 to-black text-neutral-300 p-4 sm:p-6">
+          <div class="card-body lg:w-1/2 bg-gradient-to-br from-surface-container-high to-surface-container-highest text-on-surface p-4 sm:p-6">
             <div class="flex items-center gap-3 mb-4">
               <div class="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
-              <h3 class="card-title text-2xl sm:text-3xl bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
+              <h3 class="card-title text-2xl sm:text-3xl text-primary">
                 {dgettext("navigation", "Born in Hong Kong")}
               </h3>
             </div>
@@ -79,10 +79,10 @@
 
       <!-- Our Mission Section -->
       <div class="text-center">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-4">
           {dgettext("navigation", "Our Mission")}
         </h2>
-        <p class="text-lg sm:text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+        <p class="text-lg sm:text-xl text-on-surface mb-12 max-w-3xl mx-auto">
           {dgettext(
             "user",
             "Empowering developers worldwide through accessible, high-quality open source solutions"
@@ -90,7 +90,7 @@
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <.dm_card class="bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <.dm_card class="bg-surface-container backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <div class="card-body text-center">
               <div class="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <.dm_mdi name="source-merge" class="w-8 h-8 text-success" />
@@ -98,7 +98,7 @@
               <h3 class="card-title text-lg font-bold text-success mb-3">
                 {dgettext("common", "Open Source First")}
               </h3>
-              <p class="text-sm text-gray-300">
+              <p class="text-sm text-on-surface">
                 {dgettext(
                   "user",
                   "We believe in the power of collaborative development and transparent code that benefits everyone"
@@ -107,7 +107,7 @@
             </div>
           </.dm_card>
 
-          <.dm_card class="bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <.dm_card class="bg-surface-container backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <div class="card-body text-center">
               <div class="w-16 h-16 bg-warning/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <.dm_mdi name="star" class="w-8 h-8 text-warning" />
@@ -115,7 +115,7 @@
               <h3 class="card-title text-lg font-bold text-warning mb-3">
                 {dgettext("common", "Quality Driven")}
               </h3>
-              <p class="text-sm text-gray-300">
+              <p class="text-sm text-on-surface">
                 {dgettext(
                   "user",
                   "Every line of code is crafted with attention to detail, performance, and user experience"
@@ -124,7 +124,7 @@
             </div>
           </.dm_card>
 
-          <.dm_card class="bg-base-100/95 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <.dm_card class="bg-surface-container backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
             <div class="card-body text-center">
               <div class="w-16 h-16 bg-info/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <.dm_mdi name="account-group" class="w-8 h-8 text-info" />
@@ -132,7 +132,7 @@
               <h3 class="card-title text-lg font-bold text-info mb-3">
                 {dgettext("common", "Community Focused")}
               </h3>
-              <p class="text-sm text-gray-300">
+              <p class="text-sm text-on-surface">
                 {dgettext(
                   "user",
                   "We build tools that solve real problems and foster a supportive developer community"
@@ -145,7 +145,7 @@
 
       <!-- Our Team Culture Section -->
       <div class="text-center py-12">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-12">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-12">
           {dgettext("navigation", "Our Team Culture")}
         </h2>
 
@@ -155,13 +155,13 @@
               <.dm_mdi name="run" class="w-8 h-8 text-primary" />
             </div>
             <h3 class="text-xl font-bold text-primary mb-3">{dgettext("common", "Active")}</h3>
-            <p class="text-gray-300 mb-4">
+            <p class="text-on-surface mb-4">
               {dgettext(
                 "user",
                 "We're constantly moving, learning, and adapting to new technologies and challenges"
               )}
             </p>
-            <ul class="text-left text-gray-400 space-y-2">
+            <ul class="text-left text-on-surface-variant space-y-2">
               <li class="flex items-center">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext(
                   "common",
@@ -190,13 +190,13 @@
             <h3 class="text-xl font-bold text-secondary mb-3">
               {dgettext("common", "Optimistic")}
             </h3>
-            <p class="text-gray-300 mb-4">
+            <p class="text-on-surface mb-4">
               {dgettext(
                 "user",
                 "We approach every challenge with positivity and believe in the power of technology to improve lives"
               )}
             </p>
-            <ul class="text-left text-gray-400 space-y-2">
+            <ul class="text-left text-on-surface-variant space-y-2">
               <li class="flex items-center">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext(
                   "common",
@@ -219,17 +219,19 @@
           </.dm_card>
 
           <.dm_card class="bg-transparent shadow-none text-center">
-            <div class="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <.dm_mdi name="heart" class="w-8 h-8 text-accent" />
+            <div class="w-16 h-16 bg-tertiary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <.dm_mdi name="heart" class="w-8 h-8 text-tertiary" />
             </div>
-            <h3 class="text-xl font-bold text-accent mb-3">{dgettext("common", "Passionate")}</h3>
-            <p class="text-gray-300 mb-4">
+            <h3 class="text-xl font-bold text-tertiary mb-3">
+              {dgettext("common", "Passionate")}
+            </h3>
+            <p class="text-on-surface mb-4">
               {dgettext(
                 "user",
                 "We love what we do and pour our hearts into creating exceptional software experiences"
               )}
             </p>
-            <ul class="text-left text-gray-400 space-y-2">
+            <ul class="text-left text-on-surface-variant space-y-2">
               <li class="flex items-center">
                 <.dm_mdi name="check" class="w-4 h-4 text-success mr-2" /> {dgettext(
                   "common",
@@ -254,17 +256,17 @@
       </div>
 
       <!-- Technology Stack Section -->
-      <.dm_card class="card-side bg-base-100/95 backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
+      <.dm_card class="card-side bg-surface-container backdrop-blur-sm shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02] group">
         <figure class="lg:w-1/2 relative overflow-hidden max-h-96 lg:max-h-none">
           <img
             src="/images/space-earth-light.jpg"
             alt="Technology"
             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           </div>
         </figure>
-        <div class="card-body lg:w-1/2 bg-gradient-to-br from-gray-900 to-black text-neutral-300 p-4 sm:p-6">
+        <div class="card-body lg:w-1/2 bg-gradient-to-br from-surface-container-high to-surface-container-highest text-on-surface p-4 sm:p-6">
           <div class="flex items-center gap-3 mb-4">
             <div class="w-3 h-3 bg-info rounded-full animate-pulse"></div>
             <h2 class="card-title text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-r from-info to-cyan-400 bg-clip-text text-transparent">
@@ -297,10 +299,10 @@
 
       <!-- Contact & Community Section -->
       <div class="text-center py-16 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl">
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-on-surface mb-4">
           {dgettext("navigation", "Join Our Community")}
         </h2>
-        <p class="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+        <p class="text-lg sm:text-xl text-on-surface mb-8 max-w-2xl mx-auto">
           {dgettext(
             "user",
             "We're always excited to connect with fellow developers, contributors, and users who share our passion for open source"
@@ -318,7 +320,7 @@
           <.dm_btn
             variant="outline"
             size="lg"
-            class="border-white text-white hover:bg-white hover:text-black"
+            class="border-outline text-on-surface hover:bg-surface-container-highest hover:text-on-surface"
           >
             <.link href="https://github.com/gsmlg" target="_blank" class="flex items-center gap-2">
               <.dm_mdi name="github" class="w-5 h-5" /> {dgettext(
@@ -328,7 +330,7 @@
             </.link>
           </.dm_btn>
         </div>
-        <div class="mt-8 flex items-center justify-center gap-2 text-gray-400">
+        <div class="mt-8 flex items-center justify-center gap-2 text-on-surface-variant">
           <.dm_mdi name="email" class="w-4 h-4" />
           <span>{dgettext("common", "contact@gsmlg.dev")}</span>
         </div>

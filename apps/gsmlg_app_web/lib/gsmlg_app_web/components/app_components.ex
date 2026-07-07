@@ -11,8 +11,11 @@ defmodule GsmlgAppWeb.AppComponents do
 
   def app_footer(assigns) do
     ~H"""
-    <.dm_page_footer class="bg-slate-900 text-slate-500">
-      <:section title={dgettext("navigation", "Site Map")} title_class="py-2 px-4 text-slate-600">
+    <.dm_page_footer class="bg-surface-container-high text-on-surface-variant">
+      <:section
+        title={dgettext("navigation", "Site Map")}
+        title_class="py-2 px-4 text-on-surface"
+      >
         <.link class="py-2 px-4" href="/">{dgettext("navigation", "Home")}</.link>
         <.link class="py-2 px-4" href="/apps">{dgettext("navigation", "Apps")}</.link>
         <.link class="py-2 px-4" href="/support">{dgettext("navigation", "Support")}</.link>
@@ -20,9 +23,9 @@ defmodule GsmlgAppWeb.AppComponents do
       </:section>
       <:copyright>
         <div class="flex gap-x-4">
-          <.dm_mdi name="youtube" class="w-8 h-8 text-slate-600" />
-          <.dm_mdi name="twitter" class="w-8 h-8 text-slate-600" />
-          <.dm_mdi name="facebook" class="w-8 h-8 text-slate-600" />
+          <.dm_mdi name="youtube" class="w-8 h-8 text-on-surface-variant" />
+          <.dm_mdi name="twitter" class="w-8 h-8 text-on-surface-variant" />
+          <.dm_mdi name="facebook" class="w-8 h-8 text-on-surface-variant" />
         </div>
         <p class="my-4 text-md">
           {dgettext("common", "Copyright © 2025 GSMLG All rights reserved.")}
@@ -54,8 +57,8 @@ defmodule GsmlgAppWeb.AppComponents do
     <.dm_card
       id={@id}
       class={[
-        "bg-base-100 shadow-2xl hover:shadow-3xl transition-all duration-300",
-        "border border-base-300 hover:border-primary",
+        "bg-surface-container shadow-2xl hover:shadow-3xl transition-all duration-300",
+        "border border-outline-variant hover:border-primary",
         "group cursor-pointer card-hover-lift",
         @class
       ]}
@@ -78,6 +81,7 @@ defmodule GsmlgAppWeb.AppComponents do
       <:action>
         <.dm_dropdown position="bottom">
           <:trigger class="btn btn-circle btn-ghost btn-sm">
+            <span class="sr-only">Open actions for {@name}</span>
             <.dm_mdi name="dots-vertical" class="w-4 h-4" />
           </:trigger>
           <:content>
@@ -96,7 +100,7 @@ defmodule GsmlgAppWeb.AppComponents do
 
       <div class="card-body">
         <div class="space-y-3">
-          <p :for={d <- @description} class="text-base-content/80 leading-relaxed">
+          <p :for={d <- @description} class="text-on-surface-variant leading-relaxed">
             {render_slot(d)}
           </p>
         </div>
@@ -105,7 +109,7 @@ defmodule GsmlgAppWeb.AppComponents do
 
         <div class="card-actions justify-between items-center">
           <div class="flex items-center gap-2">
-            <span class="text-sm font-semibold text-base-content/60">
+            <span class="text-sm font-semibold text-on-surface-variant">
               {dgettext("user", "Available on:")}:
             </span>
             <div class="flex gap-2">
@@ -169,20 +173,22 @@ defmodule GsmlgAppWeb.AppComponents do
         <!-- App Icon & Identity -->
         <div class="flex items-start gap-5 flex-1 min-w-0">
           <div class="shrink-0">
-            <div class="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl overflow-hidden ring-2 ring-white/10 group-hover:ring-primary/50 transition-all duration-300 group-hover:scale-105">
+            <div class="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl overflow-hidden ring-2 ring-outline-variant group-hover:ring-primary transition-all duration-300 group-hover:scale-105">
               <img src={@app.icon_path} alt={@app.name} class="w-full h-full object-cover" />
             </div>
           </div>
           <div class="min-w-0 flex-1 space-y-2">
             <div class="flex items-center gap-3 flex-wrap">
-              <h2 class="text-xl sm:text-2xl font-bold text-white group-hover:text-primary transition-colors duration-300">
+              <h2 class="text-xl sm:text-2xl font-bold text-on-surface group-hover:text-primary transition-colors duration-300">
                 {@app.name}
               </h2>
               <.dm_badge variant="tertiary" class="badge-xs capitalize">{@app.category}</.dm_badge>
             </div>
-            <p class="text-gray-400 leading-relaxed text-sm sm:text-base">{@app.short_description}</p>
+            <p class="text-on-surface-variant leading-relaxed text-sm sm:text-base">
+              {@app.short_description}
+            </p>
             <%= if @app.long_description do %>
-              <p class="text-gray-500 leading-relaxed text-sm">{@app.long_description}</p>
+              <p class="text-on-surface-variant leading-relaxed text-sm">{@app.long_description}</p>
             <% end %>
           </div>
         </div>
@@ -193,7 +199,8 @@ defmodule GsmlgAppWeb.AppComponents do
             <.platform_chips platforms={@app.platforms} />
           </div>
           <.dm_dropdown position="bottom">
-            <:trigger class="btn btn-circle btn-ghost btn-sm text-gray-400 hover:text-white">
+            <:trigger class="btn btn-circle btn-ghost btn-sm text-on-surface-variant hover:text-on-surface">
+              <span class="sr-only">Open actions for {@app.name}</span>
               <.dm_mdi name="dots-vertical" class="w-5 h-5" />
             </:trigger>
             <:content>
@@ -212,33 +219,34 @@ defmodule GsmlgAppWeb.AppComponents do
       </div>
 
       <!-- Store Links & Quick Actions -->
-      <div class="mt-5 pt-5 border-t border-white/5 flex flex-wrap items-center justify-between gap-4">
+      <div class="mt-5 pt-5 border-t border-outline-variant flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-          <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <span class="text-xs font-medium text-on-surface-variant uppercase tracking-wider">
             {dgettext("user", "Available on")}
           </span>
           <div class="flex gap-1">
             <.link
               :for={store <- @app.store_links}
-              class="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/15 flex items-center justify-center transition-all duration-200 hover:scale-110"
+              class="w-9 h-9 rounded-lg bg-surface-container-high hover:bg-surface-container-highest flex items-center justify-center transition-all duration-200 hover:scale-110"
               target="_blank"
               href={store.url}
+              aria-label={"Open #{store.store_type} store link for #{@app.name}"}
             >
-              <.store_icon type={store.store_type} class="w-5 h-5 text-gray-300" />
+              <.store_icon type={store.store_type} class="w-5 h-5 text-on-surface-variant" />
             </.link>
           </div>
         </div>
         <div class="flex gap-2">
           <.link
             navigate={~p"/apps-support/app/#{@app.label}"}
-            class="text-xs text-gray-400 hover:text-primary flex items-center gap-1 transition-colors"
+            class="text-xs text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors"
           >
             <.dm_mdi name="headset" class="w-3.5 h-3.5" /> {dgettext("navigation", "Support")}
           </.link>
-          <span class="text-gray-600">|</span>
+          <span class="text-on-surface-variant">|</span>
           <.link
             navigate={~p"/apps-privacy/app/#{@app.label}"}
-            class="text-xs text-gray-400 hover:text-primary flex items-center gap-1 transition-colors"
+            class="text-xs text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors"
           >
             <.dm_mdi name="shield-lock-outline" class="w-3.5 h-3.5" /> {dgettext(
               "navigation",
@@ -283,7 +291,7 @@ defmodule GsmlgAppWeb.AppComponents do
     ~H"""
     <div class={[
       "badge badge-lg gap-2 platform-badge",
-      "bg-white/90 text-gray-800 border-2 border-white/50 shadow-xl",
+      "bg-primary-container text-on-primary-container border-2 border-outline-variant shadow-xl",
       "hover:scale-105 transition-transform duration-200 font-semibold"
     ]}>
       <.dm_mdi name={@icon} class="w-4 h-4" />
@@ -315,8 +323,8 @@ defmodule GsmlgAppWeb.AppComponents do
   defp platform_chip_color("android"), do: "bg-success text-success-content"
   defp platform_chip_color("macos"), do: "bg-warning text-warning-content"
   defp platform_chip_color("windows"), do: "bg-error text-error-content"
-  defp platform_chip_color("linux"), do: "bg-neutral text-neutral-content"
-  defp platform_chip_color(_), do: "bg-base-200 text-base-content"
+  defp platform_chip_color("linux"), do: "bg-tertiary text-tertiary-content"
+  defp platform_chip_color(_), do: "bg-surface-container-high text-on-surface"
 
   defp platform_icon("ios"), do: "🍎"
   defp platform_icon("android"), do: "🤖"
@@ -336,7 +344,7 @@ defmodule GsmlgAppWeb.AppComponents do
   attr(:description, :string, default: nil)
   attr(:type, :string, default: "image", values: ["image", "gradient"])
   attr(:background, :string, default: nil)
-  attr(:gradient_colors, :string, default: "from-black/50 to-black/80")
+  attr(:gradient_colors, :string, default: "from-primary/80 to-secondary/80")
   attr(:min_height, :string, default: "min-h-screen")
   attr(:icon, :string, default: nil)
   attr(:cta, :string, default: nil)
@@ -345,28 +353,36 @@ defmodule GsmlgAppWeb.AppComponents do
   slot(:inner_block, doc: "Custom content for the hero section")
 
   def hero_section(assigns) do
+    assigns =
+      assigns
+      |> assign(:background_class, hero_background_class(assigns.type, assigns.gradient_colors))
+      |> assign(:background_style, hero_background_style(assigns.type, assigns.background))
+
     ~H"""
-    <div class={[
-      "hero relative overflow-hidden",
-      @min_height,
-      hero_background_style(@type, @background, @gradient_colors),
-      @class
-    ]}>
+    <div
+      class={[
+        "hero relative overflow-hidden",
+        @min_height,
+        @background_class,
+        @class
+      ]}
+      style={@background_style}
+    >
       <div class={["hero-overlay bg-gradient-to-b", @gradient_colors]}></div>
-      <div class="hero-content text-center text-neutral-content relative z-10">
+      <div class="hero-content text-center text-inverse-on-surface relative z-10">
         <div class="max-w-5xl px-4 sm:px-6 lg:px-8">
           <div class="animate-fade-in-down">
             <div :if={@icon} class="flex items-center justify-center mb-6">
-              <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
+              <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-2xl bg-primary text-primary-content backdrop-blur-sm flex items-center justify-center border border-outline-variant">
                 <.dm_mdi
                   name={@icon}
-                  class="w-10 h-10 lg:w-12 lg:h-12 text-white drop-shadow-lg"
+                  class="w-10 h-10 lg:w-12 lg:h-12 drop-shadow-lg"
                 />
               </div>
             </div>
             <h1 class={[
               "text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold",
-              "bg-gradient-to-r from-white via-amber-200 to-orange-300 bg-clip-text text-transparent text-shimmer",
+              "text-inverse-on-surface drop-shadow-lg",
               "leading-tight tracking-tight"
             ]}>
               {@title}
@@ -376,7 +392,7 @@ defmodule GsmlgAppWeb.AppComponents do
           <div :if={@subtitle} class="animate-fade-in-up animation-delay-200 mt-6">
             <h2 class={[
               "mb-8 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold",
-              "text-gray-200/90",
+              "text-inverse-on-surface/90",
               "leading-relaxed"
             ]}>
               {@subtitle}
@@ -384,7 +400,7 @@ defmodule GsmlgAppWeb.AppComponents do
           </div>
 
           <div :if={@description} class="animate-fade-in animation-delay-400">
-            <p class="mb-10 text-base sm:text-lg lg:text-xl text-gray-300/80 max-w-2xl mx-auto leading-relaxed">
+            <p class="mb-10 text-base sm:text-lg lg:text-xl text-inverse-on-surface/80 max-w-2xl mx-auto leading-relaxed">
               {@description}
             </p>
           </div>
@@ -406,10 +422,10 @@ defmodule GsmlgAppWeb.AppComponents do
       </div>
 
       <div class="absolute bottom-8 left-1/2 animate-bounce-chevron">
-        <a href="#page" class="block">
+        <a href="#main-content" class="block" aria-label={dgettext("navigation", "Skip to content")}>
           <.dm_mdi
             name="chevron-double-down"
-            class="w-8 h-8 text-white/50 hover:text-white/80 transition-colors"
+            class="w-8 h-8 text-inverse-on-surface/70 hover:text-inverse-on-surface transition-colors"
           />
         </a>
       </div>
@@ -417,11 +433,15 @@ defmodule GsmlgAppWeb.AppComponents do
     """
   end
 
-  defp hero_background_style("image", background, _gradient),
-    do: "style=\"background-image: url(#{background});\""
+  defp hero_background_class("image", _gradient), do: "bg-cover bg-center"
 
-  defp hero_background_style("gradient", _background, gradient_colors),
+  defp hero_background_class("gradient", gradient_colors),
     do: "bg-gradient-to-br #{gradient_colors}"
+
+  defp hero_background_style("image", background) when is_binary(background),
+    do: "background-image: url(#{background});"
+
+  defp hero_background_style(_type, _background), do: nil
 
   @doc """
   Generates playstore_icon

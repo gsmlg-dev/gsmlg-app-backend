@@ -9,11 +9,17 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
   alias AshAuthentication.Phoenix.{Components, ResetLive, SignInLive}
 
   override SignInLive do
-    set(:root_class, "grid min-h-screen place-items-center bg-surface text-on-surface px-4 py-10")
+    set(:root_class, """
+    admin-auth-page flex min-h-screen items-center bg-surface px-4 py-8 text-on-surface
+    sm:px-6 lg:px-8
+    """)
   end
 
   override ResetLive do
-    set(:root_class, "grid min-h-screen place-items-center bg-surface text-on-surface px-4 py-10")
+    set(:root_class, """
+    admin-auth-page flex min-h-screen items-center bg-surface px-4 py-8 text-on-surface
+    sm:px-6 lg:px-8
+    """)
   end
 
   override Components.Reset do
@@ -36,12 +42,13 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
 
   override Components.SignIn do
     set(:root_class, """
-    w-full flex flex-col justify-center
+    mx-auto grid w-full max-w-6xl gap-5 lg:grid-cols-[minmax(0,1fr)_420px]
+    lg:items-center
     """)
 
     set(:strategy_class, """
-    mx-auth w-full max-w-md rounded-2xl border border-outline-variant
-    bg-surface-container p-6 shadow-lg
+    admin-auth-card mx-auto w-full max-w-md rounded-lg border border-outline-variant
+    bg-surface-container p-6 shadow-xl sm:p-8 lg:mx-0 lg:max-w-none
     """)
 
     set(:authentication_error_container_class, "text-error text-center")
@@ -49,15 +56,24 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
   end
 
   override Components.Banner do
-    set(:root_class, "w-full flex justify-center py-2")
-    set(:href_class, nil)
+    set(:root_class, """
+    admin-auth-brand flex min-h-36 w-full items-end rounded-lg p-6
+    shadow-xl sm:min-h-44 sm:p-8 lg:min-h-[540px] lg:p-10
+    """)
+
+    set(:href_class, "text-on-primary-container no-underline")
     set(:href_url, "/")
     set(:image_class, "block dark:hidden")
     set(:dark_image_class, "hidden dark:block")
     set(:image_url, nil)
     set(:dark_image_url, nil)
-    set(:text_class, "text-3xl tracking-tight font-bold text-on-surface")
-    set(:text, "GSMLG Admin")
+
+    set(:text_class, """
+    admin-auth-brand-title max-w-[10ch] text-4xl font-bold leading-tight tracking-tight
+    sm:text-5xl lg:text-6xl
+    """)
+
+    set(:text, "GSMLG Admin Console")
   end
 
   override Components.HorizontalRule do
@@ -89,9 +105,17 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
   end
 
   override Components.Password do
-    set(:root_class, "mt-4 mb-4")
-    set(:interstitial_class, "flex flex-row justify-between content-between text-sm font-medium")
-    set(:toggler_class, "flex-none text-primary hover:text-secondary px-2 first:pl-0 last:pr-0")
+    set(:root_class, "my-1")
+
+    set(:interstitial_class, """
+    mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm font-medium
+    text-on-surface-variant
+    """)
+
+    set(:toggler_class, """
+    flex-none text-primary underline-offset-4 hover:text-secondary hover:underline
+    """)
+
     set(:sign_in_toggle_text, "Already have an account?")
     set(:register_toggle_text, "Need an account?")
     set(:reset_toggle_text, "Forgot your password?")
@@ -133,21 +157,21 @@ defmodule GsmlgAppAdminWeb.AshOverrides do
   end
 
   override Components.Password.Input do
-    set(:field_class, "mt-2 mb-2")
+    set(:field_class, "mb-4")
     set(:label_class, "block text-sm font-medium text-on-surface mb-1")
 
     set(:input_class, """
-    input w-full bg-surface text-on-surface border border-outline
-    placeholder:text-on-surface-variant focus:outline-none focus:border-primary sm:text-sm
+    input w-full border border-outline bg-surface text-on-surface
+    placeholder:text-on-surface-variant focus:border-primary focus:outline-none sm:text-sm
     """)
 
     set(:input_class_with_error, """
-    input w-full bg-surface text-on-surface border border-error
-    placeholder:text-on-surface-variant focus:outline-none focus:border-error sm:text-sm
+    input w-full border border-error bg-surface text-on-surface
+    placeholder:text-on-surface-variant focus:border-error focus:outline-none sm:text-sm
     """)
 
     set(:submit_class, """
-    btn btn-primary w-full mt-4 mb-4
+    btn btn-primary mt-5 mb-4 w-full shadow-md
     """)
 
     set(:identity_input_label, "Email")

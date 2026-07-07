@@ -1,6 +1,6 @@
 <Layouts.support flash={@flash}>
-  <section class="w-full h-full flex flex-col bg-[#202035] text-white gap-12 py-12">
-    <header class="w-5/6 lg:w-2/3 xl:w-1/2 flex flex-col justify-center items-center self-center bg-[#1B1B30] p-8 mx-12 rounded-md drop-shadow-md">
+  <section class="w-full h-full flex flex-col bg-surface text-on-surface gap-12 py-12">
+    <header class="w-5/6 lg:w-2/3 xl:w-1/2 flex flex-col justify-center items-center self-center bg-surface-container p-8 mx-12 rounded-md drop-shadow-md">
       <h3 class="flex text-4xl justify-center my-4">
         {dgettext("navigation", "How can we help?")}
       </h3>
@@ -13,20 +13,26 @@
             <input
               placeholder={dgettext("navigation", "Search for help documents")}
               type="search"
-              class="input input-bordered join-item bg-gray-900 text-white border-gray-700 focus:border-slate-200"
+              name="query"
+              aria-label={dgettext("navigation", "Search for help documents")}
+              class="input input-bordered join-item bg-surface-container-high text-on-surface border-outline focus:border-primary"
             />
-            <button class="btn btn-square btn-ghost join-item text-slate-200 hover:text-cyan-200">
+            <button
+              type="button"
+              class="btn btn-square btn-ghost join-item text-on-surface hover:text-primary"
+              aria-label={dgettext("navigation", "Search help documents")}
+            >
               <.dm_bsi name="search" class="w-6 h-6" />
             </button>
           </div>
         </div>
       </form>
     </header>
-    <section class="w-5/6 lg:w-2/3 xl:w-1/2 px-8 py-12 mx-auto mx-12 bg-base-300 rounded-lg shadow-xl">
+    <section class="w-5/6 lg:w-2/3 xl:w-1/2 px-8 py-12 mx-auto mx-12 bg-surface-container-high rounded-lg shadow-xl">
       <div class="card">
         <div class="card-body">
           <h2 class="card-title text-2xl mb-6">{dgettext("navigation", "Popular Topics")}</h2>
-          <div class="menu bg-base-200 rounded-box w-full">
+          <div class="menu bg-surface-container rounded-box w-full">
             <li><a>{dgettext("user", "What is Ansible?")}</a></li>
             <li><a>{dgettext("user", "How to install Ansible Semaphore Server?")}</a></li>
           </div>
