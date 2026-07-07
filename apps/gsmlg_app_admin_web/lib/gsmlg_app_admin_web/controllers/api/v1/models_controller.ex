@@ -9,7 +9,9 @@ defmodule GsmlgAppAdminWeb.Api.V1.ModelsController do
 
   require Logger
 
+  alias GsmlgAppAdmin.AI.BackplaneError
   alias GsmlgAppAdmin.AI.Gateway
+  alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
   alias GsmlgAppAdminWeb.Plugs.ApiKeyAuth
 
   def index(conn, _params) do
@@ -19,6 +21,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.ModelsController do
       case Gateway.list_models(api_key) do
         {:ok, models} ->
           json(conn, %{object: "list", data: models})
+
+        {:error, %BackplaneError{} = error} ->
+          conn
+          |> put_status(RequestHelpers.backplane_error_status(error))
+          |> json(RequestHelpers.backplane_error_body(:openai, error))
 
         {:error, reason} ->
           Logger.error("Models list error: #{inspect(reason)}")

@@ -10,6 +10,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
 
   require Logger
 
+  alias GsmlgAppAdmin.AI.BackplaneError
   alias GsmlgAppAdmin.AI.Gateway
   alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
   alias GsmlgAppAdminWeb.Plugs.ApiKeyAuth
@@ -60,10 +61,10 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
       {:ok, response} ->
         json(conn, format_openai_response(response, request.model))
 
-      {:error, "No provider found" <> _ = reason} ->
+      {:error, %BackplaneError{} = error} ->
         conn
-        |> put_status(422)
-        |> json(%{error: %{message: reason, type: "invalid_request_error"}})
+        |> put_status(RequestHelpers.backplane_error_status(error))
+        |> json(RequestHelpers.backplane_error_body(:openai, error))
 
       {:error, "API key does not have" <> _ = reason} ->
         conn
@@ -80,13 +81,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
   end
 
   defp stream_response(conn, api_key, request) do
-    # Pre-validate provider before committing to a 200 response
     case Gateway.resolve_provider(api_key, request.model) do
-      {:error, "No provider found" <> _ = reason} ->
-        conn
-        |> put_status(422)
-        |> json(%{error: %{message: reason, type: "invalid_request_error"}})
-
       {:error, "API key does not have" <> _ = reason} ->
         conn
         |> put_status(403)
@@ -99,7 +94,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ChatCompletionsController do
         |> put_status(500)
         |> json(%{error: %{message: "An internal error occurred.", type: "server_error"}})
 
-      {:ok, _provider} ->
+      {:ok, :backplane} ->
         do_stream_response(conn, api_key, request)
     end
   end

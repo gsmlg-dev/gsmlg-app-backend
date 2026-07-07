@@ -1,8 +1,8 @@
 defmodule GsmlgAppAdminWeb.AiProviderLive.Components do
   @moduledoc """
-  Shared components for the AI Provider module.
+  Shared components for the AI gateway module.
 
-  Provides a sidebar navigation layout used by all AI Provider sub-module pages.
+  Provides a sidebar navigation layout used by AI gateway sub-module pages.
   """
 
   use Phoenix.Component
@@ -13,35 +13,9 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Components do
     %{
       label: nil,
       items: [
-        %{path: "/chat", label: "AI Chat", icon: "chat-outline"}
-      ]
-    },
-    %{
-      label: "Gateway",
-      items: [
-        %{path: "/ai-provider/providers", label: "Providers", icon: "chip"},
-        %{path: "/ai-provider/api-keys", label: "API Keys", icon: "key-variant"},
-        %{path: "/ai-provider/usage", label: "API Usage", icon: "chart-bar"}
-      ]
-    },
-    %{
-      label: "Prompts & Memory",
-      items: [
-        %{path: "/ai-provider/system-prompts", label: "System Prompts", icon: "text-box-outline"},
-        %{path: "/ai-provider/memories", label: "Memories", icon: "brain"}
-      ]
-    },
-    %{
-      label: "Tools",
-      items: [
-        %{path: "/ai-provider/tools", label: "Tools", icon: "wrench-outline"},
-        %{path: "/ai-provider/mcp-servers", label: "MCP Servers", icon: "server-outline"}
-      ]
-    },
-    %{
-      label: "Agents",
-      items: [
-        %{path: "/ai-provider/agents", label: "Agents", icon: "robot-outline"}
+        %{path: "/chat", label: "AI Chat", icon: "chat-outline"},
+        %{path: "/ai-provider/agents", label: "Agents", icon: "robot-outline"},
+        %{path: "/ai-provider/config", label: "Config", icon: "cog-outline"}
       ]
     }
   ]
@@ -61,7 +35,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Components do
         >
           <.dm_mdi name="arrow-left" class="w-4 h-4" /> Back to Home
         </.link>
-        <h2 class="px-3 py-2 text-lg font-semibold text-secondary-content">AI Provider</h2>
+        <h2 class="px-3 py-2 text-lg font-semibold text-secondary-content">AI Gateway</h2>
         <div :for={section <- @menu_sections} class="mb-2">
           <h3
             :if={section.label}

@@ -9,6 +9,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ImagesController do
 
   require Logger
 
+  alias GsmlgAppAdmin.AI.BackplaneError
   alias GsmlgAppAdmin.AI.Gateway
   alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
   alias GsmlgAppAdminWeb.Plugs.ApiKeyAuth
@@ -27,6 +28,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.ImagesController do
       case Gateway.generate_image(api_key, params, request_ip: RequestHelpers.client_ip(conn)) do
         {:ok, result} ->
           json(conn, result)
+
+        {:error, %BackplaneError{} = error} ->
+          conn
+          |> put_status(RequestHelpers.backplane_error_status(error))
+          |> json(RequestHelpers.backplane_error_body(:openai, error))
 
         {:error, reason} ->
           {status, type} = classify_error(reason)
@@ -50,9 +56,6 @@ defmodule GsmlgAppAdminWeb.Api.V1.ImagesController do
     cond do
       String.contains?(reason_str, "Missing required parameter") ->
         {400, "invalid_request_error"}
-
-      String.contains?(reason_str, "No provider found") ->
-        {422, "invalid_request_error"}
 
       String.contains?(reason_str, "API key does not have") ->
         {403, "permission_error"}

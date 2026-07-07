@@ -50,32 +50,18 @@
         ><%= @form[:system_prompt].value %></textarea>
       </div>
 
-      <div class="grid grid-cols-2 gap-4">
-        <div class="form-control">
-          <label class="label"><span class="label-text">Model</span></label>
-          <input
-            type="text"
-            name="form[model]"
-            value={@form[:model].value}
-            class="input input-bordered w-full"
-            placeholder="e.g. gpt-4o (blank = auto)"
-          />
-        </div>
-
-        <div class="form-control">
-          <label class="label"><span class="label-text">Provider</span></label>
-          <select name="form[provider_id]" class="select select-bordered w-full">
-            <option value="">Auto-resolve</option>
-            <%= for p <- @providers do %>
-              <option value={p.id} selected={@form[:provider_id].value == to_string(p.id)}>
-                {p.name}
-              </option>
-            <% end %>
-          </select>
-        </div>
+      <div class="form-control">
+        <label class="label"><span class="label-text">Model</span></label>
+        <input
+          type="text"
+          name="form[model]"
+          value={@form[:model].value}
+          class="input input-bordered w-full"
+          placeholder="Backplane model or alias"
+        />
       </div>
 
-      <div class="grid grid-cols-3 gap-4">
+      <div class="grid grid-cols-2 gap-4">
         <div class="form-control">
           <label class="label"><span class="label-text">Max Iterations</span></label>
           <input
@@ -84,17 +70,6 @@
             value={@form[:max_iterations].value}
             class="input input-bordered w-full"
           />
-        </div>
-
-        <div class="form-control">
-          <label class="label"><span class="label-text">Tool Choice</span></label>
-          <select name="form[tool_choice]" class="select select-bordered w-full">
-            <option value="auto" selected={@form[:tool_choice].value == "auto"}>Auto</option>
-            <option value="required" selected={@form[:tool_choice].value == "required"}>
-              Required
-            </option>
-            <option value="none" selected={@form[:tool_choice].value == "none"}>None</option>
-          </select>
         </div>
 
         <div class="form-control">

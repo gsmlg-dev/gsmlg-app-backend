@@ -3,13 +3,13 @@ defmodule GsmlgAppAdmin.AI.Gateway do
   Core orchestration module for the AI API Gateway.
 
   Works with a normalized internal format — controllers handle format translation.
-  Provides entry points for chat completions, image generation, OCR, and agent execution.
+  Provides entry points for chat completions, embeddings, image generation, OCR,
+  and agent execution. Backplane owns downstream provider/model routing.
   """
 
   alias GsmlgAppAdmin.Accounts
   alias GsmlgAppAdmin.AI
   alias GsmlgAppAdmin.AI.Client
-  alias GsmlgAppAdmin.AI.ToolExecutor
 
   require Logger
 
@@ -28,31 +28,29 @@ defmodule GsmlgAppAdmin.AI.Gateway do
   def chat(api_key, request, opts \\ []) do
     scope = Keyword.get(opts, :scope, :chat_completions)
 
-    with {:ok, provider} <- resolve_provider(api_key, request.model),
+    with :ok <- validate_model_access(api_key, request.model),
          :ok <- check_scope(api_key, scope) do
-      # Inject system prompts and memories
       request = inject_system_context(api_key, request)
-      messages = build_messages(request)
-      call_opts = build_call_opts(request, opts)
+      call_opts = client_call_opts(request, opts, scope)
       request_ip = Keyword.get(opts, :request_ip)
 
       if request[:stream] do
         stream_callback = Keyword.get(opts, :stream_callback)
-        result = Client.stream_with_callback(provider, messages, stream_callback, call_opts)
+        result = Client.stream_with_callback(request, stream_callback, call_opts)
 
         case result do
           {:ok, :streaming_complete} ->
-            log_usage(api_key, provider, request, :chat, :success, request_ip: request_ip)
+            log_usage(api_key, request, :chat, :success, request_ip: request_ip)
             {:ok, :streaming_complete}
 
           {:error, reason} ->
-            log_usage(api_key, provider, request, :chat, :error, request_ip: request_ip)
+            log_usage(api_key, request, :chat, :error, request_ip: request_ip)
             {:error, reason}
         end
       else
-        case Client.chat_completion(provider, messages, call_opts) do
+        case Client.chat_completion(request, call_opts) do
           {:ok, response} ->
-            log_usage(api_key, provider, request, :chat, :success,
+            log_usage(api_key, request, :chat, :success,
               tokens: get_in(response, [:usage, :total_tokens]) || 0,
               prompt_tokens: get_in(response, [:usage, :prompt_tokens]) || 0,
               completion_tokens: get_in(response, [:usage, :completion_tokens]) || 0,
@@ -62,7 +60,7 @@ defmodule GsmlgAppAdmin.AI.Gateway do
             {:ok, response}
 
           {:error, reason} ->
-            log_usage(api_key, provider, request, :chat, :error, request_ip: request_ip)
+            log_usage(api_key, request, :chat, :error, request_ip: request_ip)
             {:error, reason}
         end
       end
@@ -70,271 +68,106 @@ defmodule GsmlgAppAdmin.AI.Gateway do
   end
 
   @doc """
-  Resolves a provider for the given model, filtered by key restrictions.
+  Validates local model restrictions before a request is sent to Backplane.
   """
   def resolve_provider(api_key, model) do
-    require Ash.Query
-
-    allowed_models = Map.get(api_key, :allowed_models, []) || []
-
-    if allowed_models != [] and model not in allowed_models do
-      {:error, "API key does not have access to model '#{model}'."}
-    else
-      case AI.list_active_providers() do
-        {:ok, providers} ->
-          providers =
-            providers
-            |> filter_by_key_restrictions(api_key)
-            |> find_provider_for_model(model)
-
-          case providers do
-            nil -> {:error, "No provider found for model '#{model}'."}
-            provider -> {:ok, provider}
-          end
-
-        {:error, _} ->
-          {:error, "Failed to load providers."}
-      end
-    end
+    with :ok <- validate_model_access(api_key, model), do: {:ok, :backplane}
   end
 
   @doc """
   Lists available models for the given API key.
   """
-  def list_models(api_key) do
-    case AI.list_active_providers() do
-      {:ok, providers} ->
-        providers = filter_by_key_restrictions(providers, api_key)
+  def list_models(api_key, opts \\ []) do
+    case Client.list_models(Keyword.get(opts, :client_opts, [])) do
+      {:ok, %{"data" => models}} when is_list(models) ->
+        {:ok, filter_models_by_key(models, api_key)}
 
-        models =
-          providers
-          |> Enum.flat_map(fn provider ->
-            all_models = [provider.model | provider.available_models || []]
+      {:ok, %{data: models}} when is_list(models) ->
+        {:ok, filter_models_by_key(models, api_key)}
 
-            all_models
-            |> Enum.uniq()
-            |> Enum.filter(fn model ->
-              allowed_models = Map.get(api_key, :allowed_models, []) || []
-              allowed_models == [] or model in allowed_models
-            end)
-            |> Enum.map(fn model ->
-              %{
-                id: model,
-                object: "model",
-                created: DateTime.to_unix(provider.created_at),
-                owned_by: provider.slug
-              }
-            end)
-          end)
-          |> Enum.uniq_by(& &1.id)
-
-        {:ok, models}
-
-      {:error, _} ->
-        {:error, "Failed to load models."}
-    end
-  end
-
-  @doc """
-  Runs a named agent with the tool execution loop.
-
-  The agent iterates: call LLM → if tool_calls in response, execute tools,
-  append results, call LLM again. Stops when LLM returns content without
-  tool_calls or max_iterations is reached.
-  """
-  def run_agent(api_key, agent, messages, opts \\ []) do
-    model = Keyword.get(opts, :model, agent.model)
-    max_iterations = Keyword.get(opts, :max_iterations, agent.max_iterations)
-
-    with {:ok, provider} <- resolve_provider(api_key, model),
-         :ok <- check_scope(api_key, :agents) do
-      # Load agent's tools (empty list on error — agent can still run without tools)
-      tools =
-        case AI.list_tools_for_agent(agent.id) do
-          {:ok, t} ->
-            t
-
-          {:error, reason} ->
-            Logger.warning("Agent #{agent.slug}: failed to load tools — #{inspect(reason)}")
-            []
-        end
-
-      # Build agent request with agent's own system prompt + caller system prompt
-      caller_system = Keyword.get(opts, :caller_system)
-
-      agent_system =
-        case {agent[:system_prompt], caller_system} do
-          {nil, nil} -> nil
-          {nil, cs} -> cs
-          {as, nil} -> as
-          {as, cs} -> "#{as}\n\n#{cs}"
-        end
-
-      request = %{
-        model: model,
-        system: agent_system,
-        messages: messages,
-        stream: false,
-        params: agent.model_params || %{}
-      }
-
-      # Inject agent system context (including agent-scoped memories)
-      request = inject_system_context(api_key, request, agent_id: agent.id)
-
-      all_messages = build_messages(request)
-      call_opts = build_call_opts(request, opts)
-
-      # Add tool definitions if agent has tools
-      call_opts =
-        if tools != [] do
-          tool_defs = Enum.map(tools, &tool_to_function_def/1)
-          Keyword.put(call_opts, :tools, tool_defs)
-        else
-          call_opts
-        end
-
-      # Run the agent loop
-      request_ip = Keyword.get(opts, :request_ip)
-
-      case agent_loop(provider, all_messages, call_opts, tools, max_iterations, 0, []) do
-        {:ok, content, iterations, total_tokens, tool_calls_made} ->
-          log_usage(api_key, provider, request, :agent, :success,
-            tokens: total_tokens,
-            agent_id: agent.id,
-            request_ip: request_ip
-          )
-
-          {:ok,
-           %{
-             id: "agent_run_#{generate_id()}",
-             agent: agent.slug,
-             model: model,
-             content: content,
-             tool_calls_made: tool_calls_made,
-             iterations: iterations,
-             usage: %{total_tokens: total_tokens}
-           }}
-
-        {:error, reason} ->
-          log_usage(api_key, provider, request, :agent, :error, request_ip: request_ip)
-          {:error, reason}
-      end
-    end
-  end
-
-  defp agent_loop(_provider, _messages, _call_opts, _tools, max_iter, iteration, _acc)
-       when iteration >= max_iter do
-    {:error, "Agent reached maximum iterations (#{max_iter}) without a final response."}
-  end
-
-  defp agent_loop(provider, messages, call_opts, tools, max_iter, iteration, tool_calls_acc) do
-    case Client.chat_completion(provider, messages, call_opts) do
-      {:ok, response} ->
-        tokens = get_in(response, [:usage, :total_tokens]) || 0
-        tool_calls = response[:tool_calls] || []
-
-        if tool_calls == [] do
-          # No tool calls — final response
-          {:ok, response[:content] || "", iteration + 1, tokens, tool_calls_acc}
-        else
-          # Execute each tool call with timing, build tool result messages
-          {tool_messages, new_metadata} = execute_tool_calls_with_timing(tool_calls, tools)
-
-          # Append assistant message (with tool_calls) and tool results
-          updated_messages =
-            messages ++
-              [%{role: "assistant", content: response.content, tool_calls: tool_calls}] ++
-              tool_messages
-
-          agent_loop(
-            provider,
-            updated_messages,
-            call_opts,
-            tools,
-            max_iter,
-            iteration + 1,
-            tool_calls_acc ++ new_metadata
-          )
-        end
+      {:ok, _body} ->
+        {:ok, []}
 
       {:error, reason} ->
         {:error, reason}
     end
   end
 
-  defp execute_tool_calls_with_timing(tool_calls, tools) do
-    tools_by_name = Map.new(tools, fn t -> {t.name, t} end)
+  @doc """
+  Runs a named agent through Backplane.
 
-    {messages, metadata} =
-      Enum.map(tool_calls, fn tc ->
-        tool_name = tc["function"]["name"] || tc[:function][:name]
-        arguments = parse_tool_arguments(tc["function"]["arguments"] || tc[:function][:arguments])
-        call_id = tc["id"] || tc[:id] || generate_id()
+  Backplane owns MCP/tool access and downstream model routing. The local agent
+  layer validates scope/model access, injects system context, and proxies one
+  request to Backplane.
+  """
+  def run_agent(api_key, agent, messages, opts \\ []) do
+    model = Keyword.get(opts, :model, agent.model)
+    max_iterations = Keyword.get(opts, :max_iterations, agent.max_iterations)
 
-        start = System.monotonic_time(:millisecond)
-        result = run_tool(tools_by_name, tool_name, arguments)
-        duration_ms = System.monotonic_time(:millisecond) - start
-
-        message = %{role: "tool", tool_call_id: call_id, content: result}
-
-        meta = %{
-          tool: tool_name,
-          arguments: arguments,
-          duration_ms: duration_ms
-        }
-
-        {message, meta}
-      end)
-      |> Enum.unzip()
-
-    {messages, metadata}
-  end
-
-  defp parse_tool_arguments(args) when is_binary(args) do
-    case Jason.decode(args) do
-      {:ok, parsed} -> parsed
-      _ -> %{"raw" => args}
+    with :ok <- validate_model_access(api_key, model),
+         :ok <- check_scope(api_key, :agents) do
+      if max_iterations <= 0 do
+        {:error, "Agent reached maximum iterations (#{max_iterations}) without a final response."}
+      else
+        run_backplane_agent(api_key, agent, messages, model, opts)
+      end
     end
   end
 
-  defp parse_tool_arguments(args) when is_map(args), do: args
-  defp parse_tool_arguments(_), do: %{}
+  defp run_backplane_agent(api_key, agent, messages, model, opts) do
+    caller_system = Keyword.get(opts, :caller_system)
 
-  defp run_tool(tools_by_name, tool_name, arguments) do
-    case Map.get(tools_by_name, tool_name) do
-      nil ->
-        "Error: unknown tool '#{tool_name}'"
+    agent_system =
+      case {agent[:system_prompt], caller_system} do
+        {nil, nil} -> nil
+        {nil, cs} -> cs
+        {as, nil} -> as
+        {as, cs} -> "#{as}\n\n#{cs}"
+      end
 
-      tool ->
-        case ToolExecutor.execute(tool, arguments) do
-          {:ok, :passthrough} ->
-            "Tool '#{tool_name}' is passthrough — result delegated to caller."
-
-          {:ok, result} ->
-            result
-
-          {:error, reason} ->
-            "Error executing tool '#{tool_name}': #{reason}"
-        end
-    end
-  end
-
-  defp tool_to_function_def(tool) do
-    %{
-      type: "function",
-      function: %{
-        name: tool.name,
-        description: tool.description,
-        parameters: tool.parameters_schema || %{"type" => "object", "properties" => %{}}
-      }
+    request = %{
+      model: model,
+      system: agent_system,
+      messages: messages,
+      stream: false,
+      params: agent.model_params || %{}
     }
+
+    request = inject_system_context(api_key, request, agent_id: agent.id)
+    call_opts = client_call_opts(request, opts, :chat_completions)
+    request_ip = Keyword.get(opts, :request_ip)
+
+    case Client.chat_completion(request, call_opts) do
+      {:ok, response} ->
+        total_tokens = get_in(response, [:usage, :total_tokens]) || 0
+
+        log_usage(api_key, request, :agent, :success,
+          tokens: total_tokens,
+          agent_id: agent.id,
+          request_ip: request_ip
+        )
+
+        {:ok,
+         %{
+           id: "agent_run_#{generate_id()}",
+           agent: agent.slug,
+           model: model,
+           content: response[:content] || "",
+           tool_calls_made: [],
+           iterations: 1,
+           usage: response[:usage] || %{total_tokens: total_tokens}
+         }}
+
+      {:error, reason} ->
+        log_usage(api_key, request, :agent, :error, agent_id: agent.id, request_ip: request_ip)
+        {:error, reason}
+    end
   end
 
   @doc """
   Generates an image via the gateway.
 
-  Proxies the request to an upstream provider's OpenAI-compatible images endpoint.
-  The model in `params["model"]` is resolved against active providers.
+  Proxies the request to Backplane's OpenAI-compatible images endpoint.
   """
   def generate_image(api_key, params, opts \\ []) do
     with :ok <- check_scope(api_key, :images) do
@@ -342,30 +175,58 @@ defmodule GsmlgAppAdmin.AI.Gateway do
       client_opts = Keyword.get(opts, :client_opts, [])
       request_ip = Keyword.get(opts, :request_ip)
 
-      if model do
-        case resolve_provider(api_key, model) do
-          {:ok, provider} ->
-            case Client.image_generation(provider, params, client_opts) do
+      cond do
+        is_nil(model) or model == "" ->
+          {:error, "Missing required parameter 'model'. Specify an image generation model."}
+
+        true ->
+          with :ok <- validate_model_access(api_key, model) do
+            case Client.image_generation(params, client_opts) do
               {:ok, response} ->
-                log_usage(api_key, provider, %{model: model}, :image, :success,
+                log_usage(api_key, %{model: model}, :image, :success, request_ip: request_ip)
+                {:ok, response}
+
+              {:error, reason} ->
+                log_usage(api_key, %{model: model}, :image, :error, request_ip: request_ip)
+                {:error, reason}
+            end
+          end
+      end
+    end
+  end
+
+  @doc """
+  Generates embeddings through Backplane.
+  """
+  def create_embedding(api_key, params, opts \\ []) do
+    with :ok <- check_scope(api_key, :embeddings) do
+      model = params["model"]
+      client_opts = Keyword.get(opts, :client_opts, [])
+      request_ip = Keyword.get(opts, :request_ip)
+
+      cond do
+        is_nil(model) or model == "" ->
+          {:error, "Missing required parameter 'model'. Specify an embedding model."}
+
+        true ->
+          with :ok <- validate_model_access(api_key, model) do
+            case Client.embeddings(params, client_opts) do
+              {:ok, response} ->
+                usage = response["usage"] || response[:usage] || %{}
+
+                log_usage(api_key, %{model: model}, :embedding, :success,
+                  tokens: usage["total_tokens"] || usage[:total_tokens] || 0,
+                  prompt_tokens: usage["prompt_tokens"] || usage[:prompt_tokens] || 0,
                   request_ip: request_ip
                 )
 
                 {:ok, response}
 
               {:error, reason} ->
-                log_usage(api_key, provider, %{model: model}, :image, :error,
-                  request_ip: request_ip
-                )
-
+                log_usage(api_key, %{model: model}, :embedding, :error, request_ip: request_ip)
                 {:error, reason}
             end
-
-          {:error, reason} ->
-            {:error, reason}
-        end
-      else
-        {:error, "Missing required parameter 'model'. Specify an image generation model."}
+          end
       end
     end
   end
@@ -444,22 +305,6 @@ defmodule GsmlgAppAdmin.AI.Gateway do
 
   defp generate_id do
     :crypto.strong_rand_bytes(12) |> Base.url_encode64(padding: false)
-  end
-
-  defp filter_by_key_restrictions(providers, api_key) do
-    allowed = Map.get(api_key, :allowed_providers, []) || []
-
-    providers
-    |> Enum.filter(fn provider ->
-      allowed == [] or provider.id in allowed
-    end)
-  end
-
-  defp find_provider_for_model(providers, model) do
-    Enum.find(providers, fn provider ->
-      all_models = [provider.model | provider.available_models || []]
-      model in all_models
-    end)
   end
 
   @doc false
@@ -592,27 +437,6 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     end)
   end
 
-  defp build_messages(request) do
-    system_messages =
-      case request[:system] do
-        nil -> []
-        system -> [%{role: "system", content: system}]
-      end
-
-    user_messages =
-      Enum.map(request.messages, fn msg ->
-        base = %{role: to_string(msg.role), content: msg.content}
-
-        # Preserve tool-related fields for multi-turn tool use
-        base
-        |> maybe_put_if_present(msg, :tool_call_id)
-        |> maybe_put_if_present(msg, :tool_calls)
-        |> maybe_put_if_present(msg, :name)
-      end)
-
-    system_messages ++ user_messages
-  end
-
   defp build_call_opts(request, _opts) do
     params = request[:params] || %{}
 
@@ -625,15 +449,18 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     |> maybe_put_opt(:tool_choice, request[:tool_choice])
   end
 
+  defp client_call_opts(request, opts, scope) do
+    request
+    |> build_call_opts(opts)
+    |> Keyword.put(:api_format, api_format_for_scope(scope))
+    |> Keyword.merge(Keyword.get(opts, :client_opts, []))
+  end
+
+  defp api_format_for_scope(:messages), do: :anthropic
+  defp api_format_for_scope(_scope), do: :openai
+
   defp maybe_put_opt(opts, _key, nil), do: opts
   defp maybe_put_opt(opts, key, value), do: Keyword.put(opts, key, value)
-
-  defp maybe_put_if_present(map, source, key) do
-    case Map.get(source, key) do
-      nil -> map
-      value -> Map.put(map, key, value)
-    end
-  end
 
   defp check_scope(api_key, scope) do
     if scope in (api_key.scopes || []) do
@@ -643,41 +470,89 @@ defmodule GsmlgAppAdmin.AI.Gateway do
     end
   end
 
-  defp log_usage(api_key, provider, request, endpoint_type, status, opts) do
+  defp validate_model_access(api_key, model) do
+    allowed_models = Map.get(api_key, :allowed_models, []) || []
+
+    if allowed_models != [] and model not in allowed_models do
+      {:error, "API key does not have access to model '#{model}'."}
+    else
+      :ok
+    end
+  end
+
+  defp filter_models_by_key(models, api_key) do
+    allowed_models = Map.get(api_key, :allowed_models, []) || []
+
+    if allowed_models == [] do
+      models
+    else
+      Enum.filter(models, fn model ->
+        model_id = model["id"] || model[:id]
+        model_id in allowed_models
+      end)
+    end
+  end
+
+  defp log_usage(api_key, request, endpoint_type, status, opts) do
     tokens = Keyword.get(opts, :tokens, 0)
     prompt_tokens = Keyword.get(opts, :prompt_tokens, 0)
     completion_tokens = Keyword.get(opts, :completion_tokens, 0)
     agent_id = Keyword.get(opts, :agent_id)
     request_ip = Keyword.get(opts, :request_ip)
 
-    Task.Supervisor.start_child(GsmlgAppAdmin.TaskSupervisor, fn ->
-      try do
-        AI.ApiKey.increment_usage(api_key, 1, tokens)
+    log_fun = fn ->
+      do_log_usage(api_key, request, endpoint_type, status,
+        tokens: tokens,
+        prompt_tokens: prompt_tokens,
+        completion_tokens: completion_tokens,
+        agent_id: agent_id,
+        request_ip: request_ip
+      )
+    end
 
-        log_attrs = %{
-          endpoint_type: endpoint_type,
-          model: request[:model] || to_string(request.model),
-          prompt_tokens: prompt_tokens,
-          completion_tokens: completion_tokens,
-          total_tokens: tokens,
-          status: status,
-          api_key_id: api_key.id,
-          provider_id: provider.id
-        }
+    if async_usage_logging?() do
+      Task.Supervisor.start_child(GsmlgAppAdmin.TaskSupervisor, log_fun)
+    else
+      log_fun.()
+    end
+  end
 
-        log_attrs =
-          if request_ip, do: Map.put(log_attrs, :request_ip, request_ip), else: log_attrs
+  defp async_usage_logging? do
+    Application.get_env(:gsmlg_app_admin, :async_usage_logging, true)
+  end
 
-        log_attrs =
-          if agent_id, do: Map.put(log_attrs, :agent_id, agent_id), else: log_attrs
+  defp do_log_usage(api_key, request, endpoint_type, status, opts) do
+    try do
+      tokens = Keyword.fetch!(opts, :tokens)
+      prompt_tokens = Keyword.fetch!(opts, :prompt_tokens)
+      completion_tokens = Keyword.fetch!(opts, :completion_tokens)
+      agent_id = Keyword.get(opts, :agent_id)
+      request_ip = Keyword.get(opts, :request_ip)
 
-        AI.ApiUsageLog.create(log_attrs)
-      rescue
-        e ->
-          Logger.warning(
-            "Failed to log usage for key #{api_key.id} (#{endpoint_type}/#{status}): #{inspect(e)}"
-          )
-      end
-    end)
+      AI.ApiKey.increment_usage(api_key, 1, tokens)
+
+      log_attrs = %{
+        endpoint_type: endpoint_type,
+        model: request[:model] || to_string(request.model),
+        prompt_tokens: prompt_tokens,
+        completion_tokens: completion_tokens,
+        total_tokens: tokens,
+        status: status,
+        api_key_id: api_key.id
+      }
+
+      log_attrs =
+        if request_ip, do: Map.put(log_attrs, :request_ip, request_ip), else: log_attrs
+
+      log_attrs =
+        if agent_id, do: Map.put(log_attrs, :agent_id, agent_id), else: log_attrs
+
+      AI.ApiUsageLog.create(log_attrs)
+    rescue
+      e ->
+        Logger.warning(
+          "Failed to log usage for key #{api_key.id} (#{endpoint_type}/#{status}): #{inspect(e)}"
+        )
+    end
   end
 end

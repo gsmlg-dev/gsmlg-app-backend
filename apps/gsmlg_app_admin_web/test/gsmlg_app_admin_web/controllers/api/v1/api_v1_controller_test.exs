@@ -10,6 +10,61 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
 
   alias GsmlgAppAdmin.AI.ApiKey
 
+  setup do
+    original_backplane = Application.get_env(:gsmlg_app_admin, :backplane, [])
+    stub = :"api_v1_backplane_#{System.unique_integer([:positive])}"
+
+    Req.Test.stub(stub, fn conn ->
+      case {conn.method, conn.request_path} do
+        {"GET", "/v1/models"} ->
+          Req.Test.json(conn, %{
+            "object" => "list",
+            "data" => [%{"id" => "gpt-4o", "object" => "model"}]
+          })
+
+        {"POST", "/v1/chat/completions"} ->
+          Req.Test.json(conn, %{
+            "model" => "gpt-4o",
+            "choices" => [%{"message" => %{"content" => "Backplane chat response"}}],
+            "usage" => %{"prompt_tokens" => 1, "completion_tokens" => 2, "total_tokens" => 3}
+          })
+
+        {"POST", "/v1/messages"} ->
+          Req.Test.json(conn, %{
+            "model" => "claude-sonnet-4-20250514",
+            "content" => [%{"type" => "text", "text" => "Backplane message response"}],
+            "usage" => %{"input_tokens" => 1, "output_tokens" => 2}
+          })
+
+        {"POST", "/v1/images/generations"} ->
+          Req.Test.json(conn, %{
+            "created" => 1_234_567_890,
+            "data" => [%{"url" => "https://example.com/image.png"}]
+          })
+
+        _ ->
+          conn
+          |> Plug.Conn.put_status(404)
+          |> Req.Test.json(%{"error" => %{"message" => "Unhandled Backplane test path"}})
+      end
+    end)
+
+    Application.put_env(
+      :gsmlg_app_admin,
+      :backplane,
+      Keyword.merge(original_backplane || [],
+        server_url: "http://backplane.test",
+        req_opts: [plug: {Req.Test, stub}]
+      )
+    )
+
+    on_exit(fn ->
+      Application.put_env(:gsmlg_app_admin, :backplane, original_backplane)
+    end)
+
+    :ok
+  end
+
   defp create_user do
     uid = :erlang.unique_integer([:positive])
 
@@ -126,7 +181,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
       refute conn.status == 403
     end
 
-    test "returns 422 when no provider found for model", %{conn: conn} do
+    test "proxies unknown local models to Backplane", %{conn: conn} do
       {raw_key, _} = create_api_key([:chat_completions])
 
       conn =
@@ -139,10 +194,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
           "stream" => false
         })
 
-      assert conn.status == 422
+      assert conn.status == 200
       body = Jason.decode!(conn.resp_body)
-      assert body["error"]["type"] == "invalid_request_error"
-      assert body["error"]["message"] =~ "provider"
+
+      assert body["choices"] |> List.first() |> get_in(["message", "content"]) ==
+               "Backplane chat response"
     end
 
     test "returns 403 when model is not in allowed_models", %{conn: conn} do
@@ -233,7 +289,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
       refute conn.status == 403
     end
 
-    test "returns 422 when no provider found for model", %{conn: conn} do
+    test "proxies unknown local models to Backplane", %{conn: conn} do
       {raw_key, _} = create_api_key([:messages])
 
       conn =
@@ -246,10 +302,9 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
           "stream" => false
         })
 
-      assert conn.status == 422
+      assert conn.status == 200
       body = Jason.decode!(conn.resp_body)
-      assert body["error"]["type"] == "invalid_request_error"
-      assert body["error"]["message"] =~ "provider"
+      assert body["content"] == [%{"text" => "Backplane message response", "type" => "text"}]
     end
 
     test "returns 403 when model is not in allowed_models", %{conn: conn} do
@@ -327,7 +382,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
       assert body["error"]["type"] == "invalid_request_error"
     end
 
-    test "returns 422 when no provider found for model", %{conn: conn} do
+    test "proxies image generation to Backplane", %{conn: conn} do
       {raw_key, _} = create_api_key([:images])
 
       conn =
@@ -339,10 +394,9 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
           "prompt" => "a cat"
         })
 
-      assert conn.status == 422
+      assert conn.status == 200
       body = Jason.decode!(conn.resp_body)
-      assert body["error"]["message"] =~ "provider" or body["error"]["message"] =~ "model"
-      assert body["error"]["type"] == "invalid_request_error"
+      assert [%{"url" => "https://example.com/image.png"}] = body["data"]
     end
   end
 
@@ -545,7 +599,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
       assert body["error"]["message"] =~ "model" or body["error"]["message"] =~ "OCR"
     end
 
-    test "returns 422 when model has no matching provider", %{conn: conn} do
+    test "proxies OCR requests to Backplane", %{conn: conn} do
       {raw_key, _} = create_api_key([:ocr])
 
       conn =
@@ -554,10 +608,9 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
         |> put_req_header("content-type", "application/json")
         |> post("/api/v1/ocr", %{"model" => "nonexistent-vision-model"})
 
-      assert conn.status == 422
+      assert conn.status == 200
       body = Jason.decode!(conn.resp_body)
-      assert body["error"]["type"] == "invalid_request_error"
-      assert body["error"]["message"] =~ "provider"
+      assert body["content"] == "Backplane chat response"
     end
   end
 
@@ -857,7 +910,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
   end
 
   describe "streaming pre-validation" do
-    test "chat completions streaming returns 422 for missing provider instead of empty stream",
+    test "chat completions streaming starts when local model restrictions pass",
          %{conn: conn} do
       {raw_key, _} = create_api_key([:chat_completions])
 
@@ -871,12 +924,11 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
           "stream" => true
         })
 
-      assert conn.status == 422
-      body = Jason.decode!(conn.resp_body)
-      assert body["error"]["message"] =~ "No provider found"
+      assert conn.status == 200
+      assert conn.resp_body =~ "data:"
     end
 
-    test "messages streaming returns 422 for missing provider instead of empty stream",
+    test "messages streaming starts when local model restrictions pass",
          %{conn: conn} do
       {raw_key, _} = create_api_key([:messages])
 
@@ -890,9 +942,8 @@ defmodule GsmlgAppAdminWeb.Api.V1.ControllerTest do
           "stream" => true
         })
 
-      assert conn.status == 422
-      body = Jason.decode!(conn.resp_body)
-      assert body["error"]["message"] =~ "No provider found"
+      assert conn.status == 200
+      assert conn.resp_body =~ "event:"
     end
   end
 end

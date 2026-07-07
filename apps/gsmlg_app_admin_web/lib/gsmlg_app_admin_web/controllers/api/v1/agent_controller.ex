@@ -10,6 +10,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
   require Logger
 
   alias GsmlgAppAdmin.AI
+  alias GsmlgAppAdmin.AI.BackplaneError
   alias GsmlgAppAdmin.AI.Gateway
   alias GsmlgAppAdminWeb.Api.V1.RequestHelpers
   alias GsmlgAppAdminWeb.Plugs.ApiKeyAuth
@@ -159,10 +160,10 @@ defmodule GsmlgAppAdminWeb.Api.V1.AgentController do
           {:ok, result} ->
             json(conn, result)
 
-          {:error, "No provider found" <> _ = reason} ->
+          {:error, %BackplaneError{} = error} ->
             conn
-            |> put_status(422)
-            |> json(%{error: %{message: reason, type: "invalid_request_error"}})
+            |> put_status(RequestHelpers.backplane_error_status(error))
+            |> json(RequestHelpers.backplane_error_body(:openai, error))
 
           {:error, "Agent reached maximum" <> _ = reason} ->
             conn

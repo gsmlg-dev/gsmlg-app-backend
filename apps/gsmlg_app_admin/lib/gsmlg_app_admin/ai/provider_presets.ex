@@ -2,7 +2,8 @@ defmodule GsmlgAppAdmin.AI.ProviderPresets do
   @moduledoc """
   Predefined provider configurations for common LLM providers.
 
-  Supports providers via ReqLLM's unified interface and other OpenAI-compatible APIs.
+  Retained for legacy provider records. Runtime LLM, embedding, and MCP routing
+  is handled by the configured Backplane server.
   """
 
   @presets [

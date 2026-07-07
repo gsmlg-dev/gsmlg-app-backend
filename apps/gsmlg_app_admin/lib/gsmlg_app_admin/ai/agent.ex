@@ -1,7 +1,8 @@
 defmodule GsmlgAppAdmin.AI.Agent do
   @moduledoc """
   An admin-configured AI persona that combines a model, system prompt,
-  tools, and behavioral settings into a reusable unit.
+  and behavioral settings into a reusable unit. Model routing and tool access
+  are handled by Backplane.
   """
 
   use Ash.Resource,

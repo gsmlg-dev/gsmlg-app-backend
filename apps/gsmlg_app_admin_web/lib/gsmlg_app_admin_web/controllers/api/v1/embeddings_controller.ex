@@ -1,8 +1,8 @@
-defmodule GsmlgAppAdminWeb.Api.V1.OcrController do
+defmodule GsmlgAppAdminWeb.Api.V1.EmbeddingsController do
   @moduledoc """
-  OCR endpoint for extracting text from images.
+  OpenAI-compatible embeddings endpoint.
 
-  Handles `POST /api/v1/ocr`.
+  Handles `POST /api/v1/embeddings` by proxying through Backplane.
   """
 
   use GsmlgAppAdminWeb, :controller
@@ -17,38 +17,30 @@ defmodule GsmlgAppAdminWeb.Api.V1.OcrController do
   def create(conn, params) do
     api_key = conn.assigns.api_key
 
-    if ApiKeyAuth.has_scope?(api_key, :ocr) do
-      case RequestHelpers.validate_image_url(params["image"]) do
-        {:error, message} ->
-          conn
-          |> put_status(400)
-          |> json(%{error: %{message: message, type: "invalid_request_error"}})
-
-        :ok ->
-          handle_ocr(conn, api_key, params)
-      end
+    if ApiKeyAuth.has_scope?(api_key, :embeddings) do
+      handle_embedding(conn, api_key, params)
     else
       conn
       |> put_status(403)
-      |> json(%{error: %{message: "API key lacks 'ocr' scope.", type: "permission_error"}})
+      |> json(%{error: %{message: "API key lacks 'embeddings' scope.", type: "permission_error"}})
       |> halt()
     end
   end
 
-  defp handle_ocr(conn, api_key, params) do
-    case Gateway.extract_text(api_key, params, request_ip: RequestHelpers.client_ip(conn)) do
+  defp handle_embedding(conn, api_key, params) do
+    case Gateway.create_embedding(api_key, params, request_ip: RequestHelpers.client_ip(conn)) do
       {:ok, result} ->
         json(conn, result)
-
-      {:error, "No OCR model" <> _ = reason} ->
-        conn
-        |> put_status(400)
-        |> json(%{error: %{message: reason, type: "invalid_request_error"}})
 
       {:error, %BackplaneError{} = error} ->
         conn
         |> put_status(RequestHelpers.backplane_error_status(error))
         |> json(RequestHelpers.backplane_error_body(:openai, error))
+
+      {:error, "Missing required parameter" <> _ = reason} ->
+        conn
+        |> put_status(400)
+        |> json(%{error: %{message: reason, type: "invalid_request_error"}})
 
       {:error, "API key does not have" <> _ = reason} ->
         conn
@@ -56,7 +48,7 @@ defmodule GsmlgAppAdminWeb.Api.V1.OcrController do
         |> json(%{error: %{message: reason, type: "permission_error"}})
 
       {:error, reason} ->
-        Logger.error("OCR API error: #{inspect(reason)}")
+        Logger.error("Embeddings API error: #{inspect(reason)}")
 
         conn
         |> put_status(500)

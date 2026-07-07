@@ -19,7 +19,7 @@ defmodule GsmlgAppAdmin.AI.ApiUsageLog do
 
     attribute :endpoint_type, :atom do
       allow_nil?(false)
-      constraints(one_of: [:chat, :image, :ocr, :agent])
+      constraints(one_of: [:chat, :embedding, :image, :ocr, :agent])
       description("Type of API endpoint used")
     end
 

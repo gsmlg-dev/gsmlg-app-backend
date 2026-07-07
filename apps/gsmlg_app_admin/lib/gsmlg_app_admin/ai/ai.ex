@@ -5,8 +5,8 @@ defmodule GsmlgAppAdmin.AI do
   This domain provides functionality for:
   - Managing chat conversations
   - Storing and retrieving chat messages
-  - Configuring AI provider settings
-  - Interacting with multiple LLM providers (DeepSeek, Zhipu AI, Moonshot)
+  - Managing API keys, system prompts, memories, and agents
+  - Proxying LLM, embedding, and image traffic through Backplane
   """
 
   use Ash.Domain
@@ -15,6 +15,7 @@ defmodule GsmlgAppAdmin.AI do
     Agent,
     AgentTemplate,
     AgentTool,
+    BackplaneConfig,
     ApiKey,
     ApiKeyTemplate,
     ApiUsageLog,
@@ -31,6 +32,7 @@ defmodule GsmlgAppAdmin.AI do
     resource(Agent)
     resource(AgentTemplate)
     resource(AgentTool)
+    resource(BackplaneConfig)
     resource(ApiKey)
     resource(ApiKeyTemplate)
     resource(ApiUsageLog)
@@ -41,6 +43,39 @@ defmodule GsmlgAppAdmin.AI do
     resource(Provider)
     resource(SystemPromptTemplate)
     resource(Tool)
+  end
+
+  # --- Backplane Configuration ---
+
+  @doc """
+  Gets the persisted Backplane configuration, if one has been saved.
+  """
+  def get_backplane_config do
+    case BackplaneConfig.default() do
+      {:ok, [config | _]} -> {:ok, config}
+      {:ok, []} -> {:ok, nil}
+      error -> error
+    end
+  end
+
+  @doc """
+  Creates or updates the singleton Backplane configuration.
+  """
+  def upsert_backplane_config(attrs) do
+    case get_backplane_config() do
+      {:ok, nil} ->
+        BackplaneConfig
+        |> Ash.Changeset.for_create(:create, attrs)
+        |> Ash.create()
+
+      {:ok, config} ->
+        config
+        |> Ash.Changeset.for_update(:update, attrs)
+        |> Ash.update()
+
+      error ->
+        error
+    end
   end
 
   @doc """

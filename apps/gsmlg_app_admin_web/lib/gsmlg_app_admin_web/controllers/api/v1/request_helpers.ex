@@ -5,6 +5,8 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpers do
 
   import Bitwise
 
+  alias GsmlgAppAdmin.AI.BackplaneError
+
   @doc """
   Converts a role string to an existing atom.
 
@@ -65,6 +67,24 @@ defmodule GsmlgAppAdminWeb.Api.V1.RequestHelpers do
 
   def error_body(:openai, type, message) do
     %{error: %{message: message, type: type}}
+  end
+
+  @doc """
+  Converts a Backplane proxy error into this endpoint's response format.
+  """
+  def backplane_error_status(%BackplaneError{status: status}) when is_integer(status),
+    do: status
+
+  def backplane_error_status(%BackplaneError{}), do: 502
+
+  def backplane_error_body(:anthropic, %BackplaneError{body: %{"type" => "error"} = body}),
+    do: body
+
+  def backplane_error_body(:openai, %BackplaneError{body: %{"error" => _error} = body}),
+    do: body
+
+  def backplane_error_body(format, %BackplaneError{type: type, message: message}) do
+    error_body(format, type || "api_error", message)
   end
 
   @doc """

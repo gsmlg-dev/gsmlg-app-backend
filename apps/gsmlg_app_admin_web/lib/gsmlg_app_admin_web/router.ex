@@ -43,6 +43,7 @@ defmodule GsmlgAppAdminWeb.Router do
 
     # OpenAI-compatible endpoints
     post "/chat/completions", ChatCompletionsController, :create
+    post "/embeddings", EmbeddingsController, :create
     get "/models", ModelsController, :index
 
     # Anthropic-compatible endpoint
@@ -109,7 +110,9 @@ defmodule GsmlgAppAdminWeb.Router do
       live "/chat", ChatLive.Index, :index
       live "/chat/:id", ChatLive.Index, :conversation
 
-      # AI Provider module routes
+      # AI gateway routes
+      live "/ai-provider/config", AiProviderLive.Config.Index, :index
+
       live "/ai-provider/providers", AiProviderLive.ProviderSettings.Index, :index
       live "/ai-provider/providers/new", AiProviderLive.ProviderSettings.Form, :new
       live "/ai-provider/providers/:id", AiProviderLive.ProviderSettings.Show, :show

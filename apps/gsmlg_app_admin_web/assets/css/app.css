@@ -99,6 +99,16 @@
 }
 
 @layer components {
+  @media (width >= 48rem) {
+    .admin-appbar .appbar-brand > nav > .appbar-nav {
+      width: fit-content;
+      min-width: max-content;
+      height: auto;
+      flex: 0 0 auto;
+      padding-inline: 0.75rem;
+    }
+  }
+
   .admin-auth-page {
     background:
       linear-gradient(

@@ -41,7 +41,7 @@ defmodule GsmlgAppAdmin.AI.ApiKey do
     end
 
     attribute :scopes, {:array, :atom} do
-      default([:chat_completions, :messages, :images, :ocr, :agents, :models_list])
+      default([:chat_completions, :messages, :embeddings, :images, :ocr, :agents, :models_list])
       description("Allowed API scopes for this key")
     end
 

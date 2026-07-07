@@ -1,6 +1,6 @@
 defmodule GsmlgAppAdminWeb.AiProviderLiveTest do
   @moduledoc """
-  LiveView tests for the AI Provider admin pages.
+  LiveView tests for the AI gateway admin pages.
 
   Tests that all pages load correctly for authenticated users and
   that unauthenticated users are redirected to sign-in.
@@ -10,6 +10,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLiveTest do
 
   import Phoenix.LiveViewTest
 
+  alias GsmlgAppAdmin.AI
   alias GsmlgAppAdminWeb.Session.Store
 
   @password "TestPassword123!"
@@ -42,7 +43,14 @@ defmodule GsmlgAppAdminWeb.AiProviderLiveTest do
 
   # ── Page Load Tests ──────────────────────────────────────────────────────
 
-  describe "AI Provider pages load for authenticated users" do
+  describe "AI gateway pages load for authenticated users" do
+    test "Backplane config page loads", %{conn: conn, user: user} do
+      {:ok, _view, html} = conn |> sign_in(user) |> live("/ai-provider/config")
+      assert html =~ "Backplane Config"
+      assert html =~ "Server Address"
+      assert html =~ "Auth Token"
+    end
+
     test "providers index page loads", %{conn: conn, user: user} do
       {:ok, _view, html} = conn |> sign_in(user) |> live("/ai-provider/providers")
       assert html =~ "AI Provider Settings"
@@ -90,6 +98,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLiveTest do
 
   describe "unauthenticated access redirects to sign-in" do
     @ai_provider_paths [
+      "/ai-provider/config",
       "/ai-provider/providers",
       "/ai-provider/api-keys",
       "/ai-provider/system-prompts",
@@ -112,22 +121,43 @@ defmodule GsmlgAppAdminWeb.AiProviderLiveTest do
   # ── Sidebar Navigation Tests ─────────────────────────────────────────────
 
   describe "sidebar navigation" do
-    test "sidebar shows all AI Provider sections", %{conn: conn, user: user} do
-      {:ok, _view, html} = conn |> sign_in(user) |> live("/ai-provider/providers")
+    test "sidebar only shows chat, agents, and config", %{conn: conn, user: user} do
+      {:ok, _view, html} = conn |> sign_in(user) |> live("/ai-provider/config")
 
-      assert html =~ "Providers"
-      assert html =~ "API Keys"
-      assert html =~ "API Usage"
-      assert html =~ "System Prompts"
-      assert html =~ "Memories"
-      assert html =~ "Tools"
-      assert html =~ "MCP Servers"
+      assert html =~ "AI Chat"
       assert html =~ "Agents"
+      assert html =~ "Config"
+      refute html =~ "Providers"
+      refute html =~ "API Keys"
+      refute html =~ "API Usage"
+      refute html =~ "System Prompts"
+      refute html =~ "Memories"
+      refute html =~ "Tools"
+      refute html =~ "MCP Servers"
     end
 
     test "sidebar highlights current page", %{conn: conn, user: user} do
-      {:ok, _view, html} = conn |> sign_in(user) |> live("/ai-provider/providers")
-      assert html =~ "active"
+      {:ok, _view, html} = conn |> sign_in(user) |> live("/ai-provider/config")
+      assert html =~ "bg-primary text-primary-content"
+    end
+  end
+
+  describe "Backplane config" do
+    test "saves server address and auth token", %{conn: conn, user: user} do
+      {:ok, view, _html} = conn |> sign_in(user) |> live("/ai-provider/config")
+
+      view
+      |> form("#backplane-config-form", %{
+        "config" => %{
+          "server_url" => "https://backplane.example.com",
+          "auth_token" => "secret-token"
+        }
+      })
+      |> render_submit()
+
+      assert {:ok, config} = AI.get_backplane_config()
+      assert config.server_url == "https://backplane.example.com"
+      assert config.auth_token == "secret-token"
     end
   end
 

@@ -1,4 +1,4 @@
-<.dm_simple_appbar class="appbar-primary sticky top-0 z-100">
+<.dm_simple_appbar class="admin-appbar appbar-primary sticky top-0 z-100">
   <:logo>
     <.link
       href="/"
@@ -16,7 +16,7 @@
     <.dm_mdi name="apps" class="w-4 h-4 mr-1 inline" /> Apps
   </:menu>
   <:menu
-    to={~p"/ai-provider/providers"}
+    to={~p"/ai-provider/config"}
     active={String.starts_with?(assigns[:current_uri] || "", "/ai-provider")}
   >
     <.dm_mdi name="robot" class="w-4 h-4 mr-1 inline" /> AI

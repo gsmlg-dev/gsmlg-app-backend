@@ -1,6 +1,7 @@
 defmodule GsmlgAppAdmin.AI.GatewayTest do
   use GsmlgAppAdmin.DataCase, async: true
 
+  alias GsmlgAppAdmin.AI.BackplaneError
   alias GsmlgAppAdmin.AI.Gateway
 
   describe "inject_system_context/2" do
@@ -101,7 +102,13 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
       assert reason =~ "model"
     end
 
-    test "returns provider error when no matching provider exists" do
+    test "returns Backplane transport error when upstream is unavailable" do
+      stub = :"gw_image_unavailable_#{System.unique_integer([:positive])}"
+
+      Req.Test.stub(stub, fn conn ->
+        Req.Test.transport_error(conn, :econnrefused)
+      end)
+
       api_key = %{
         id: "test-key",
         user_id: nil,
@@ -111,9 +118,13 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
       }
 
       assert {:error, reason} =
-               Gateway.generate_image(api_key, %{"model" => "dall-e-3", "prompt" => "a cat"})
+               Gateway.generate_image(
+                 api_key,
+                 %{"model" => "dall-e-3", "prompt" => "a cat"},
+                 client_opts: [plug: {Req.Test, stub}]
+               )
 
-      assert reason =~ "provider" or reason =~ "model"
+      assert %BackplaneError{type: "transport_error"} = reason
     end
 
     test "returns {:ok, response} on happy path when provider resolves and upstream returns 200" do
@@ -187,19 +198,20 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
         allowed_models: []
       }
 
-      assert {:error, reason} =
+      assert {:error, %BackplaneError{} = reason} =
                Gateway.generate_image(
                  api_key,
                  %{"model" => "dall-e-3", "prompt" => "a cat"},
                  client_opts: [plug: {Req.Test, stub}]
                )
 
-      assert reason =~ "429"
+      assert reason.status == 429
+      assert reason.message == "Rate limit exceeded"
     end
   end
 
   describe "resolve_provider/2" do
-    test "returns error when no providers exist for a model" do
+    test "returns backplane when local model restrictions allow the model" do
       api_key = %{
         id: "test-key",
         user_id: nil,
@@ -208,13 +220,24 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
         allowed_models: []
       }
 
-      assert {:error, reason} = Gateway.resolve_provider(api_key, "nonexistent-model")
-      assert reason =~ "No provider found"
+      assert {:ok, :backplane} = Gateway.resolve_provider(api_key, "nonexistent-model")
     end
   end
 
   describe "chat/3" do
-    test "returns error when no matching provider exists" do
+    test "sends chat to Backplane without requiring a local provider" do
+      stub = :"gw_chat_ok_#{System.unique_integer([:positive])}"
+
+      Req.Test.stub(stub, fn conn ->
+        assert conn.request_path == "/v1/chat/completions"
+
+        Req.Test.json(conn, %{
+          "model" => "nonexistent-model",
+          "choices" => [%{"message" => %{"content" => "Backplane response"}}],
+          "usage" => %{"total_tokens" => 3}
+        })
+      end)
+
       api_key = %{
         id: "test-key",
         user_id: nil,
@@ -231,13 +254,27 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
         params: %{}
       }
 
-      assert {:error, reason} = Gateway.chat(api_key, request)
-      assert reason =~ "No provider found"
+      assert {:ok, response} =
+               Gateway.chat(api_key, request, client_opts: [plug: {Req.Test, stub}])
+
+      assert response.content == "Backplane response"
     end
   end
 
   describe "run_agent/4" do
-    test "returns error when no matching provider exists" do
+    test "runs agent through Backplane without requiring a local provider" do
+      stub = :"gw_agent_ok_#{System.unique_integer([:positive])}"
+
+      Req.Test.stub(stub, fn conn ->
+        assert conn.request_path == "/v1/chat/completions"
+
+        Req.Test.json(conn, %{
+          "model" => "nonexistent-model",
+          "choices" => [%{"message" => %{"content" => "Agent response"}}],
+          "usage" => %{"total_tokens" => 4}
+        })
+      end)
+
       api_key = %{
         id: "test-key",
         user_id: nil,
@@ -257,8 +294,11 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
 
       messages = [%{role: :user, content: "Hello"}]
 
-      assert {:error, reason} = Gateway.run_agent(api_key, agent, messages)
-      assert reason =~ "No provider found"
+      assert {:ok, response} =
+               Gateway.run_agent(api_key, agent, messages, client_opts: [plug: {Req.Test, stub}])
+
+      assert response.content == "Agent response"
+      assert response.tool_calls_made == []
     end
 
     test "returns error when api_key lacks agents scope and provider exists" do
@@ -1008,21 +1048,7 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
       assert {:ok, _} = Gateway.resolve_provider(api_key, "open-model-x")
     end
 
-    test "filters by allowed_providers" do
-      {:ok, provider} =
-        GsmlgAppAdmin.AI.Provider
-        |> Ash.Changeset.for_create(:create, %{
-          name: "Allowed Provider #{System.unique_integer([:positive])}",
-          slug: "allowed-#{System.unique_integer([:positive])}",
-          api_base_url: "http://fake.local",
-          api_key: "test-key",
-          model: "allowed-model-xyz",
-          available_models: ["allowed-model-xyz"],
-          is_active: true
-        })
-        |> Ash.create(authorize?: false)
-
-      # Key restricted to a different provider — should fail
+    test "ignores legacy allowed_providers because Backplane owns provider routing" do
       api_key = %{
         id: "test-key",
         user_id: nil,
@@ -1031,38 +1057,24 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
         allowed_models: []
       }
 
-      assert {:error, _} = Gateway.resolve_provider(api_key, "allowed-model-xyz")
-
-      # Key with the correct provider ID — should succeed
-      api_key_ok = %{
-        id: "test-key",
-        user_id: nil,
-        scopes: [:chat_completions],
-        allowed_providers: [provider.id],
-        allowed_models: []
-      }
-
-      assert {:ok, _} = Gateway.resolve_provider(api_key_ok, "allowed-model-xyz")
+      assert {:ok, :backplane} = Gateway.resolve_provider(api_key, "allowed-model-xyz")
     end
   end
 
-  describe "list_models/1 filters by allowed_providers" do
-    test "only returns models from allowed providers" do
-      {:ok, provider} =
-        GsmlgAppAdmin.AI.Provider
-        |> Ash.Changeset.for_create(:create, %{
-          name: "Prov Filter #{System.unique_integer([:positive])}",
-          slug: "prov-filter-#{System.unique_integer([:positive])}",
-          api_base_url: "http://fake.local",
-          api_key: "test-key",
-          model: "prov-filter-model",
-          available_models: ["prov-filter-model"],
-          is_active: true
-        })
-        |> Ash.create(authorize?: false)
+  describe "list_models/1 with legacy provider restrictions" do
+    test "ignores legacy allowed_providers and returns Backplane models" do
+      stub = :"gw_models_legacy_provider_#{System.unique_integer([:positive])}"
 
-      # Key restricted to a non-existent provider
-      api_key_no_match = %{
+      Req.Test.stub(stub, fn conn ->
+        assert conn.request_path == "/v1/models"
+
+        Req.Test.json(conn, %{
+          "object" => "list",
+          "data" => [%{"id" => "prov-filter-model", "object" => "model"}]
+        })
+      end)
+
+      api_key = %{
         id: "test-key",
         user_id: nil,
         scopes: [:models_list],
@@ -1070,39 +1082,27 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
         allowed_models: []
       }
 
-      assert {:ok, models} = Gateway.list_models(api_key_no_match)
-      model_ids = Enum.map(models, & &1.id)
-      refute "prov-filter-model" in model_ids
-
-      # Key with matching provider
-      api_key_match = %{
-        id: "test-key",
-        user_id: nil,
-        scopes: [:models_list],
-        allowed_providers: [provider.id],
-        allowed_models: []
-      }
-
-      assert {:ok, models} = Gateway.list_models(api_key_match)
-      model_ids = Enum.map(models, & &1.id)
+      assert {:ok, models} = Gateway.list_models(api_key, client_opts: [plug: {Req.Test, stub}])
+      model_ids = Enum.map(models, &(&1["id"] || &1[:id]))
       assert "prov-filter-model" in model_ids
     end
   end
 
-  describe "list_models/1 with DB providers" do
-    test "returns models from active providers" do
-      {:ok, _provider} =
-        GsmlgAppAdmin.AI.Provider
-        |> Ash.Changeset.for_create(:create, %{
-          name: "Models Test #{System.unique_integer([:positive])}",
-          slug: "models-test-#{System.unique_integer([:positive])}",
-          api_base_url: "http://fake.local",
-          api_key: "test-key",
-          model: "test-model-alpha",
-          available_models: ["test-model-alpha", "test-model-beta"],
-          is_active: true
+  describe "list_models/1 with Backplane models" do
+    test "returns models from Backplane" do
+      stub = :"gw_models_all_#{System.unique_integer([:positive])}"
+
+      Req.Test.stub(stub, fn conn ->
+        assert conn.request_path == "/v1/models"
+
+        Req.Test.json(conn, %{
+          "object" => "list",
+          "data" => [
+            %{"id" => "test-model-alpha", "object" => "model"},
+            %{"id" => "test-model-beta", "object" => "model"}
+          ]
         })
-        |> Ash.create(authorize?: false)
+      end)
 
       api_key = %{
         id: "test-key",
@@ -1112,8 +1112,8 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
         allowed_models: []
       }
 
-      assert {:ok, models} = Gateway.list_models(api_key)
-      model_ids = Enum.map(models, & &1.id)
+      assert {:ok, models} = Gateway.list_models(api_key, client_opts: [plug: {Req.Test, stub}])
+      model_ids = Enum.map(models, &(&1["id"] || &1[:id]))
       assert "test-model-alpha" in model_ids
       assert "test-model-beta" in model_ids
     end
@@ -1146,18 +1146,19 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
     end
 
     test "filters models by allowed_models restriction" do
-      {:ok, _provider} =
-        GsmlgAppAdmin.AI.Provider
-        |> Ash.Changeset.for_create(:create, %{
-          name: "Restricted Test #{System.unique_integer([:positive])}",
-          slug: "restricted-test-#{System.unique_integer([:positive])}",
-          api_base_url: "http://fake.local",
-          api_key: "test-key",
-          model: "restricted-model-a",
-          available_models: ["restricted-model-a", "restricted-model-b"],
-          is_active: true
+      stub = :"gw_models_restricted_#{System.unique_integer([:positive])}"
+
+      Req.Test.stub(stub, fn conn ->
+        assert conn.request_path == "/v1/models"
+
+        Req.Test.json(conn, %{
+          "object" => "list",
+          "data" => [
+            %{"id" => "restricted-model-a", "object" => "model"},
+            %{"id" => "restricted-model-b", "object" => "model"}
+          ]
         })
-        |> Ash.create(authorize?: false)
+      end)
 
       api_key = %{
         id: "test-key",
@@ -1167,8 +1168,8 @@ defmodule GsmlgAppAdmin.AI.GatewayTest do
         allowed_models: ["restricted-model-a"]
       }
 
-      assert {:ok, models} = Gateway.list_models(api_key)
-      model_ids = Enum.map(models, & &1.id)
+      assert {:ok, models} = Gateway.list_models(api_key, client_opts: [plug: {Req.Test, stub}])
+      model_ids = Enum.map(models, &(&1["id"] || &1[:id]))
       assert "restricted-model-a" in model_ids
       refute "restricted-model-b" in model_ids
     end

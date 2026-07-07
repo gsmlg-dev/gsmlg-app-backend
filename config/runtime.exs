@@ -1,5 +1,9 @@
 import Config
 
+config :gsmlg_app_admin, :backplane,
+  server_url: System.get_env("BACKPLANE_SERVER_URL", "http://localhost:4220"),
+  auth_token: System.get_env("BACKPLANE_AUTH_TOKEN") || System.get_env("BACKPLANE_API_KEY")
+
 if config_env() == :prod do
   secret_key_base =
     System.get_env("SECRET_KEY_BASE") ||

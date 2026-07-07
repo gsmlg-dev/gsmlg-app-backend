@@ -1,0 +1,61 @@
+<.ai_provider_layout current_path={@current_uri}>
+  <div class="p-4 sm:p-6">
+    <div class="mb-6">
+      <h1 class="text-3xl font-semibold leading-8 text-on-surface">Backplane Config</h1>
+    </div>
+
+    <div class="max-w-2xl rounded-lg border border-outline-variant bg-surface-container p-5 shadow-sm">
+      <.form for={@form} id="backplane-config-form" phx-change="validate" phx-submit="save">
+        <div class="space-y-5">
+          <div class="form-control">
+            <label class="label"><span class="label-text">Server Address</span></label>
+            <input
+              type="url"
+              name="config[server_url]"
+              value={@form[:server_url].value}
+              class="input input-bordered w-full"
+              placeholder="http://localhost:4220"
+              required
+            />
+          </div>
+
+          <div class="form-control">
+            <div class="mb-1 flex items-center justify-between gap-3">
+              <label class="label p-0"><span class="label-text">Auth Token</span></label>
+              <span
+                :if={@auth_token_present}
+                class="badge badge-sm badge-success"
+              >
+                Configured
+              </span>
+            </div>
+            <input
+              type="password"
+              name="config[auth_token]"
+              value={@form[:auth_token].value}
+              class="input input-bordered w-full"
+              autocomplete="new-password"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <label :if={@auth_token_present} class="label w-fit cursor-pointer gap-2">
+            <input type="hidden" name="config[clear_auth_token]" value="false" />
+            <input
+              type="checkbox"
+              name="config[clear_auth_token]"
+              value="true"
+              checked={@form[:clear_auth_token].value == "true"}
+              class="checkbox"
+            />
+            <span class="label-text">Clear auth token</span>
+          </label>
+
+          <div class="flex justify-end">
+            <button type="submit" class="btn btn-primary">Save Config</button>
+          </div>
+        </div>
+      </.form>
+    </div>
+  </div>
+</.ai_provider_layout>

@@ -1,32 +1,31 @@
 defmodule GsmlgAppAdmin.AI.Client do
   @moduledoc """
-  AI client module using ReqLLM for standardized LLM API access.
+  AI client module backed by the configured Backplane API server.
 
-  Supports multiple providers via ReqLLM's unified interface.
+  Backplane owns provider routing, credential injection, embeddings, and MCP
+  tool access. This client only adapts the app's normalized request shape to
+  Backplane's OpenAI-compatible and Anthropic-compatible `/v1/*` endpoints.
   """
 
+  alias GsmlgAppAdmin.AI.BackplaneClient
+
   @doc """
-  Sends a chat completion request to the specified provider.
+  Sends a chat completion request through Backplane.
 
   ## Parameters
-    - provider: The AI provider configuration (Ash resource with api_base_url, api_key, model, etc.)
-    - messages: List of message maps with :role and :content
-    - opts: Optional parameters (temperature, max_tokens, model override, tools, etc.)
+    - request: Normalized gateway request map.
+    - opts: Optional parameters and Req options.
 
   ## Returns
     - {:ok, response_map} on success (with :content, :model, :usage, :tool_calls keys)
     - {:error, reason} on failure
   """
-  def chat_completion(provider, messages, opts \\ []) do
-    model_spec = build_model_spec(provider, opts)
-    req_opts = build_req_opts(provider, opts)
+  def chat_completion(request, opts \\ []) do
+    api_format = Keyword.get(opts, :api_format, :openai)
 
-    case ReqLLM.generate_text(model_spec, format_messages(messages), req_opts) do
-      {:ok, response} ->
-        {:ok, normalize_response(response, provider, opts)}
-
-      {:error, reason} ->
-        {:error, format_error(reason)}
+    case BackplaneClient.post(request_path(api_format), request_body(api_format, request), opts) do
+      {:ok, body} -> {:ok, normalize_response(api_format, body, request.model)}
+      {:error, reason} -> {:error, reason}
     end
   end
 
@@ -35,25 +34,19 @@ defmodule GsmlgAppAdmin.AI.Client do
 
   The callback receives `{:content, text}` or `{:thinking, text}` tuples.
   """
-  def stream_with_callback(provider, messages, callback, opts \\ []) do
-    model_spec = build_model_spec(provider, opts)
-    req_opts = build_req_opts(provider, opts)
+  def stream_with_callback(request, callback, opts \\ []) do
+    api_format = Keyword.get(opts, :api_format, :openai)
+    body = request_body(api_format, Map.put(request, :stream, true))
 
-    case ReqLLM.stream_text(model_spec, format_messages(messages), req_opts) do
-      {:ok, stream_response} ->
-        case ReqLLM.StreamResponse.process_stream(stream_response,
-               on_result: fn text -> callback.({:content, text}) end,
-               on_thinking: fn text -> callback.({:thinking, text}) end
-             ) do
-          {:error, reason} ->
-            {:error, format_error(reason)}
+    into = fn {:data, data}, {req, resp} ->
+      {events, buffer} = split_sse_events(to_string(resp.body || "") <> data)
+      Enum.each(events, &handle_sse_event(&1, api_format, callback))
+      {:cont, {req, %{resp | body: buffer}}}
+    end
 
-          _response ->
-            {:ok, :streaming_complete}
-        end
-
-      {:error, reason} ->
-        {:error, format_error(reason)}
+    case BackplaneClient.post(request_path(api_format), body, Keyword.put(opts, :into, into)) do
+      {:ok, _body} -> {:ok, :streaming_complete}
+      {:error, reason} -> {:error, reason}
     end
   rescue
     e ->
@@ -61,116 +54,136 @@ defmodule GsmlgAppAdmin.AI.Client do
   end
 
   @doc """
-  Sends an image generation request to an OpenAI-compatible images endpoint.
+  Sends an image generation request through Backplane.
 
   ## Parameters
-    - provider: The AI provider configuration
     - params: Map with prompt, model, n, size, quality, response_format, style
 
   ## Returns
     - {:ok, response_body} on success
     - {:error, reason} on failure
   """
-  def image_generation(provider, params, req_opts \\ []) do
-    headers = [
-      {"Content-Type", "application/json"},
-      {"Authorization", "Bearer #{provider.api_key}"}
-    ]
-
-    url = "#{provider.api_base_url}/images/generations"
-
-    body =
-      %{model: params["model"] || provider.model, prompt: params["prompt"]}
-      |> maybe_put(:n, params["n"])
-      |> maybe_put(:size, params["size"])
-      |> maybe_put(:quality, params["quality"])
-      |> maybe_put(:response_format, params["response_format"])
-      |> maybe_put(:style, params["style"])
-
-    req_options =
-      Keyword.merge([headers: headers, json: body, receive_timeout: 120_000], req_opts)
-
-    case Req.post(url, req_options) do
-      {:ok, %Req.Response{status: 200, body: body}} ->
-        {:ok, body}
-
-      {:ok, %Req.Response{status: status, body: body}} ->
-        {:error, extract_error_message(body, status)}
-
-      {:error, error} ->
-        {:error, "Request failed: #{inspect(error)}"}
-    end
+  def image_generation(params, req_opts \\ []) do
+    BackplaneClient.post("/v1/images/generations", params, req_opts)
   end
 
-  # -- Private: Model Spec --
+  @doc "Sends an embeddings request through Backplane."
+  def embeddings(params, req_opts \\ []) do
+    BackplaneClient.post("/v1/embeddings", params, req_opts)
+  end
 
-  defp build_model_spec(provider, opts) do
-    model = Keyword.get(opts, :model, provider.model)
+  @doc "Lists models exposed by Backplane."
+  def list_models(req_opts \\ []) do
+    BackplaneClient.get("/v1/models", req_opts)
+  end
+
+  # -- Private: Request Building --
+
+  defp request_path(:anthropic), do: "/v1/messages"
+  defp request_path(_), do: "/v1/chat/completions"
+
+  defp request_body(:anthropic, request) do
+    params = request[:params] || %{}
 
     %{
-      provider: map_provider(provider.slug),
-      id: model,
-      base_url: provider.api_base_url
+      "model" => request.model,
+      "messages" => Enum.map(request.messages || [], &message_for_anthropic/1),
+      "max_tokens" => param(params, :max_tokens) || 4096,
+      "stream" => request[:stream] == true
+    }
+    |> maybe_put("system", request[:system])
+    |> maybe_put("temperature", param(params, :temperature))
+    |> maybe_put("top_p", param(params, :top_p))
+    |> maybe_put("tools", request[:tools])
+  end
+
+  defp request_body(_openai, request) do
+    params = request[:params] || %{}
+
+    %{
+      "model" => request.model,
+      "messages" => openai_messages(request),
+      "stream" => request[:stream] == true
+    }
+    |> maybe_put("temperature", param(params, :temperature))
+    |> maybe_put("max_tokens", param(params, :max_tokens))
+    |> maybe_put("top_p", param(params, :top_p))
+    |> maybe_put("tools", request[:tools])
+    |> maybe_put("tool_choice", request[:tool_choice])
+  end
+
+  defp openai_messages(request) do
+    system_messages =
+      case request[:system] do
+        nil -> []
+        "" -> []
+        system -> [%{"role" => "system", "content" => system}]
+      end
+
+    system_messages ++ Enum.map(request.messages || [], &message_for_openai/1)
+  end
+
+  defp message_for_openai(message) do
+    %{
+      "role" => to_string(message[:role] || message["role"]),
+      "content" => message[:content] || message["content"] || ""
+    }
+    |> maybe_put("tool_call_id", message[:tool_call_id] || message["tool_call_id"])
+    |> maybe_put("tool_calls", message[:tool_calls] || message["tool_calls"])
+    |> maybe_put("name", message[:name] || message["name"])
+  end
+
+  defp message_for_anthropic(message) do
+    %{
+      "role" => to_string(message[:role] || message["role"]),
+      "content" => message[:content] || message["content"] || ""
     }
   end
 
-  # Map our provider slugs to ReqLLM provider atoms.
-  defp map_provider("anthropic"), do: :anthropic
-  defp map_provider("google"), do: :google
-  defp map_provider("groq"), do: :groq
-  defp map_provider("xai"), do: :xai
-  defp map_provider("amazon_bedrock"), do: :amazon_bedrock
-  defp map_provider("azure"), do: :azure
-  defp map_provider("cerebras"), do: :cerebras
-  defp map_provider("openrouter"), do: :openrouter
-  defp map_provider(_), do: :openai
-
-  # -- Private: Messages --
-
-  defp format_messages(messages) do
-    Enum.map(messages, fn msg ->
-      base = %{
-        "role" => to_string(msg[:role] || msg["role"]),
-        "content" => msg[:content] || msg["content"]
-      }
-
-      # Preserve tool-related fields for multi-turn tool use
-      base
-      |> maybe_put("tool_call_id", msg[:tool_call_id] || msg["tool_call_id"])
-      |> maybe_put("tool_calls", msg[:tool_calls] || msg["tool_calls"])
-      |> maybe_put("name", msg[:name] || msg["name"])
-    end)
-  end
-
-  # -- Private: Options --
-
-  defp build_req_opts(provider, opts) do
-    base_params = provider.default_params || %{}
-
-    []
-    |> Keyword.put(:api_key, provider.api_key)
-    |> Keyword.put(:base_url, provider.api_base_url)
-    |> maybe_put_opt(:temperature, Keyword.get(opts, :temperature) || base_params["temperature"])
-    |> maybe_put_opt(:max_tokens, Keyword.get(opts, :max_tokens) || base_params["max_tokens"])
-    |> maybe_put_opt(:top_p, Keyword.get(opts, :top_p) || base_params["top_p"])
-    |> maybe_put_opt(:tools, Keyword.get(opts, :tools))
-    |> maybe_put_opt(:tool_choice, Keyword.get(opts, :tool_choice))
-  end
+  defp param(params, key), do: params[key] || params[to_string(key)]
 
   # -- Private: Response Normalization --
 
-  defp normalize_response(response, provider, opts) do
-    text = ReqLLM.Response.text(response)
-    usage = ReqLLM.Response.usage(response)
-    tool_calls = ReqLLM.Response.tool_calls(response)
-
+  defp normalize_response(:anthropic, body, fallback_model) when is_map(body) do
     %{
-      content: text,
-      model: Keyword.get(opts, :model, provider.model),
-      usage: normalize_usage(usage),
-      tool_calls: tool_calls
+      content: anthropic_text(body["content"] || body[:content]),
+      model: body["model"] || body[:model] || fallback_model,
+      usage: normalize_anthropic_usage(body["usage"] || body[:usage]),
+      tool_calls: []
     }
   end
+
+  defp normalize_response(_openai, body, fallback_model) when is_map(body) do
+    choice = first_choice(body)
+    message = choice["message"] || choice[:message] || %{}
+
+    %{
+      content: message["content"] || message[:content] || body["output_text"] || "",
+      model: body["model"] || body[:model] || fallback_model,
+      usage: normalize_usage(body["usage"] || body[:usage]),
+      tool_calls: message["tool_calls"] || message[:tool_calls] || []
+    }
+  end
+
+  defp normalize_response(_format, body, fallback_model) do
+    %{content: to_string(body), model: fallback_model, usage: %{}, tool_calls: []}
+  end
+
+  defp first_choice(%{"choices" => [choice | _]}), do: choice
+  defp first_choice(%{choices: [choice | _]}), do: choice
+  defp first_choice(_body), do: %{}
+
+  defp anthropic_text(content) when is_binary(content), do: content
+
+  defp anthropic_text(content) when is_list(content) do
+    Enum.map_join(content, "", fn
+      %{"type" => "text", "text" => text} -> text
+      %{type: "text", text: text} -> text
+      _ -> ""
+    end)
+  end
+
+  defp anthropic_text(_content), do: ""
 
   defp normalize_usage(nil), do: %{}
 
@@ -192,39 +205,83 @@ defmodule GsmlgAppAdmin.AI.Client do
     }
   end
 
-  # -- Private: Error Formatting --
+  defp normalize_anthropic_usage(nil), do: %{}
 
-  defp format_error(%{message: message}), do: message
-  defp format_error(reason) when is_binary(reason), do: reason
-  defp format_error(reason), do: inspect(reason)
+  defp normalize_anthropic_usage(usage) when is_map(usage) do
+    prompt = usage["input_tokens"] || usage[:input_tokens] || 0
+    completion = usage["output_tokens"] || usage[:output_tokens] || 0
 
-  # -- Private: Image Generation Helpers --
+    %{
+      prompt_tokens: prompt,
+      completion_tokens: completion,
+      total_tokens: usage["total_tokens"] || usage[:total_tokens] || prompt + completion
+    }
+  end
 
-  defp extract_error_message(body, status) when is_map(body) do
-    case get_in(body, ["error", "message"]) do
-      nil ->
-        case body["message"] do
-          nil -> "HTTP #{status}: #{inspect(body)}"
-          msg -> "HTTP #{status}: #{msg}"
-        end
+  # -- Private: SSE Parsing --
 
-      msg ->
-        "HTTP #{status}: #{msg}"
+  defp split_sse_events(buffer) do
+    parts = Regex.split(~r/\r?\n\r?\n/, buffer)
+
+    if Regex.match?(~r/\r?\n\r?\n$/, buffer) do
+      {Enum.reject(parts, &(&1 == "")), ""}
+    else
+      {parts |> Enum.drop(-1) |> Enum.reject(&(&1 == "")), List.last(parts) || ""}
     end
   end
 
-  defp extract_error_message(body, status) when is_binary(body) and body != "" do
-    case Jason.decode(body) do
-      {:ok, decoded} -> extract_error_message(decoded, status)
-      {:error, _} -> "HTTP #{status}: #{body}"
+  defp handle_sse_event(event, api_format, callback) do
+    event
+    |> event_data()
+    |> dispatch_sse_data(api_format, callback)
+  end
+
+  defp event_data(event) do
+    event
+    |> String.split(~r/\r?\n/)
+    |> Enum.filter(&String.starts_with?(&1, "data:"))
+    |> Enum.map(fn line ->
+      line |> String.replace_prefix("data:", "") |> String.trim_leading()
+    end)
+    |> Enum.join("\n")
+  end
+
+  defp dispatch_sse_data("", _api_format, _callback), do: :ok
+  defp dispatch_sse_data("[DONE]", _api_format, _callback), do: :ok
+
+  defp dispatch_sse_data(data, api_format, callback) do
+    case Jason.decode(data) do
+      {:ok, decoded} -> dispatch_decoded_sse(decoded, api_format, callback)
+      {:error, _} -> :ok
     end
   end
 
-  defp extract_error_message(_body, status), do: "HTTP #{status}: Unknown error"
+  defp dispatch_decoded_sse(decoded, :anthropic, callback) do
+    delta = decoded["delta"] || %{}
+
+    cond do
+      is_binary(delta["text"]) -> callback.({:content, delta["text"]})
+      is_binary(delta["thinking"]) -> callback.({:thinking, delta["thinking"]})
+      true -> :ok
+    end
+  end
+
+  defp dispatch_decoded_sse(decoded, _openai, callback) do
+    delta =
+      decoded
+      |> first_choice()
+      |> then(&(&1["delta"] || &1[:delta] || %{}))
+
+    cond do
+      is_binary(delta["content"]) -> callback.({:content, delta["content"]})
+      is_binary(delta[:content]) -> callback.({:content, delta[:content]})
+      is_binary(delta["reasoning_content"]) -> callback.({:thinking, delta["reasoning_content"]})
+      is_binary(delta[:reasoning_content]) -> callback.({:thinking, delta[:reasoning_content]})
+      true -> :ok
+    end
+  end
 
   defp maybe_put(map, _key, nil), do: map
+  defp maybe_put(map, _key, ""), do: map
   defp maybe_put(map, key, value), do: Map.put(map, key, value)
-
-  defp maybe_put_opt(opts, _key, nil), do: opts
-  defp maybe_put_opt(opts, key, value), do: Keyword.put(opts, key, value)
 end

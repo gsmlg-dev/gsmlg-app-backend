@@ -6,25 +6,22 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
   use GsmlgAppAdminWeb, :live_view
 
   alias GsmlgAppAdmin.AI
-  alias GsmlgAppAdmin.AI.{Client, MockClient}
+  alias GsmlgAppAdmin.AI.Client
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, providers} = AI.list_active_providers()
+    models = load_backplane_models()
 
     # current_user is already loaded by AshAuthentication.Phoenix.LiveSession on_mount
     current_user = socket.assigns[:current_user]
 
-    # Load saved provider selection (T012)
-    selected_provider = List.first(providers)
-    selected_model = if selected_provider, do: selected_provider.model, else: nil
+    selected_model = first_model_id(models)
 
     socket =
       socket
       |> assign(:current_user, current_user)
       |> assign(:page_title, "AI Chat")
-      |> assign(:providers, providers)
-      |> assign(:selected_provider, selected_provider)
+      |> assign(:models, models)
       |> assign(:selected_model, selected_model)
       |> assign(:conversations, [])
       |> assign(:current_conversation, nil)
@@ -72,64 +69,25 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
   @impl true
   def handle_event("select_provider", %{"provider_model" => provider_model}, socket) do
-    # Parse provider_id:model format
-    case String.split(provider_model, ":", parts: 2) do
-      [provider_id, model] ->
-        provider = Enum.find(socket.assigns.providers, &(to_string(&1.id) == provider_id))
+    model = parse_model_selection(provider_model)
 
-        # T011: Persist provider selection via JavaScript localStorage
-        socket =
-          socket
-          |> assign(:selected_provider, provider)
-          |> assign(:selected_model, model)
-          |> push_event("save_provider_selection", %{provider_model: provider_model})
+    socket =
+      socket
+      |> assign(:selected_model, model)
+      |> push_event("save_provider_selection", %{provider_model: model})
 
-        {:noreply, socket}
-
-      _ ->
-        {:noreply, socket}
-    end
+    {:noreply, socket}
   end
 
-  # T012: Handle restoring provider selection from localStorage
   @impl true
   def handle_event("restore_provider_selection", %{"provider_model" => provider_model}, socket) do
-    # Parse provider_id:model format
-    case String.split(provider_model, ":", parts: 2) do
-      [provider_id, model] ->
-        provider = Enum.find(socket.assigns.providers, &(to_string(&1.id) == provider_id))
-
-        if provider do
-          socket =
-            socket
-            |> assign(:selected_provider, provider)
-            |> assign(:selected_model, model)
-
-          {:noreply, socket}
-        else
-          {:noreply, socket}
-        end
-
-      _ ->
-        {:noreply, socket}
-    end
+    {:noreply, assign(socket, :selected_model, parse_model_selection(provider_model))}
   end
 
   # Legacy handler for old format
   @impl true
   def handle_event("restore_provider_selection", %{"provider_id" => provider_id}, socket) do
-    provider = Enum.find(socket.assigns.providers, &(to_string(&1.id) == provider_id))
-
-    if provider do
-      socket =
-        socket
-        |> assign(:selected_provider, provider)
-        |> assign(:selected_model, provider.model)
-
-      {:noreply, socket}
-    else
-      {:noreply, socket}
-    end
+    {:noreply, assign(socket, :selected_model, provider_id)}
   end
 
   @impl true
@@ -254,13 +212,11 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
   defp create_conversation(socket) do
     user = socket.assigns.current_user
-    provider = socket.assigns.selected_provider
 
     {:ok, conversation} =
       AI.create_conversation(%{
         title: "New Chat",
         user_id: user.id,
-        provider_id: provider && provider.id,
         model_params: %{}
       })
 
@@ -299,35 +255,33 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
   @impl true
   def handle_info({:request_ai_response, _conversation_id}, socket) do
-    provider = socket.assigns.selected_provider
     selected_model = socket.assigns.selected_model
     messages = Enum.map(socket.assigns.messages, &format_message_for_api/1)
 
-    # Determine which client to use
-    use_mock? =
-      is_nil(provider) ||
-        provider.api_key == "sk-placeholder-configure-via-env" ||
-        is_nil(provider.api_key)
-
-    client_module = if use_mock?, do: MockClient, else: Client
-
-    # Stream response
     parent = self()
 
-    # Pass the selected model to override provider's default model
-    opts = if selected_model, do: [model: selected_model], else: []
-
     Task.async(fn ->
+      request = %{
+        model: selected_model,
+        system: nil,
+        messages: messages,
+        stream: true,
+        params: %{}
+      }
+
       result =
-        client_module.stream_with_callback(
-          provider,
-          messages,
-          fn chunk ->
-            send(parent, {:stream_chunk, chunk})
-            chunk
-          end,
-          opts
-        )
+        if selected_model do
+          Client.stream_with_callback(
+            request,
+            fn chunk ->
+              send(parent, {:stream_chunk, chunk})
+              chunk
+            end,
+            api_format: :openai
+          )
+        else
+          {:error, "No Backplane model selected"}
+        end
 
       send(parent, {:stream_complete, result})
     end)
@@ -410,7 +364,6 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
     conversation = socket.assigns.current_conversation
     content = socket.assigns.streaming_content
     streaming_thinking = socket.assigns.streaming_thinking
-    provider = socket.assigns.selected_provider
     selected_model = socket.assigns.selected_model
     start_time = socket.assigns.streaming_start_time
     token_count = socket.assigns.streaming_token_count
@@ -438,8 +391,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
       end
 
     # Build assistant message params
-    model_name = selected_model || (provider && provider.model) || "Assistant"
-    provider_name = if provider, do: provider.name, else: nil
+    model_name = selected_model || "Assistant"
 
     assistant_message_params = %{
       conversation_id: conversation.id,
@@ -447,7 +399,7 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
       content: full_content,
       metadata: %{
         model: model_name,
-        provider: provider_name,
+        provider: "Backplane",
         thinking: thinking,
         answer: answer,
         tokens: token_count,
@@ -458,8 +410,6 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
     case AI.add_message(conversation.id, assistant_message_params) do
       {:ok, assistant_message} ->
-        track_provider_usage(provider, full_content, {:ok, nil})
-
         socket
         |> reset_streaming_state()
         |> update(:messages, fn messages -> messages ++ [assistant_message] end)
@@ -471,14 +421,6 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
         |> reset_streaming_state()
         |> put_flash(:error, "Failed to save assistant response")
     end
-  end
-
-  defp track_provider_usage(nil, _content, _result), do: :ok
-
-  defp track_provider_usage(provider, content, _result) do
-    # Rough estimate based on content length (~4 chars per token)
-    estimated_tokens = div(String.length(content), 4)
-    AI.increment_provider_usage(provider, 2, estimated_tokens)
   end
 
   defp load_conversations(socket) do
@@ -580,17 +522,12 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
 
   defp get_streaming_speed(_token_count, _start_time), do: nil
 
-  # Get the current model name for streaming display
-  defp get_current_model_name(nil, _selected_model), do: "Assistant"
-
-  defp get_current_model_name(_provider, selected_model)
+  defp get_current_model_name(selected_model)
        when is_binary(selected_model) and selected_model != "" do
     selected_model
   end
 
-  defp get_current_model_name(provider, _selected_model) do
-    provider.model || "Assistant"
-  end
+  defp get_current_model_name(_selected_model), do: "Assistant"
 
   # Reset streaming-related socket assigns to their default values
   defp reset_streaming_state(socket) do
@@ -603,16 +540,38 @@ defmodule GsmlgAppAdminWeb.ChatLive.Index do
     |> assign(:streaming_token_count, 0)
   end
 
-  # Get all models for a provider (only from available_models, no duplicates)
-  defp get_provider_models(provider) do
-    case provider.available_models do
-      [_ | _] = models ->
-        # Only show models from available_models, remove duplicates
-        Enum.uniq(models)
+  defp load_backplane_models do
+    case Client.list_models() do
+      {:ok, %{"data" => models}} when is_list(models) ->
+        Enum.flat_map(models, &normalize_model/1)
+
+      {:ok, %{data: models}} when is_list(models) ->
+        Enum.flat_map(models, &normalize_model/1)
 
       _ ->
-        # Fallback to default model only if no available_models configured
-        if provider.model && provider.model != "", do: [provider.model], else: []
+        []
     end
   end
+
+  defp normalize_model(model) do
+    case model["id"] || model[:id] do
+      id when is_binary(id) and id != "" ->
+        [%{id: id, owned_by: model["owned_by"] || model[:owned_by]}]
+
+      _ ->
+        []
+    end
+  end
+
+  defp first_model_id([model | _]), do: model.id
+  defp first_model_id([]), do: nil
+
+  defp parse_model_selection(selection) when is_binary(selection) do
+    case String.split(selection, ":", parts: 2) do
+      [_legacy_provider_id, model] -> model
+      [model] -> model
+    end
+  end
+
+  defp parse_model_selection(_selection), do: nil
 end

@@ -8,8 +8,6 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Agent.FormComponent do
 
   @impl true
   def update(%{agent: agent, action: action} = assigns, socket) do
-    {:ok, providers} = AI.list_providers()
-
     form =
       case action do
         :new ->
@@ -19,9 +17,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Agent.FormComponent do
             "description" => "",
             "system_prompt" => "",
             "model" => "",
-            "provider_id" => "",
             "max_iterations" => "10",
-            "tool_choice" => "auto",
             "is_active" => true
           }
 
@@ -32,15 +28,13 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Agent.FormComponent do
             "description" => agent.description || "",
             "system_prompt" => agent.system_prompt || "",
             "model" => agent.model || "",
-            "provider_id" => agent.provider_id || "",
             "max_iterations" => to_string(agent.max_iterations),
-            "tool_choice" => agent.tool_choice || "auto",
             "is_active" => agent.is_active
           }
       end
       |> to_form()
 
-    {:ok, socket |> assign(assigns) |> assign(form: form, providers: providers)}
+    {:ok, socket |> assign(assigns) |> assign(form: form)}
   end
 
   @impl true
@@ -55,9 +49,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Agent.FormComponent do
       description: blank_to_nil(params["description"]),
       system_prompt: blank_to_nil(params["system_prompt"]),
       model: blank_to_nil(params["model"]),
-      provider_id: blank_to_nil(params["provider_id"]),
       max_iterations: String.to_integer(params["max_iterations"] || "10"),
-      tool_choice: params["tool_choice"] || "auto",
       is_active: params["is_active"] == "true"
     }
 

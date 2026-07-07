@@ -6,13 +6,11 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
 
   alias GsmlgAppAdmin.AI
 
-  @all_scopes ~w(chat_completions messages images ocr agents models_list)
+  @all_scopes ~w(chat_completions messages embeddings images ocr agents models_list)
   @valid_scopes @all_scopes
 
   @impl true
   def update(%{api_key: api_key, action: action} = assigns, socket) do
-    {:ok, providers} = AI.list_providers()
-
     form =
       case action do
         :new ->
@@ -21,8 +19,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
             "description" => "",
             "scopes" => default_scopes(),
             "expires_at" => "",
-            "allowed_models" => "",
-            "allowed_providers" => []
+            "allowed_models" => ""
           }
           |> to_form()
 
@@ -34,8 +31,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
             "rate_limit_rpm" => api_key.rate_limit_rpm,
             "rate_limit_rpd" => api_key.rate_limit_rpd,
             "expires_at" => format_datetime_local(api_key.expires_at),
-            "allowed_models" => Enum.join(api_key.allowed_models || [], ", "),
-            "allowed_providers" => Enum.map(api_key.allowed_providers || [], &to_string/1)
+            "allowed_models" => Enum.join(api_key.allowed_models || [], ", ")
           }
           |> to_form()
       end
@@ -44,8 +40,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
      socket
      |> assign(assigns)
      |> assign(:form, form)
-     |> assign(:all_scopes, @all_scopes)
-     |> assign(:providers, providers)}
+     |> assign(:all_scopes, @all_scopes)}
   end
 
   @impl true
@@ -72,7 +67,6 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
       rate_limit_rpm: parse_int(params["rate_limit_rpm"]),
       rate_limit_rpd: parse_int(params["rate_limit_rpd"]),
       allowed_models: parse_comma_list(params["allowed_models"]),
-      allowed_providers: params["allowed_providers"] || [],
       user_id: socket.assigns.current_user.id
     }
 
@@ -104,8 +98,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
       expires_at: parse_datetime(params["expires_at"]),
       rate_limit_rpm: parse_int(params["rate_limit_rpm"]),
       rate_limit_rpd: parse_int(params["rate_limit_rpd"]),
-      allowed_models: parse_comma_list(params["allowed_models"]),
-      allowed_providers: params["allowed_providers"] || []
+      allowed_models: parse_comma_list(params["allowed_models"])
     }
 
     case AI.update_api_key(socket.assigns.api_key, attrs) do
@@ -161,6 +154,6 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.ApiKey.FormComponent do
   end
 
   defp default_scopes do
-    ~w(chat_completions messages images ocr agents models_list)
+    ~w(chat_completions messages embeddings images ocr agents models_list)
   end
 end

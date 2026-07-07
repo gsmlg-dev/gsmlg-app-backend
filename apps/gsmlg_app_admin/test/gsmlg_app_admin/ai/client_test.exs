@@ -1,140 +1,190 @@
 defmodule GsmlgAppAdmin.AI.ClientTest do
   use ExUnit.Case, async: true
 
+  alias GsmlgAppAdmin.AI.BackplaneError
   alias GsmlgAppAdmin.AI.Client
 
-  defp fake_provider(overrides \\ %{}) do
+  defp request(overrides \\ %{}) do
     Map.merge(
       %{
-        slug: "openai",
-        api_base_url: "https://api.openai.com/v1",
-        api_key: "sk-test-invalid-key",
         model: "gpt-4o",
-        default_params: %{"temperature" => 0.7, "max_tokens" => 4096}
+        system: "You are helpful.",
+        messages: [%{role: :user, content: "hello"}],
+        stream: false,
+        params: %{temperature: 0.2, max_tokens: 64}
       },
       overrides
     )
   end
 
-  describe "chat_completion/3" do
-    test "returns error for invalid API key" do
-      provider = fake_provider()
-      messages = [%{role: "user", content: "hello"}]
+  defp json_body(conn) do
+    {:ok, body, conn} = Plug.Conn.read_body(conn)
+    {Jason.decode!(body), conn}
+  end
 
-      assert {:error, _reason} = Client.chat_completion(provider, messages)
+  describe "chat_completion/2" do
+    test "posts OpenAI-compatible requests to Backplane" do
+      stub = :"client_chat_#{System.unique_integer([:positive])}"
+
+      Req.Test.stub(stub, fn conn ->
+        assert conn.method == "POST"
+        assert conn.request_path == "/v1/chat/completions"
+        {body, conn} = json_body(conn)
+        assert body["model"] == "gpt-4o"
+
+        assert [%{"role" => "system"}, %{"role" => "user", "content" => "hello"}] =
+                 body["messages"]
+
+        Req.Test.json(conn, %{
+          "model" => "gpt-4o",
+          "choices" => [%{"message" => %{"content" => "hi"}}],
+          "usage" => %{
+            "prompt_tokens" => 3,
+            "completion_tokens" => 2,
+            "total_tokens" => 5
+          }
+        })
+      end)
+
+      assert {:ok, response} = Client.chat_completion(request(), plug: {Req.Test, stub})
+      assert response.content == "hi"
+      assert response.model == "gpt-4o"
+      assert response.usage.total_tokens == 5
     end
 
-    test "passes model override from opts" do
-      provider = fake_provider()
-      messages = [%{role: "user", content: "hello"}]
+    test "posts Anthropic-compatible requests to Backplane" do
+      stub = :"client_messages_#{System.unique_integer([:positive])}"
 
-      # Will still error (invalid key), but verifies opts are passed through
-      assert {:error, _reason} = Client.chat_completion(provider, messages, model: "gpt-4o-mini")
+      Req.Test.stub(stub, fn conn ->
+        assert conn.method == "POST"
+        assert conn.request_path == "/v1/messages"
+        {body, conn} = json_body(conn)
+        assert body["model"] == "claude-sonnet-4-20250514"
+        assert body["system"] == "You are helpful."
+
+        Req.Test.json(conn, %{
+          "model" => "claude-sonnet-4-20250514",
+          "content" => [%{"type" => "text", "text" => "hello from claude"}],
+          "usage" => %{"input_tokens" => 4, "output_tokens" => 3}
+        })
+      end)
+
+      assert {:ok, response} =
+               Client.chat_completion(
+                 request(%{model: "claude-sonnet-4-20250514"}),
+                 api_format: :anthropic,
+                 plug: {Req.Test, stub}
+               )
+
+      assert response.content == "hello from claude"
+      assert response.usage.total_tokens == 7
+    end
+
+    test "returns BackplaneError when upstream returns non-success status" do
+      stub = :"client_chat_error_#{System.unique_integer([:positive])}"
+
+      Req.Test.stub(stub, fn conn ->
+        conn
+        |> Plug.Conn.put_status(429)
+        |> Req.Test.json(%{"error" => %{"message" => "Rate limit exceeded"}})
+      end)
+
+      assert {:error, %BackplaneError{} = error} =
+               Client.chat_completion(request(), plug: {Req.Test, stub})
+
+      assert error.status == 429
+      assert error.message == "Rate limit exceeded"
     end
   end
 
-  describe "stream_with_callback/4" do
-    test "returns error for invalid provider" do
-      provider = fake_provider()
-      messages = [%{role: "user", content: "hello"}]
-      callback = fn _chunk -> :ok end
+  describe "stream_with_callback/3" do
+    test "parses OpenAI SSE content chunks" do
+      stub = :"client_stream_#{System.unique_integer([:positive])}"
+      test_pid = self()
 
-      assert {:error, _reason} = Client.stream_with_callback(provider, messages, callback)
+      Req.Test.stub(stub, fn conn ->
+        Req.Test.text(conn, """
+        data: {"choices":[{"delta":{"content":"hel"}}]}
+
+        data: {"choices":[{"delta":{"content":"lo"}}]}
+
+        data: [DONE]
+
+        """)
+      end)
+
+      callback = fn chunk -> send(test_pid, chunk) end
+
+      assert {:ok, :streaming_complete} =
+               Client.stream_with_callback(request(), callback, plug: {Req.Test, stub})
+
+      assert_receive {:content, "hel"}
+      assert_receive {:content, "lo"}
     end
   end
 
   describe "image_generation/2" do
-    test "returns error for invalid provider" do
-      provider = fake_provider()
-      params = %{"prompt" => "a cat", "model" => "dall-e-3"}
+    test "proxies image generation params to Backplane" do
+      stub = :"client_image_#{System.unique_integer([:positive])}"
 
-      assert {:error, _reason} = Client.image_generation(provider, params)
-    end
-  end
+      Req.Test.stub(stub, fn conn ->
+        assert conn.method == "POST"
+        assert conn.request_path == "/v1/images/generations"
+        {body, conn} = json_body(conn)
+        assert body["prompt"] == "a cat"
+        assert body["model"] == "dall-e-3"
 
-  describe "image_generation/2 - branch coverage via Req.Test" do
-    test "returns {:ok, body} when upstream returns HTTP 200" do
-      Req.Test.stub(:client_image_200, fn conn ->
         Req.Test.json(conn, %{
           "created" => 1_234_567_890,
           "data" => [%{"url" => "https://example.com/image.png"}]
         })
       end)
 
-      provider = fake_provider()
       params = %{"prompt" => "a cat", "model" => "dall-e-3"}
 
-      assert {:ok, body} =
-               Client.image_generation(provider, params, plug: {Req.Test, :client_image_200})
-
+      assert {:ok, body} = Client.image_generation(params, plug: {Req.Test, stub})
       assert [%{"url" => "https://example.com/image.png"}] = body["data"]
     end
+  end
 
-    test "returns {:error, reason} when upstream returns non-200 status" do
-      Req.Test.stub(:client_image_401, fn conn ->
-        conn
-        |> Plug.Conn.put_status(401)
-        |> Req.Test.json(%{"error" => %{"message" => "Invalid API key"}})
+  describe "embeddings/2" do
+    test "proxies embeddings params to Backplane" do
+      stub = :"client_embeddings_#{System.unique_integer([:positive])}"
+
+      Req.Test.stub(stub, fn conn ->
+        assert conn.request_path == "/v1/embeddings"
+        {body, conn} = json_body(conn)
+        assert body["model"] == "text-embedding-3-small"
+        assert body["input"] == "hello"
+
+        Req.Test.json(conn, %{
+          "object" => "list",
+          "data" => [%{"embedding" => [0.1, 0.2], "index" => 0}]
+        })
       end)
 
-      provider = fake_provider()
-      params = %{"prompt" => "a cat", "model" => "dall-e-3"}
-
-      assert {:error, reason} =
-               Client.image_generation(provider, params, plug: {Req.Test, :client_image_401})
-
-      assert reason =~ "401"
+      params = %{"model" => "text-embedding-3-small", "input" => "hello"}
+      assert {:ok, body} = Client.embeddings(params, plug: {Req.Test, stub})
+      assert [%{"embedding" => [0.1, 0.2]}] = body["data"]
     end
+  end
 
-    test "returns {:error, reason} on transport/network failure" do
-      Req.Test.stub(:client_image_fail, fn conn ->
-        Req.Test.transport_error(conn, :econnrefused)
+  describe "list_models/1" do
+    test "loads models from Backplane" do
+      stub = :"client_models_#{System.unique_integer([:positive])}"
+
+      Req.Test.stub(stub, fn conn ->
+        assert conn.method == "GET"
+        assert conn.request_path == "/v1/models"
+
+        Req.Test.json(conn, %{
+          "object" => "list",
+          "data" => [%{"id" => "gpt-4o", "object" => "model"}]
+        })
       end)
 
-      provider = fake_provider()
-      params = %{"prompt" => "a cat", "model" => "dall-e-3"}
-
-      assert {:error, reason} =
-               Client.image_generation(provider, params, plug: {Req.Test, :client_image_fail})
-
-      assert reason =~ "Request failed"
-    end
-
-    test "accepts request with nil prompt when prompt key is absent" do
-      Req.Test.stub(:client_image_nil_prompt, fn conn ->
-        Req.Test.json(conn, %{"created" => 1, "data" => []})
-      end)
-
-      provider = fake_provider()
-      # No "prompt" key — body will contain prompt: nil
-      params = %{"model" => "dall-e-3"}
-
-      # Should not crash; stub returns 200 so result is {:ok, _}
-      assert {:ok, _body} =
-               Client.image_generation(provider, params,
-                 plug: {Req.Test, :client_image_nil_prompt}
-               )
-    end
-
-    test "propagates optional params (n, size, quality, style, response_format) into request" do
-      Req.Test.stub(:client_image_opts, fn conn ->
-        Req.Test.json(conn, %{"created" => 1, "data" => []})
-      end)
-
-      provider = fake_provider()
-
-      params = %{
-        "prompt" => "a cat",
-        "model" => "dall-e-3",
-        "n" => 2,
-        "size" => "512x512",
-        "quality" => "hd",
-        "style" => "vivid",
-        "response_format" => "url"
-      }
-
-      assert {:ok, _body} =
-               Client.image_generation(provider, params, plug: {Req.Test, :client_image_opts})
+      assert {:ok, %{"data" => [%{"id" => "gpt-4o"}]}} =
+               Client.list_models(plug: {Req.Test, stub})
     end
   end
 end

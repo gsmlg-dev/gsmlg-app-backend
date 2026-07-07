@@ -172,8 +172,8 @@ defmodule GsmlgAppAdminWeb.AiProviderCrudExtendedTest do
           "slug" => "test-agent",
           "description" => "An agent for testing",
           "system_prompt" => "You are a test agent.",
+          "model" => "gpt-4o",
           "max_iterations" => "5",
-          "tool_choice" => "auto",
           "is_active" => "true"
         }
       })
@@ -183,8 +183,8 @@ defmodule GsmlgAppAdminWeb.AiProviderCrudExtendedTest do
       agent = Enum.find(agents, &(&1.slug == "test-agent"))
       assert agent
       assert agent.name == "Test Agent"
+      assert agent.model == "gpt-4o"
       assert agent.max_iterations == 5
-      assert agent.tool_choice == "auto"
     end
 
     test "edits an existing agent", %{conn: conn, user: user} do
@@ -208,8 +208,8 @@ defmodule GsmlgAppAdminWeb.AiProviderCrudExtendedTest do
         "form" => %{
           "name" => "Updated Agent",
           "description" => "Updated description",
+          "model" => "gpt-4o-mini",
           "max_iterations" => "20",
-          "tool_choice" => "required",
           "is_active" => "true"
         }
       })
@@ -218,8 +218,8 @@ defmodule GsmlgAppAdminWeb.AiProviderCrudExtendedTest do
       updated = AI.get_agent!(agent.id)
       assert updated.name == "Updated Agent"
       assert updated.description == "Updated description"
+      assert updated.model == "gpt-4o-mini"
       assert updated.max_iterations == 20
-      assert updated.tool_choice == "required"
     end
 
     test "deletes an agent", %{conn: conn, user: user} do
@@ -264,7 +264,6 @@ defmodule GsmlgAppAdminWeb.AiProviderCrudExtendedTest do
       assert html =~ "visible-agent"
       assert html =~ "gpt-4o"
       assert html =~ "Active"
-      assert html =~ "tool_choice: required"
       assert html =~ "This agent should be visible"
     end
   end

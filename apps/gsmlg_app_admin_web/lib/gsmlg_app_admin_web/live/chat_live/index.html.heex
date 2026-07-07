@@ -14,10 +14,10 @@
       </button>
     </div>
 
-    <!-- Provider Selection -->
+    <!-- Model Selection -->
     <div class="p-4 border-b border-outline-variant">
       <label class="label" for="chat-provider-model-sidebar">
-        <span class="label-text font-semibold">AI Provider</span>
+        <span class="label-text font-semibold">Backplane Model</span>
       </label>
       <form phx-change="select_provider">
         <select
@@ -25,20 +25,10 @@
           class="select select-bordered w-full"
           name="provider_model"
         >
-          <%= for provider <- @providers do %>
-            <optgroup label={provider.name}>
-              <%= for model <- get_provider_models(provider) do %>
-                <option
-                  value={"#{provider.id}:#{model}"}
-                  selected={
-                    @selected_provider && @selected_provider.id == provider.id &&
-                      @selected_model == model
-                  }
-                >
-                  {model}
-                </option>
-              <% end %>
-            </optgroup>
+          <%= for model <- @models do %>
+            <option value={model.id} selected={@selected_model == model.id}>
+              {model.id}
+            </option>
           <% end %>
         </select>
       </form>
@@ -84,7 +74,7 @@
 
     <!-- Settings Link -->
     <div class="p-4 border-t border-outline-variant">
-      <.link navigate={~p"/ai-provider/providers"} class="btn btn-ghost btn-block justify-start">
+      <.link navigate={~p"/ai-provider/config"} class="btn btn-ghost btn-block justify-start">
         <.dm_mdi name="cog" class="w-5 h-5" /> Settings
       </.link>
     </div>
@@ -92,17 +82,14 @@
 
   <!-- Main Chat Area -->
   <section class="flex min-w-0 flex-1 flex-col">
-    <%= if Enum.empty?(@providers) do %>
-      <!-- No Provider Configured -->
+    <%= if Enum.empty?(@models) do %>
+      <!-- No Backplane Models Available -->
       <div class="flex-1 flex items-center justify-center">
         <div class="text-center p-8 max-w-md">
           <.dm_mdi name="robot" class="w-20 h-20 mx-auto mb-4 text-on-surface-variant" />
-          <h2 class="text-2xl font-bold mb-2">No AI Provider Configured</h2>
-          <p class="text-on-surface-variant mb-6">
-            To start chatting, you need to configure at least one AI provider.
-          </p>
-          <.link navigate={~p"/ai-provider/providers"} class="btn btn-primary">
-            <.dm_mdi name="cog" class="w-5 h-5 mr-2" /> Configure Providers
+          <h2 class="text-2xl font-bold mb-2">No Backplane Models Available</h2>
+          <.link navigate={~p"/ai-provider/config"} class="btn btn-primary">
+            <.dm_mdi name="cog" class="w-5 h-5 mr-2" /> Gateway Settings
           </.link>
         </div>
       </div>
@@ -123,20 +110,10 @@
               class="select select-bordered select-sm"
               name="provider_model"
             >
-              <%= for provider <- @providers do %>
-                <optgroup label={provider.name}>
-                  <%= for model <- get_provider_models(provider) do %>
-                    <option
-                      value={"#{provider.id}:#{model}"}
-                      selected={
-                        @selected_provider && @selected_provider.id == provider.id &&
-                          @selected_model == model
-                      }
-                    >
-                      {model}
-                    </option>
-                  <% end %>
-                </optgroup>
+              <%= for model <- @models do %>
+                <option value={model.id} selected={@selected_model == model.id}>
+                  {model.id}
+                </option>
               <% end %>
             </select>
           </form>
@@ -204,7 +181,7 @@
             phx-hook="StreamingMarkdown"
           >
             <div class="chat-header flex items-center gap-2">
-              {get_current_model_name(@selected_provider, @selected_model)}
+              {get_current_model_name(@selected_model)}
               <span class="text-xs opacity-50">
                 <%= if @streaming_token_count > 0 do %>
                   <% speed = get_streaming_speed(@streaming_token_count, @streaming_start_time) %> ~{@streaming_token_count}tokens<%= if speed do %>

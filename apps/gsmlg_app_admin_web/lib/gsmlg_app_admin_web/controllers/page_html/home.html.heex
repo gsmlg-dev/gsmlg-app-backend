@@ -94,8 +94,8 @@
           </div>
         </.link>
 
-        <%!-- AI Provider Card --%>
-        <.link href="/ai-provider/providers" class="group block">
+        <%!-- AI Gateway Card --%>
+        <.link href="/ai-provider/config" class="group block">
           <div class="relative h-full rounded-lg border border-outline-variant bg-surface-container p-6
                       transition-all duration-300 ease-out
                       hover:border-tertiary hover:bg-surface-container-high hover:shadow-lg
@@ -114,10 +114,10 @@
               />
             </div>
             <h3 class="text-xl font-semibold text-on-surface mb-2">
-              AI Providers
+              AI Gateway
             </h3>
             <p class="text-sm text-on-surface-variant leading-relaxed">
-              Configure LLM providers, API keys, and model settings. Monitor usage and manage gateway access.
+              Configure the Backplane connection and manage AI agents.
             </p>
             <div class="mt-6 pt-4 border-t border-outline-variant">
               <span class="text-xs font-semibold tracking-wider uppercase text-tertiary
@@ -129,73 +129,25 @@
         </.link>
       </div>
 
-      <%!-- AI Provider Quick Links --%>
+      <%!-- AI Gateway Quick Links --%>
       <div class="mt-10">
         <h2 class="text-xs font-semibold tracking-wider uppercase text-on-surface-variant mb-4">
-          AI Provider Settings
+          AI Gateway
         </h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           <.link
-            href="/ai-provider/api-keys"
+            href="/chat"
             class="group flex items-center gap-2 px-4 py-3 rounded-xl
                         bg-surface-container border border-transparent
                         hover:bg-surface-container-high hover:border-outline-variant
                         transition-all duration-200"
           >
             <.dm_mdi
-              name="key-variant"
+              name="chat-outline"
               class="w-4 h-4 text-on-surface-variant group-hover:text-primary transition-colors"
             />
             <span class="text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
-              API Keys
-            </span>
-          </.link>
-
-          <.link
-            href="/ai-provider/system-prompts"
-            class="group flex items-center gap-2 px-4 py-3 rounded-xl
-                        bg-surface-container border border-transparent
-                        hover:bg-surface-container-high hover:border-outline-variant
-                        transition-all duration-200"
-          >
-            <.dm_mdi
-              name="text-box-outline"
-              class="w-4 h-4 text-on-surface-variant group-hover:text-primary transition-colors"
-            />
-            <span class="text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
-              Prompts
-            </span>
-          </.link>
-
-          <.link
-            href="/ai-provider/memories"
-            class="group flex items-center gap-2 px-4 py-3 rounded-xl
-                        bg-surface-container border border-transparent
-                        hover:bg-surface-container-high hover:border-outline-variant
-                        transition-all duration-200"
-          >
-            <.dm_mdi
-              name="brain"
-              class="w-4 h-4 text-on-surface-variant group-hover:text-primary transition-colors"
-            />
-            <span class="text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
-              Memories
-            </span>
-          </.link>
-
-          <.link
-            href="/ai-provider/tools"
-            class="group flex items-center gap-2 px-4 py-3 rounded-xl
-                        bg-surface-container border border-transparent
-                        hover:bg-surface-container-high hover:border-outline-variant
-                        transition-all duration-200"
-          >
-            <.dm_mdi
-              name="wrench"
-              class="w-4 h-4 text-on-surface-variant group-hover:text-primary transition-colors"
-            />
-            <span class="text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
-              Tools
+              AI Chat
             </span>
           </.link>
 
@@ -216,18 +168,18 @@
           </.link>
 
           <.link
-            href="/ai-provider/usage"
+            href="/ai-provider/config"
             class="group flex items-center gap-2 px-4 py-3 rounded-xl
                         bg-surface-container border border-transparent
                         hover:bg-surface-container-high hover:border-outline-variant
                         transition-all duration-200"
           >
             <.dm_mdi
-              name="chart-bar"
+              name="cog-outline"
               class="w-4 h-4 text-on-surface-variant group-hover:text-primary transition-colors"
             />
             <span class="text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
-              Usage
+              Config
             </span>
           </.link>
         </div>

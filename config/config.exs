@@ -77,6 +77,10 @@ config :duskmoon_bundler, :gsmlg_app_admin_web,
 config :gsmlg_app_admin,
   ecto_repos: [GsmlgAppAdmin.Repo]
 
+config :gsmlg_app_admin, :backplane,
+  server_url: "http://localhost:4220",
+  auth_token: nil
+
 config :gsmlg_app_admin,
   ash_domains: [GsmlgAppAdmin.Accounts, GsmlgAppAdmin.Blog, GsmlgAppAdmin.AI, GsmlgAppAdmin.Apps]
 
