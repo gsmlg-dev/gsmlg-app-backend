@@ -6,7 +6,7 @@ defmodule GsmlgAppAdminWeb.AuthController do
     return_to = get_session(conn, :return_to) || ~p"/"
 
     conn
-    |> delete_session(:return_to)
+    |> renew_session()
     |> store_in_session(user)
     |> assign(:current_user, user)
     |> redirect(to: return_to)
@@ -23,7 +23,16 @@ defmodule GsmlgAppAdminWeb.AuthController do
     return_to = get_session(conn, :return_to) || ~p"/sign-in"
 
     conn
-    |> clear_session(:gsmlg_app_admin_web)
+    |> clear_session(:gsmlg_app_admin)
+    |> renew_session()
     |> redirect(to: return_to)
+  end
+
+  defp renew_session(conn) do
+    delete_csrf_token()
+
+    conn
+    |> configure_session(renew: true)
+    |> Plug.Conn.clear_session()
   end
 end

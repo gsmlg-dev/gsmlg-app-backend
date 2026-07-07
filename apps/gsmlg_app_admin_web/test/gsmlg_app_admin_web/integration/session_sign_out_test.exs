@@ -24,6 +24,24 @@ defmodule GsmlgAppAdminWeb.Integration.SessionSignOutTest do
   end
 
   describe "sign-out flow" do
+    test "sign-in clears stale anonymous csrf state", %{conn: conn, user: user} do
+      stale_csrf_token = "abcdefghijklmnopqrstuvwx"
+
+      conn =
+        conn
+        |> init_test_session(%{"_csrf_token" => stale_csrf_token})
+        |> post("/auth/user/default/sign_in", %{
+          "user" => %{
+            "email" => to_string(user.email),
+            "password" => @password
+          }
+        })
+
+      assert redirected_to(conn) == "/"
+      assert get_session(conn, "user") != nil
+      assert get_session(conn, "_csrf_token") == nil
+    end
+
     test "sign-out clears the session", %{conn: conn, user: user} do
       # Sign in first
       conn =
