@@ -8,7 +8,17 @@ defmodule GsmlgAppAdmin.Repo.Migrations.Install2Extensions do
   use Ecto.Migration
 
   def up do
-    execute("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
+    execute("""
+    DO $$
+    BEGIN
+      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+    EXCEPTION WHEN OTHERS THEN
+      CREATE OR REPLACE FUNCTION uuid_generate_v4() RETURNS uuid AS $func$
+        SELECT gen_random_uuid();
+      $func$ LANGUAGE sql;
+    END $$;
+    """)
+
     execute("CREATE EXTENSION IF NOT EXISTS \"citext\"")
   end
 

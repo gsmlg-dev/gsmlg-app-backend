@@ -54,9 +54,11 @@ defmodule GsmlgApp.Umbrella.MixProject do
       setup: [
         "deps.get",
         "assets.setup",
-        "do --app gsmlg_app_admin cmd mix ecto.setup",
+        "ecto.setup",
         "assets.build"
       ],
+      "ecto.setup": ["do --app gsmlg_app_admin cmd mix ecto.setup"],
+      "ecto.reset": ["do --app gsmlg_app_admin cmd mix ecto.reset"],
       "assets.setup": ["npm.install"],
       "assets.build": [
         "do --app gsmlg_app_web cmd mix assets.build",

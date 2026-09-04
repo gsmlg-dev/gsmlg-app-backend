@@ -61,7 +61,7 @@ defmodule GsmlgAppAdmin.MixProject do
       "ecto.setup": [
         "ecto.create",
         "ecto.migrate",
-        "run apps/gsmlg_app_admin/priv/repo/seeds.exs"
+        "run -e 'GsmlgAppAdmin.Release.seed()'"
       ],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
