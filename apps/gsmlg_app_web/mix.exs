@@ -49,7 +49,6 @@ defmodule GsmlgAppWeb.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~>0.26 or ~> 1.0"},
       {:gsmlg_app, in_umbrella: true},
-      # TODO(upstream): gsmlg-dev/concord#93 - transitive ExTurso musl NIFs block release.
       {:gsmlg_whois, "~> 0.2"},
       {:jason, "~> 1.2"},
       {:bandit, "~> 1.5"},
