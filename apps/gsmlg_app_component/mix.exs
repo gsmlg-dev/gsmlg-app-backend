@@ -4,7 +4,7 @@ defmodule GsmlgAppComponent.MixProject do
   def project do
     [
       app: :gsmlg_app_component,
-      version: "1.0.0",
+      version: "1.1.2",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
