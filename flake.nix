@@ -59,7 +59,7 @@
           installPhase = ''
             mkdir -p $out
             cp -r node_modules $out/
-            cp npm.lock $out/npm.lock
+            cp package-lock.json $out/package-lock.json
             for app in apps/gsmlg_app_web apps/gsmlg_app_admin_web; do
               if [ -d "$app/node_modules" ]; then
                 mkdir -p "$out/$app"
@@ -91,7 +91,7 @@
 
               # ── npm workspace dependencies ──────────────────────────────────────
               ln -sf ${npmFodDeps}/node_modules node_modules
-              ln -sf ${npmFodDeps}/npm.lock npm.lock
+              ln -sf ${npmFodDeps}/package-lock.json package-lock.json
 
               for app in ${lib.concatStringsSep " " webApps}; do
                 src_nm="${npmFodDeps}/apps/$app/node_modules"

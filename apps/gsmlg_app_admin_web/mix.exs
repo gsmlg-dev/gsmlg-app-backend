@@ -46,7 +46,7 @@ defmodule GsmlgAppAdminWeb.MixProject do
       {:duskmoon_bundler, "~> 9.6"},
       {:floki, "~> 0.38"},
       {:lazy_html, ">= 0.1.0"},
-      {:phoenix_live_dashboard, "~> 0.8.2"},
+      {:phoenix_live_dashboard, "~> 0.9.1"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~>0.26 or ~> 1.0"},

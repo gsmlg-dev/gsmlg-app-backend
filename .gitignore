@@ -24,7 +24,9 @@ erl_crash.dump
 
 # js
 node_modules
-package-lock.json
+
+# Local validation worktrees.
+/.trees/
 
 # devenv
 .devenv

@@ -41,7 +41,7 @@ defmodule GsmlgAppWeb.MixProject do
       {:phoenix_html, "~> 4.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 1.0"},
-      {:phoenix_live_dashboard, "~> 0.8.0"},
+      {:phoenix_live_dashboard, "~> 0.9.1"},
       {:phoenix_duskmoon, "~> 9.0"},
       {:duskmoon_bundler, "~> 9.6"},
       {:floki, "~> 0.38"},
@@ -49,6 +49,7 @@ defmodule GsmlgAppWeb.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~>0.26 or ~> 1.0"},
       {:gsmlg_app, in_umbrella: true},
+      # TODO(upstream): gsmlg-dev/concord#93 - transitive ExTurso musl NIFs block release.
       {:gsmlg_whois, "~> 0.2"},
       {:jason, "~> 1.2"},
       {:bandit, "~> 1.5"},

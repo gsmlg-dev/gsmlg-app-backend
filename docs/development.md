@@ -195,7 +195,7 @@ kill -9 <PID>
 
 ```bash
 # Clean and reinstall frontend dependencies
-rm -rf node_modules npm.lock
+rm -rf node_modules package-lock.json
 mix assets.setup
 mix assets.build
 ```
