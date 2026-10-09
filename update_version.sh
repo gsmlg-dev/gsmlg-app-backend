@@ -3,11 +3,11 @@
 VER=${1:-1.0.0}
 
 FILES=(
-  gsmlg_app/mix.exs
-  gsmlg_app_admin/mix.exs
-  gsmlg_app_admin_web/mix.exs
-  gsmlg_app_component/mix.exs
-  gsmlg_app_web/mix.exs
+  apps/gsmlg_app/mix.exs
+  apps/gsmlg_app_admin/mix.exs
+  apps/gsmlg_app_admin_web/mix.exs
+  apps/gsmlg_app_component/mix.exs
+  apps/gsmlg_app_web/mix.exs
   mix.exs
 )
 
