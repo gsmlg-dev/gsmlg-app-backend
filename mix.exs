@@ -42,8 +42,8 @@ defmodule GsmlgApp.Umbrella.MixProject do
       # Required to run "mix format" on ~H/.heex files from the umbrella root
       {:phoenix_live_view, ">= 1.0.0"},
       {:idna, "~> 7.0"},
-      # TODO(upstream): duskmoon-dev/phoenix-duskmoon-ui#186 - QuickBEAM crashes on Alpine.
-      {:duskmoon_bundler, "~> 9.6"},
+      # Alpine releases require the corrected QuickBEAM musl NIFs.
+      {:duskmoon_bundler, "~> 9.16.11"},
       # Code quality tools
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
