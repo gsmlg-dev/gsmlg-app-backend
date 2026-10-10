@@ -5,6 +5,16 @@ on:
     branches: [ '*' ]
 
 jobs:
+  release-image-checks:
+    name: Release Image Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Test release image verification
+        run: python3 -m unittest discover -s .github/scripts -p 'test_verify_release_images.py'
+
   compile:
     name: Compile
     runs-on: ubuntu-latest

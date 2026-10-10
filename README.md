@@ -165,6 +165,18 @@ docker run -p 4152:4152 \
   gsmlg-app-backend
 ```
 
+The public application is published separately for `linux/amd64` and `linux/arm64`:
+
+```bash
+docker pull ghcr.io/gsmlg-dev/gsmlg-app-public:latest
+```
+
+Version tags use the same repository, for example `gsmlg-app-public:1.1.2`.
+The existing `gsmlg-app-backend:latest-public` and versioned `-public` tags are
+also published. The public image starts `/app/bin/gsmlg_app start` on port 4152.
+Publication verifies architecture manifests, image contents, source/version labels,
+consumer pulls, and public startup on both architectures before creating a release.
+
 ### Releases
 
 Create production releases:
