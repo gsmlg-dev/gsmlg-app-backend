@@ -55,6 +55,11 @@ jobs:
         if: steps.check.outputs.skip != 'true'
         uses: actions/checkout@v5
 
+      - name: Read source revision
+        if: steps.check.outputs.skip != 'true'
+        id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Set up QEMU
         if: steps.check.outputs.skip != 'true'
         uses: docker/setup-qemu-action@v3
@@ -76,8 +81,9 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          context: git
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          labels: |
+            org.opencontainers.image.revision=${{ steps.source.outputs.sha }}
           tags: |
             type=raw,value=${{ github.event.inputs.version }}${{ matrix.tag_suffix }}
             type=raw,value=latest${{ matrix.latest_suffix }}
