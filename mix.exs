@@ -4,7 +4,7 @@ defmodule GsmlgApp.Umbrella.MixProject do
   def project do
     [
       apps_path: "apps",
-      version: "1.1.2",
+      version: "1.1.3",
       start_permanent: Mix.env() == :prod,
       listeners: [Phoenix.CodeReloader],
       deps: deps(),
