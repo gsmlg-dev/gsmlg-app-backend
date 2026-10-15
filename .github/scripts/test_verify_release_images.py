@@ -6,7 +6,9 @@ import hashlib
 import http.server
 import io
 import json
+import os
 import subprocess
+import sys
 import threading
 import unittest
 from unittest import mock
@@ -297,17 +299,39 @@ class SmokeTests(unittest.TestCase):
                 readiness_timeout=0.04, poll_interval=0.005,
             )
 
-    def test_ready_consumer_is_removed_and_has_required_runtime_secrets(self):
+    def test_ready_consumer_is_removed_and_has_only_public_runtime_environment(self):
         self.smoke()
         self.assertFalse(self.docker.containers)
         self.assertEqual(len(self.docker.removed), 1)
         args = self.docker.start_arguments
         environment = dict(item.split("=", 1) for item in args if "=" in item)
-        for key in ("SECRET_KEY_BASE", "ADMIN_SECRET_KEY_BASE", "TOKEN_SIGNING_SECRET"):
-            self.assertGreaterEqual(len(environment[key]), 64)
-        self.assertIn("DATABASE_URL", environment)
+        self.assertGreaterEqual(len(environment["SECRET_KEY_BASE"]), 64)
+        self.assertEqual(set(environment), {"SECRET_KEY_BASE", "PORT", "PHX_SERVER"})
         self.assertEqual(args[args.index("--platform") + 1], "linux/arm64")
         self.assertIn("127.0.0.1::4152", args)
+
+    def test_public_command_removes_credentials_inherited_from_the_image(self):
+        self.smoke()
+        reference = REPOSITORY + "@" + digest("public")
+        args = self.docker.start_arguments
+        command = args[args.index(reference) + 1:]
+        self.assertEqual(command, [
+            "env", "-u", "ADMIN_SECRET_KEY_BASE", "-u", "TOKEN_SIGNING_SECRET",
+            "-u", "DATABASE_URL", "/app/bin/gsmlg_app", "start",
+        ])
+        inherited = dict(PATH=os.environ.get("PATH", os.defpath),
+                         ADMIN_SECRET_KEY_BASE="image-admin-secret",
+                         TOKEN_SIGNING_SECRET="image-token-secret",
+                         DATABASE_URL="ecto://image/database", SECRET_KEY_BASE="public-secret")
+        probe = subprocess.run(
+            [*command[:-2], sys.executable, "-c",
+             "import json, os; print(json.dumps(dict(os.environ)))"],
+            env=inherited, capture_output=True, text=True, check=True,
+        )
+        environment = json.loads(probe.stdout)
+        for key in ("ADMIN_SECRET_KEY_BASE", "TOKEN_SIGNING_SECRET", "DATABASE_URL"):
+            self.assertNotIn(key, environment)
+        self.assertEqual(environment["SECRET_KEY_BASE"], "public-secret")
 
     def test_http_failure_is_bounded_and_removes_consumer(self):
         self.status = 503

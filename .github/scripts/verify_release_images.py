@@ -180,20 +180,23 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 def smoke_public(docker, reference, platform, *, readiness_timeout=120, poll_interval=1):
     """Boot a public release without a database and always remove its container."""
     name = "gsmlg-release-smoke-" + uuid.uuid4().hex[:16]
-    environment = {key: secrets.token_urlsafe(64) for key in SECRET_NAMES}
-    environment.update(
-        DATABASE_URL="ecto://release:release@127.0.0.1/release",
-        PORT="4152",
-        ADMIN_PORT="4153",
-        PHX_SERVER="true",
-    )
+    environment = {
+        "SECRET_KEY_BASE": secrets.token_urlsafe(64),
+        "PORT": "4152",
+        "PHX_SERVER": "true",
+    }
     arguments = [
         "run", "--detach", "--name", name, "--platform", platform,
         "--pull", "never", "--publish", "127.0.0.1::4152",
     ]
     for key, value in environment.items():
         arguments.extend(["--env", f"{key}={value}"])
-    arguments.append(reference)
+    # Remove image ENV defaults too, so excluded applications cannot borrow
+    # placeholder credentials and hide a public-release dependency regression.
+    arguments.extend([
+        reference, "env", "-u", "ADMIN_SECRET_KEY_BASE", "-u", "TOKEN_SIGNING_SECRET",
+        "-u", "DATABASE_URL", "/app/bin/gsmlg_app", "start",
+    ])
     failure = None
     try:
         docker.run(arguments)
@@ -224,7 +227,8 @@ def smoke_public(docker, reference, platform, *, readiness_timeout=120, poll_int
         if failure:
             try:
                 logs = docker.run(["logs", "--tail", "80", name], timeout=10, check=False)
-                print(redact(logs, (environment[key] for key in SECRET_NAMES)), file=sys.stderr)
+                print(redact(logs, (environment[key] for key in SECRET_NAMES if key in environment)),
+                      file=sys.stderr)
             except VerificationError:
                 pass
         try:

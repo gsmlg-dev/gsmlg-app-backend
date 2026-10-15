@@ -1,10 +1,13 @@
 import Config
 
-config :gsmlg_app_admin, :backplane,
-  server_url: System.get_env("BACKPLANE_SERVER_URL", "http://localhost:4220"),
-  auth_token: System.get_env("BACKPLANE_AUTH_TOKEN") || System.get_env("BACKPLANE_API_KEY")
+# Release applications are loaded before runtime configuration is evaluated.
+if Application.spec(:gsmlg_app_admin, :vsn) != nil do
+  config :gsmlg_app_admin, :backplane,
+    server_url: System.get_env("BACKPLANE_SERVER_URL", "http://localhost:4220"),
+    auth_token: System.get_env("BACKPLANE_AUTH_TOKEN") || System.get_env("BACKPLANE_API_KEY")
+end
 
-if config_env() == :prod do
+if config_env() == :prod and Application.spec(:gsmlg_app_web, :vsn) != nil do
   secret_key_base =
     System.get_env("SECRET_KEY_BASE") ||
       raise """
@@ -21,7 +24,9 @@ if config_env() == :prod do
       port: String.to_integer(System.get_env("PORT") || "4152")
     ],
     secret_key_base: secret_key_base
+end
 
+if config_env() == :prod and Application.spec(:gsmlg_app_admin, :vsn) != nil do
   database_url =
     System.get_env("DATABASE_URL") ||
       raise """
@@ -38,6 +43,21 @@ if config_env() == :prod do
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     socket_options: maybe_ipv6
 
+  # Configure Ash Authentication JWT signing secret for production
+  jwt_signing_secret =
+    System.get_env("TOKEN_SIGNING_SECRET") ||
+      raise """
+      environment variable TOKEN_SIGNING_SECRET is missing.
+      Generate one with: openssl rand -base64 64
+      """
+
+  config :ash_authentication,
+    token_signing_secret: jwt_signing_secret
+
+  config :ash_authentication, :jwt, signing_secret: jwt_signing_secret
+end
+
+if config_env() == :prod and Application.spec(:gsmlg_app_admin_web, :vsn) != nil do
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
   # want to use a different value for prod and you most likely don't want
@@ -58,17 +78,4 @@ if config_env() == :prod do
       port: String.to_integer(System.get_env("ADMIN_PORT") || "4153")
     ],
     secret_key_base: secret_key_base
-
-  # Configure Ash Authentication JWT signing secret for production
-  jwt_signing_secret =
-    System.get_env("TOKEN_SIGNING_SECRET") ||
-      raise """
-      environment variable TOKEN_SIGNING_SECRET is missing.
-      Generate one with: openssl rand -base64 64
-      """
-
-  config :ash_authentication,
-    token_signing_secret: jwt_signing_secret
-
-  config :ash_authentication, :jwt, signing_secret: jwt_signing_secret
 end
