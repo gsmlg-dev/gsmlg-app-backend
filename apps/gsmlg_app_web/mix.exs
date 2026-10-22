@@ -51,7 +51,8 @@ defmodule GsmlgAppWeb.MixProject do
       {:gsmlg_app, in_umbrella: true},
       {:gsmlg_whois, "~> 0.2"},
       {:jason, "~> 1.2"},
-      {:bandit, "~> 1.5"},
+      {:gaoxy_http, "~> 0.11.0"},
+      {:websock_adapter, "~> 0.11.0", hex: :gaoxy_websock_adapter, override: true},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]

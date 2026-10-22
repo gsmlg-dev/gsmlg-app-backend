@@ -16,12 +16,12 @@ This is an Elixir umbrella project consisting of multiple applications:
 
 ### Technology Stack
 
-- **Elixir 1.14+** - Core language and OTP
+- **Elixir 1.18+** - Core language and OTP
 - **Phoenix 1.8** - Web framework
 - **Phoenix LiveView** - Real-time web UI
 - **Ash Framework** - Data modeling and management
 - **PostgreSQL** - Primary database (admin app)
-- **Bandit** - HTTP server
+- **Gaoxy (`gaoxy_http` 0.11)** - Phoenix HTTP and WebSocket server
 - **DuskmoonBundler** - Frontend asset bundling and Tailwind compilation
 - **Swoosh** - Email library
 
@@ -56,7 +56,7 @@ Default locale is `en`
 
 ## Prerequisites
 
-- Elixir 1.14+
+- Elixir 1.18+
 - Erlang/OTP 25+
 - PostgreSQL 13+
 
@@ -126,6 +126,30 @@ mix phx.server -s gsmlg_app
 - `mix test apps/app_name/test/path/to_test.exs:line` - Run specific test line
 
 ## Configuration
+
+Both web endpoints use `Gaoxy.PhoenixAdapter` from the published `gaoxy_http`
+0.11 package. Phoenix's `:websock_adapter` dependency is overridden with the
+matching `gaoxy_websock_adapter` Hex package to support native WebSocket
+upgrades. Each web app declares this pair; the umbrella root also keeps the
+adapter override because its asset tooling pulls in Phoenix. Keep the root
+override and both web apps' dependencies aligned when updating the server.
+
+Each endpoint lists its existing `/live/websocket` socket in `websocket_paths`.
+The listener continues to use the existing development ports (4152 public,
+4153 admin) and production `PORT` / `ADMIN_PORT` settings, including the
+production IPv6 wildcard bind. Phoenix still manages routing, sessions,
+origin checks, and LiveView. HTTP/2 WebSocket extended CONNECT remains disabled
+unless explicitly enabled in the listener configuration.
+
+Both HTTP listeners retain the endpoints' 10 MiB request body limit. Each has
+an explicit 32 MiB service admission byte budget to allow the body parser's
+temporary copies; this budget is shared by active connections, not preallocated.
+
+The admin HTTP listener sets `http_limits.stream_timeout: :infinity` so active
+OpenAI and Anthropic SSE responses can continue until application completion.
+The controllers retain their 120-second idle timeout. Ordinary responses keep
+the finite request deadline; header acquisition, body reads, individual writes,
+and server shutdown also retain their finite limits.
 
 Configuration files are located in the `config/` directory:
 - `config.exs` - Base configuration

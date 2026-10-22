@@ -41,6 +41,7 @@ defmodule GsmlgApp.Umbrella.MixProject do
     [
       # Required to run "mix format" on ~H/.heex files from the umbrella root
       {:phoenix_live_view, ">= 1.0.0"},
+      {:websock_adapter, "~> 0.11.0", hex: :gaoxy_websock_adapter, override: true},
       {:idna, "~> 7.0"},
       # Alpine releases require the corrected QuickBEAM musl NIFs.
       {:duskmoon_bundler, "~> 9.16.11"},

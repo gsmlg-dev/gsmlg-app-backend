@@ -14,7 +14,12 @@ config :gsmlg_app_web,
 
 # Configures the endpoint
 config :gsmlg_app_web, GsmlgAppWeb.Endpoint,
-  adapter: Bandit.PhoenixAdapter,
+  adapter: Gaoxy.PhoenixAdapter,
+  websocket_paths: ["/live/websocket"],
+  http: [
+    http_limits: %{max_body_bytes: 10_485_760},
+    limits: %{max_bytes: 33_554_432}
+  ],
   url: [host: "localhost"],
   render_errors: [
     formats: [html: GsmlgAppWeb.ErrorHTML, json: GsmlgAppWeb.ErrorJSON],
@@ -92,7 +97,12 @@ config :gsmlg_app_admin_web,
 
 # Configures the endpoint
 config :gsmlg_app_admin_web, GsmlgAppAdminWeb.Endpoint,
-  adapter: Bandit.PhoenixAdapter,
+  adapter: Gaoxy.PhoenixAdapter,
+  websocket_paths: ["/live/websocket"],
+  http: [
+    http_limits: %{max_body_bytes: 10_485_760, stream_timeout: :infinity},
+    limits: %{max_bytes: 33_554_432}
+  ],
   url: [host: "localhost"],
   render_errors: [
     formats: [html: GsmlgAppAdminWeb.ErrorHTML, json: GsmlgAppAdminWeb.ErrorJSON],
