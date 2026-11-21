@@ -67,7 +67,7 @@ defmodule GsmlgAppAdminWeb do
   def html do
     quote do
       use Phoenix.Component
-      use PhoenixDuskmoon.Component
+      use DuskmoonPhoenix.Component
 
       # Import convenience functions from controllers
       import Phoenix.Controller,
@@ -83,7 +83,7 @@ defmodule GsmlgAppAdminWeb do
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components and translation
-      use PhoenixDuskmoon.Component
+      use DuskmoonPhoenix.Component
       use Gettext, backend: GsmlgAppAdminWeb.Gettext
 
       import GsmlgAppComponent.App

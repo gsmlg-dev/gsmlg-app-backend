@@ -10,7 +10,8 @@
   "author": "Jonathan Gao",
   "license": "ISC",
   "dependencies": {
-    "@duskmoon-dev/core": "^1.20.7",
+    "@duskmoon-dev/core": "2.0.0-rc.2",
+    "duskmoon_phoenix": "2.0.0-rc.2",
     "phoenix_html": "file:../../deps/phoenix_html"
   },
   "devDependencies": {

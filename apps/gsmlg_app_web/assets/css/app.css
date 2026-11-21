@@ -3,16 +3,16 @@
 @source "../../lib/*_web/**/*.*ex";
 @source "../../../gsmlg_app_component/assets/**/*.js";
 @source "../../../gsmlg_app_component/lib/**/*.*ex";
-@source "../../../../deps/phoenix_duskmoon/lib/phoenix_duskmoon/**/*.*ex";
+@source "../../../../deps/duskmoon_phoenix/lib/**/*.*ex";
 
-@import "tailwindcss";
+@layer properties, theme, base, components, utilities;
+@import "duskmoon_phoenix/css";
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
 @plugin "@tailwindcss/typography";
 @plugin "@duskmoon-dev/core/plugin";
-@import "@duskmoon-dev/core/themes/sunshine";
-@import "@duskmoon-dev/core/themes/moonlight";
-@import "@duskmoon-dev/core/components";
 
-/* Responsive display utilities used by PhoenixDuskmoon dependency templates. */
+/* Responsive display utilities used by DuskmoonPhoenix dependency templates. */
 @media (width >= 40rem) {
   .sm\:flex { display: flex; }
   .sm\:inline { display: inline; }

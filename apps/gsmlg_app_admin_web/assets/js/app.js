@@ -4,7 +4,7 @@ import { Socket } from "phoenix"
 import { LiveSocket } from "phoenix_live_view"
 
 // Import duskmoon LiveView hooks
-import * as DuskmoonHooks from "phoenix_duskmoon/hooks"
+import * as DuskmoonHooks from "duskmoon_phoenix/hooks"
 
 // Custom web component for collapsible thinking box
 // Maintains collapse state across LiveView updates

@@ -6,7 +6,7 @@ defmodule GsmlgAppAdminWeb.AiProviderLive.Components do
   """
 
   use Phoenix.Component
-  use PhoenixDuskmoon.Component
+  use DuskmoonPhoenix.Component
   use GsmlgAppAdminWeb, :verified_routes
 
   @menu_sections [

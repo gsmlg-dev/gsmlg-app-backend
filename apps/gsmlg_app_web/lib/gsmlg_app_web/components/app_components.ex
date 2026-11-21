@@ -1,9 +1,9 @@
 defmodule GsmlgAppWeb.AppComponents do
   @moduledoc """
-  Provides APP UI components using phoenix_duskmoon v9 design system.
+  Provides app UI components using the Duskmoon Phoenix design system.
   """
   use Phoenix.Component
-  use PhoenixDuskmoon.Component
+  use DuskmoonPhoenix.Component
 
   use Gettext, backend: GsmlgAppWeb.Gettext
 

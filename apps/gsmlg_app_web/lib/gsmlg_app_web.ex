@@ -103,7 +103,7 @@ defmodule GsmlgAppWeb do
   def html do
     quote do
       use Phoenix.Component
-      use PhoenixDuskmoon.Component
+      use DuskmoonPhoenix.Component
 
       # Import convenience functions from controllers
       import Phoenix.Controller,
@@ -122,7 +122,7 @@ defmodule GsmlgAppWeb do
       import GsmlgAppWeb.AppComponents
       use Gettext, backend: GsmlgAppWeb.Gettext
 
-      use PhoenixDuskmoon.Component
+      use DuskmoonPhoenix.Component
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS

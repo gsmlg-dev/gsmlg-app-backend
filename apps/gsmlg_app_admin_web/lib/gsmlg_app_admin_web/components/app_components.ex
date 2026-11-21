@@ -4,7 +4,7 @@ defmodule GsmlgAppAdminWeb.AppComponents do
 
   """
   use Phoenix.Component
-  use PhoenixDuskmoon.Component
+  use DuskmoonPhoenix.Component
 
   use Gettext, backend: GsmlgAppAdminWeb.Gettext
 

@@ -40,7 +40,7 @@ config :duskmoon_bundler, :gsmlg_app_web,
       %{base: "apps/gsmlg_app_web/lib/", pattern: "**/*.{ex,heex,eex}"},
       %{base: "apps/gsmlg_app_web/assets/", pattern: "**/*.{js,ts,jsx,tsx}"},
       %{base: "apps/gsmlg_app_component/lib/", pattern: "**/*.{ex,heex,eex}"},
-      %{base: "deps/phoenix_duskmoon/lib/", pattern: "**/*.{ex,heex,eex}"}
+      %{base: "deps/duskmoon_phoenix/lib/", pattern: "**/*.{ex,heex,eex}"}
     ]
   ],
   server: [
@@ -64,7 +64,7 @@ config :duskmoon_bundler, :gsmlg_app_admin_web,
       %{base: "apps/gsmlg_app_admin_web/lib/", pattern: "**/*.{ex,heex,eex}"},
       %{base: "apps/gsmlg_app_admin_web/assets/", pattern: "**/*.{js,ts,jsx,tsx}"},
       %{base: "apps/gsmlg_app_component/lib/", pattern: "**/*.{ex,heex,eex}"},
-      %{base: "deps/phoenix_duskmoon/lib/", pattern: "**/*.{ex,heex,eex}"}
+      %{base: "deps/duskmoon_phoenix/lib/", pattern: "**/*.{ex,heex,eex}"}
     ]
   ],
   server: [

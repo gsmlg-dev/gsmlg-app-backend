@@ -21,7 +21,8 @@ This is an Elixir umbrella project consisting of multiple applications:
 - **Phoenix LiveView** - Real-time web UI
 - **Ash Framework** - Data modeling and management
 - **PostgreSQL** - Primary database (admin app)
-- **Gaoxy (`gaoxy_http` 0.11)** - Phoenix HTTP and WebSocket server
+- **Gaoxy (`gaoxy_http`)** - Phoenix HTTP and WebSocket server
+- [**Duskmoon Phoenix**](https://github.com/duskmoon-dev/duskmoon-web) - Phoenix UI components and assets, pinned to the same Duskmoon Web 2.0 RC on Hex and npm
 - **DuskmoonBundler** - Frontend asset bundling and Tailwind compilation
 - **Swoosh** - Email library
 
@@ -59,6 +60,10 @@ Default locale is `en`
 - Elixir 1.18+
 - Erlang/OTP 25+
 - PostgreSQL 13+
+
+Linux GNU asset builds with DuskMoon Bundler 10 require its Ubuntu 26.04
+glibc baseline (2.43); see the [upstream platform requirement](https://github.com/duskmoon-dev/duskmoon-bundler/issues/9#issuecomment-6396025627).
+The Dockerfile's Alpine builder uses the separate musl native artifacts.
 
 ## Installation
 
@@ -128,7 +133,7 @@ mix phx.server -s gsmlg_app
 ## Configuration
 
 Both web endpoints use `Gaoxy.PhoenixAdapter` from the published `gaoxy_http`
-0.11 package. Phoenix's `:websock_adapter` dependency is overridden with the
+package (`~> 0.12`). Phoenix's `:websock_adapter` dependency is overridden with the
 matching `gaoxy_websock_adapter` Hex package to support native WebSocket
 upgrades. Each web app declares this pair; the umbrella root also keeps the
 adapter override because its asset tooling pulls in Phoenix. Keep the root

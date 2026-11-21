@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Elixir umbrella project for the GSMLG platform backend. Phoenix 1.8 + LiveView 1.1 + Ash Framework 3.x. See `AGENTS.md` for full command reference and code style guidelines.
+Elixir umbrella project for the GSMLG platform backend. Phoenix 1.8 + LiveView 1.2 + Ash Framework 3.x. See `AGENTS.md` for full command reference and code style guidelines.
 
 ## Applications
 
@@ -12,7 +12,7 @@ Elixir umbrella project for the GSMLG platform backend. Phoenix 1.8 + LiveView 1
 - **`gsmlg_app_web`** - Public web interface (apps listing, WHOIS API, static pages)
 - **`gsmlg_app_admin`** - Admin backend: Ash domains, resources, business logic
 - **`gsmlg_app_admin_web`** - Admin web interface with auth (port 4153)
-- **`gsmlg_app_component`** - Shared Phoenix components (phoenix_duskmoon)
+- **`gsmlg_app_component`** - Shared Phoenix components
 
 ## Essential Commands
 
@@ -33,7 +33,7 @@ CI runs four parallel checks on every push: compile (warnings-as-errors), format
 
 ## Technology Stack
 
-- Elixir 1.18+ / Erlang/OTP 28 + Phoenix 1.8 + LiveView 1.1
+- Elixir 1.18+ / Erlang/OTP 28 + Phoenix 1.8 + LiveView 1.2
 - Ash Framework 3.x with AshPostgres + AshAuthentication
 - PostgreSQL (UUID primary keys), Gaoxy HTTP server
 - DuskmoonBundler + Tailwind CSS + @duskmoon-dev/core for frontend assets
@@ -78,24 +78,9 @@ Router:  live "/things",         ThingLive.Index, :index
 
 ## UI Library
 
-This project uses the DuskMoon UI system:
+Both web apps use Duskmoon Web 2.0 RC. Keep `duskmoon_phoenix` and the npm Duskmoon packages pinned to the same release. Follow the `duskmoon-phoenix` skill for components, hooks and asset imports.
 
-- **`phoenix_duskmoon`** — Phoenix LiveView UI component library (primary web UI)
-- **`@duskmoon-dev/core`** — Core Tailwind CSS plugin and utilities
-- **`@duskmoon-dev/css-art`** — CSS art utilities
-- **`@duskmoon-dev/elements`** — Base web components
-- **`@duskmoon-dev/art-elements`** — Art/decorative web components
-
-Do NOT use DaisyUI or other CSS component libraries. Do NOT use `core_components.ex` — use `phoenix_duskmoon` components instead.
-Use `@duskmoon-dev/core/plugin` as the Tailwind CSS plugin.
-
-**CSS setup** (in each app's `assets/css/app.css`):
-```css
-@plugin "@duskmoon-dev/core/plugin";       /* Registers color tokens as Tailwind utilities */
-@import "@duskmoon-dev/core/themes/sunshine"; /* Light theme */
-@import "@duskmoon-dev/core/themes/moonlight"; /* Dark theme */
-@import "@duskmoon-dev/core/components";      /* All component styles */
-```
+Use `DuskmoonPhoenix.Component` for HEEx and Duskmoon as the sole CSS component library. The stylesheets import `duskmoon_phoenix/css` for component styles and both themes. The `@duskmoon-dev/core/plugin` registers tokens for application Tailwind utilities.
 
 **Component conventions:**
 - Phoenix components prefixed with `.dm_` (e.g., `.dm_modal`, `.dm_mdi`)
@@ -105,15 +90,7 @@ Use `@duskmoon-dev/core/plugin` as the Tailwind CSS plugin.
 
 ### Reporting issues or feature requests
 
-If you encounter missing features, bugs, or need functionality not yet available in any DuskMoon package, open a GitHub issue in the appropriate repository with the label `internal request`:
-
-- **`phoenix_duskmoon`** — https://github.com/gsmlg-dev/phoenix_duskmoon/issues
-- **`@duskmoon-dev/core`** — https://github.com/gsmlg-dev/duskmoon-dev/issues
-- **`@duskmoon-dev/css-art`** — https://github.com/gsmlg-dev/duskmoon-dev/issues
-- **`@duskmoon-dev/elements`** — https://github.com/gsmlg-dev/duskmoon-dev/issues
-- **`@duskmoon-dev/art-elements`** — https://github.com/gsmlg-dev/duskmoon-dev/issues
-
-Do NOT silently work around library bugs with local hacks. File the issue first, then add a temporary workaround in `app.css` with a comment referencing the issue URL.
+Follow the upstream dependency policy in `AGENTS.md` for issues with Phoenix, Core, Elements and CSS Art packages from Duskmoon Web. [Duskmoon Web issues](https://github.com/duskmoon-dev/duskmoon-web/issues)
 
 ## Apps Management: Dual-Layer Cache
 

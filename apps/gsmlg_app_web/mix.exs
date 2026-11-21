@@ -41,9 +41,9 @@ defmodule GsmlgAppWeb.MixProject do
       {:phoenix_html, "~> 4.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 1.0"},
-      {:phoenix_live_dashboard, "~> 0.9.1"},
-      {:phoenix_duskmoon, "~> 9.16.11"},
-      {:duskmoon_bundler, "~> 9.16.11"},
+      {:phoenix_live_dashboard, "~> 0.9"},
+      {:duskmoon_phoenix, "2.0.0-rc.2"},
+      {:duskmoon_bundler, "~> 10.0"},
       {:floki, "~> 0.38"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
@@ -51,8 +51,8 @@ defmodule GsmlgAppWeb.MixProject do
       {:gsmlg_app, in_umbrella: true},
       {:gsmlg_whois, "~> 0.2"},
       {:jason, "~> 1.2"},
-      {:gaoxy_http, "~> 0.11.0"},
-      {:websock_adapter, "~> 0.11.0", hex: :gaoxy_websock_adapter, override: true},
+      {:gaoxy_http, "~> 0.12"},
+      {:websock_adapter, "~> 0.12", hex: :gaoxy_websock_adapter, override: true},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
