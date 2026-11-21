@@ -160,6 +160,22 @@ class ImageVerificationTests(unittest.TestCase):
         with self.assertRaisesRegex(verifier.VerificationError, "config"):
             self.verify(target="public")
 
+    def test_containerd_image_id_can_match_the_child_manifest_digest(self):
+        reference = self.child()
+        child_digest = reference.split("@", 1)[1]
+        self.docker.images[reference].update(
+            Id=child_digest, Descriptor={"digest": child_digest}
+        )
+        self.assertEqual(self.verify(target="public")["public"]["linux/amd64"], reference)
+
+    def test_containerd_image_descriptor_must_match_the_child_manifest(self):
+        reference = self.child()
+        self.docker.images[reference].update(
+            Id=reference.split("@", 1)[1], Descriptor={"digest": digest("unrelated manifest")}
+        )
+        with self.assertRaisesRegex(verifier.VerificationError, "manifest"):
+            self.verify(target="public")
+
     def test_both_platforms_are_required(self):
         for tag in (VERSION + "-public", "latest-public"):
             self.docker.manifests[REPOSITORY + ":" + tag]["manifests"].pop()

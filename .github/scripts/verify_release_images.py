@@ -131,8 +131,13 @@ def verify_children(docker, repository, index, version, source_sha, release):
         if not isinstance(images, list) or len(images) != 1:
             raise VerificationError(f"{reference}: expected one pulled image config")
         image = images[0]
-        if image.get("Id") != config_digest:
-            raise VerificationError(f"{reference}: pulled config differs from child manifest")
+        # The classic store identifies the config. The containerd store
+        # identifies the manifest that binds the config and layers.
+        image_id = image.get("Id")
+        descriptor = image.get("Descriptor") or {}
+        manifest_matches = image_id == child_digest and descriptor.get("digest") == child_digest
+        if image_id != config_digest and not manifest_matches:
+            raise VerificationError(f"{reference}: pulled config or manifest digest differs")
         if f"{image.get('Os')}/{image.get('Architecture')}" != platform:
             raise VerificationError(f"{reference}: pulled platform differs from index")
         config = image.get("Config") or {}
