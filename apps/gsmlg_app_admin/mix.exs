@@ -4,7 +4,7 @@ defmodule GsmlgAppAdmin.MixProject do
   def project do
     [
       app: :gsmlg_app_admin,
-      version: "1.1.3",
+      version: "1.2.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
